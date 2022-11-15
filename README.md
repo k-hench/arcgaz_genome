@@ -14,7 +14,7 @@ data/
 └── genomes
     ├── arcgaz_dt_h1.fa.gz # haplotype 1 from the dovetail assembly
     ├── arcgaz_dt_h2.fa.gz # haplotype 2 from the dovetail assembly
-    ├── arcgaz_v1.fa.gz    # the old arc gaz reference genome
+    ├── arcgaz_v1.fa.gz    # the old antarctic fur seal reference genome
     └── zalcal_v1.fa.gz    # the california sea lion reference genome
 ```
 
