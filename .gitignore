@@ -1,0 +1,21 @@
+# exclude hidden R profile files
+.Rproj.user
+
+# exclude data but keep summaries/ config tables
+data/*
+
+# exclude quarto compilation side-products but track reports
+qmd/*
+!qmd/*.qmd
+.quarto/
+styles*
+!styles.scss
+
+# exclude nextflow logs and cache
+nf/*/*
+!nf/*/*.nf
+
+# exclude results by default
+results/*
+
+/.quarto/
