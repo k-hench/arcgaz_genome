@@ -10,6 +10,7 @@ Due to their size, the actual genomes are currently not tracked within the git r
 The following data setup is expected:
 
 ```sh
+data/
 └── genomes
     ├── arcgaz_dt_h1.fa.gz # haplotype 1 from the dovetail assembly
     ├── arcgaz_dt_h2.fa.gz # haplotype 2 from the dovetail assembly
