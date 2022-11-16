@@ -3,6 +3,8 @@
 
 # exclude data but keep summaries/ config tables
 data/*
+!data/metadata
+data/metadata/*
 !data/metadata/*.yml
 
 # exclude quarto compilation side-products but track reports

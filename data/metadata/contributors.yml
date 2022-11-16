@@ -1,0 +1,10 @@
+# project contributions for
+project_name: "arcgaz_genome"
+contributors:
+  - "Kosmas Hench":
+    role: "creator / author"
+    contributions_start:
+      - 2022-11-16: "initalization of the project"
+contributors:
+  - "David Vendrami":
+    role: "creator / author"
