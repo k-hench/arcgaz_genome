@@ -1,0 +1,3 @@
+<img src="img/dummy" align="right" alt="" width="160" />
+
+# Index {.unnumbered}
