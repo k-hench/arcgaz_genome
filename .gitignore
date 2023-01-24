@@ -21,4 +21,7 @@ nf/*/*
 # exclude results by default
 results/*
 
+
+.snakemake/
+
 /.quarto/

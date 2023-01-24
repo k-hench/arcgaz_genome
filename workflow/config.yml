@@ -1,0 +1,9 @@
+ref: arcgaz_dt_h1
+
+queries:
+  - arcgaz_dt_h2
+  - arcgaz_v1
+  - zalcal_v1
+
+lastParams: "-m 1 -j 3 -u 1 -p HOXD70"
+# lastParams: "-j 3"

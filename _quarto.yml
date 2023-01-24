@@ -6,7 +6,7 @@ engine: knitr
 
 book:
   title: "arcgaz_genome"
-  author: "Kosmas Hench"
+  author: "David Vendrami and Kosmas Hench"
   date: "2022-11-16"
   chapters:
     - index.qmd
@@ -15,7 +15,7 @@ book:
     search: true
     right:
       - icon: github
-        href: https://github.com/
+        href: https://github.com/k-hench/arcgaz_genome
   favicon: img/dummy.svg
 bibliography: references.bib
 

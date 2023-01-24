@@ -51,6 +51,7 @@
 // // ----- Config section -----
 params.base = "${baseDir}/../.."
 params.outdir = "${params.base}/results"
+params.genomedir = "${params.base}/data/genomes"
 // // color logging
 ( c0, c1, c2 ) = [ "\033[0m", "\033[0;32m", "\033[1;30m" ]
 // ```
@@ -65,6 +66,7 @@ ${c1}Author:${c0} Kosmas Hench
 -----------------------------------
 ${c1}base_dir${c0}        : ${params.base}
 ${c1}params.outdir${c0}   : ${params.outdir}
+${c1}params.genomedir${c0}   : ${params.genomedir}
 """
 // ```
 //
@@ -81,28 +83,30 @@ nextflow.enable.dsl = 2
 // ```groovy
 // // ----- workflow components -----
 Channel
-  .from( "in" )
-  .set{ start_ch }
+  .from( [ h1: "arcgaz_dt_h1",
+          h2: "arcgaz_dt_h2",
+          v1: "arcgaz_v1.fa.gz",
+          zc: "zalcal_v1.fa.gz"] )
+  .set{ all_genomes_ch }
 // ```
 //
-//
+// Before the alignment, we need to create a database for the reference genome using `lastdb`.
 //
 // ```groovy
-process first_process {
-  publishDir "${params.outdir}/test", mode: 'copy', pattern: "*.tsv"
-  label "Q_def_test_c_qc"
-  memory '1. GB'
+process create_last_db {
+  publishDir "${params.genomedir}/", mode: 'copy'
+  label "Q_lastdb_c_map"
+  memory '10. GB'
 
   input:
-  val( in )
+  val( ref )
 
   output:
-  file( "test.*" )
+  file( "${ref}_db*" )
 
   script:
   """
-  echo "${in}" > test.txt
-  echo "${in}" > test.tsv
+  lastdb -c ${ref}_db ${params.genomedir}/${ref}.fa.gz
   """
 }
 // ```
@@ -114,7 +118,9 @@ process first_process {
 // // ----- run workflow -----
 workflow {
   main:
-  start_ch| first_process
+  refrence_genome_ch = all_genomes_ch.map{ it["h1"] }
+  mapped_genomes_ch = all_genomes_ch.map{ [ it["h2"], it["v1"], it["zc"] ] }
+  refrence_genome_ch | create_last_db
 }
 // ```
 //
