@@ -129,6 +129,8 @@ rule lastz_align:
       dplot = "results/lastz/dplot/{species}.tsv"
     log:
       'logs/lastz_{species}.log'
+    conda:
+      'map_align'
     shell:
       """
       mkdir -p tmp
