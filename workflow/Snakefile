@@ -40,8 +40,7 @@ container: "docker://khench/msa_envs:v0.1"
 
 rule all:
     input:
-        "img/alignment.svg",
-        "img/lastz_alignments.svg"
+        "img/alignment.svg"
 
 rule lastdb_index:
     input:
