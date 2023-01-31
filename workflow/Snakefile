@@ -89,10 +89,11 @@ rule align_single_last:
       fastaFile = "data/genomes/{species}.fa.gz",
       speciesSizeFile = 'results/genome/{species}.size',
     output:
-      maf = 'results/maf/{species}.maf'
+      maf = 'results/maf/{species}.maf.gz'
     params:
       indexBase = 'data/genomes/{ref}'.format( ref = config[ 'ref' ] ),
-      lastParams = config[ 'lastParams' ]
+      lastParams = config[ 'lastParams' ],
+      mafBase = 'results/maf/{species}.maf'
     log:
       'logs/{species}_align.log'
     conda:
@@ -100,15 +101,17 @@ rule align_single_last:
     threads: 1
     shell:
       """
-      lastal {params.lastParams} {params.indexBase} {input.fastaFile} 2>{log} 1>{output.maf}
-      maf-convert psl {output.maf} 2>{log} 1>{output.psl}
+      lastal {params.lastParams} {params.indexBase} {input.fastaFile} 2>{log} 1>{params.mafBase}
+      gzip {params.mafBase}
       """
 
 rule maf_to_psl:
     input:
-      maf = 'results/maf/{species}.maf'
+      maf = 'results/maf/{species}.maf.gz'
     output:
-      psl = 'results/psl/{species}.psl'
+      psl = 'results/psl/{species}.psl.gz'
+    params:
+      pslBase = 'results/psl/{species}.psl'
     log:
       'logs/{species}_psl.log'
     conda:
@@ -116,12 +119,13 @@ rule maf_to_psl:
     threads: 1
     shell:
       """
-      maf-convert psl {output.maf} 2>{log} 1>{output.psl}
+      zcat {input.maf} | maf-convert psl 2>{log} 1>{params.pslBase}
+      gzip {params.pslBase}
       """
 
 rule plot_alignments:
     input:
-      expand( 'results/psl/{species}.psl', species = config[ "queries" ] )
+      expand( 'results/psl/{species}.psl.gz', species = config[ "queries" ] )
     output:
       "img/alignment.svg"
     log:
