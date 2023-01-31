@@ -89,8 +89,7 @@ rule align_single_last:
       fastaFile = "data/genomes/{species}.fa.gz",
       speciesSizeFile = 'results/genome/{species}.size',
     output:
-      maf = 'results/maf/{species}.maf',
-      psl = 'results/psl/{species}.psl'
+      maf = 'results/maf/{species}.maf'
     params:
       indexBase = 'data/genomes/{ref}'.format( ref = config[ 'ref' ] ),
       lastParams = config[ 'lastParams' ]
@@ -102,6 +101,21 @@ rule align_single_last:
     shell:
       """
       lastal {params.lastParams} {params.indexBase} {input.fastaFile} 2>{log} 1>{output.maf}
+      maf-convert psl {output.maf} 2>{log} 1>{output.psl}
+      """
+
+rule maf_to_psl:
+    input:
+      maf = 'results/maf/{species}.maf'
+    output:
+      psl = 'results/psl/{species}.psl'
+    log:
+      'logs/{species}_psl.log'
+    conda:
+      'msa_align'
+    threads: 1
+    shell:
+      """
       maf-convert psl {output.maf} 2>{log} 1>{output.psl}
       """
 
