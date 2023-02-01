@@ -38,7 +38,7 @@ snakemake \
 '''
 container: "docker://khench/msa_envs:v0.1"
 
-rule all:
+rule alignment:
     input:
         "img/alignment.svg"
 
