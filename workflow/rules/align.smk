@@ -38,7 +38,7 @@ snakemake \
 '''
 container: "docker://khench/msa_envs:v0.1"
 
-rule alignment:
+rule align:
     input:
         "img/alignment.svg"
 
@@ -61,16 +61,16 @@ rule lastdb_index:
 
 rule build_index:
     input:
-      str(rules.lastdb_index.output).format( ref = config[ 'ref' ] ),
+      str(rules.lastdb_index.output).format( ref = G_REF ),
       fastaFile="data/genomes/{species}.fa.gz"
     output:
       "results/genome/{species}.size"
     params:
-      indexBase='data/genomes/{ref}'.format( ref = config[ "ref" ]),
+      indexBase='data/genomes/{ref}'.format( ref = G_REF ),
       speciesSizeFile='results/genome/{species}.size',
       refNibDir='results/genome/nib',
-      refFastaFile="data/genomes/{ref}.fa.gz".format( ref = config[ "ref" ]),
-      refNib2Bit='results/genome/nib/{ref}.2bit'.format( ref = config[ 'ref' ]),
+      refFastaFile="data/genomes/{ref}.fa.gz".format( ref = G_REF ),
+      refNib2Bit='results/genome/nib/{ref}.2bit'.format( ref = G_REF ),
     log:
       'logs/{species}_index.log'
     conda:
@@ -85,13 +85,13 @@ rule build_index:
 
 rule align_single_last:
     input:
-      str(rules.lastdb_index.output).format( ref = config[ 'ref' ] ),
+      str(rules.lastdb_index.output).format( ref = G_REF ),
       fastaFile = "data/genomes/{species}.fa.gz",
       speciesSizeFile = 'results/genome/{species}.size',
     output:
       maf = 'results/maf/{species}.maf.gz'
     params:
-      indexBase = 'data/genomes/{ref}'.format( ref = config[ 'ref' ] ),
+      indexBase = 'data/genomes/{ref}'.format( ref = G_REF ),
       lastParams = config[ 'lastParams' ],
       mafBase = 'results/maf/{species}.maf'
     log:
@@ -123,9 +123,18 @@ rule maf_to_psl:
       gzip {params.pslBase}
       """
 
+rule slim_psl:
+    input: 'results/psl/{species}.psl.gz'
+    output: 'results/psl/{species}-18.psl.gz'
+    shell:
+    """
+    zcat {input} | cut -f 1-18  | gzip > {output}
+    """
+
+
 rule plot_alignments:
     input:
-      expand( 'results/psl/{species}.psl.gz', species = config[ "queries" ] )
+      expand( 'results/psl/{species}-18.psl.gz', species = G_QUERY )
     output:
       "img/alignment.svg"
     log:
@@ -139,7 +148,7 @@ rule plot_alignments:
 rule lastz_align:
     container: "docker://khench/map_align:v0.2"
     input:
-      refFile = "data/genomes/{ref}.fa.gz".format( ref = config[ 'ref' ] ),
+      refFile = "data/genomes/{ref}.fa.gz".format( ref = G_REF ),
       fastaFile = "data/genomes/{species}.fa.gz"
     output:
       maf = "results/lastz/{species}.maf",
@@ -170,7 +179,7 @@ rule lastz_align:
 rule plot_lastz_alignments:
     container: None
     input:
-      lastz_alignments = expand( 'results/lastz/dplot/{species}.tsv', species = config[ "queries" ] ),
+      lastz_alignments = expand( 'results/lastz/dplot/{species}.tsv', species = G_QUERY ),
       genome_sizes = expand( 'results/genome/{x}.size',
        x = [config[ 'ref' ]] + config[ 'queries' ] )
     output:

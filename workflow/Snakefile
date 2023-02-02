@@ -1,0 +1,45 @@
+'''
+snakemake \
+  -p -j 5 \
+  --configfile workflow/config.yml \
+  -R complete
+
+snakemake \
+  -p -j 5 \
+  --configfile workflow/config.yml \
+  -R numbering
+
+snakemake \
+  -p -j 5 \
+  --configfile workflow/config.yml\
+  -R lettering
+'''
+import os
+
+configfile: "workflow/config.yml"
+
+rule all:
+    params:
+      wd = os.getcwd()
+    message:
+     '''
+     This pipeline is meant to be run in increments.
+     Users can run the sub-workflow `numbering` (`numbers.smk`),
+     the sub-workflow `lettering` (`letters.smk`),
+     or the complete pipeline (`rule: complete`).
+     '''
+
+U_REF = config[ 'ref' ]
+U_QUERY = config[ 'queries' ]
+U_ALL = U_QUERY.insert( 0, U_REF )
+G_REF = U_REF + '_masked'
+G_QUERY = [ x + '_masked' for x in U_QUERY ]
+G_ALL = G_QUERY.insert( 0, G_REF )
+
+# rule complete:
+#     input:
+#       expand("results/l_{let_in}.txt", let_in = ALL_LETTERS),
+#       expand("results/n_{num_in}.txt", num_in = ALL_NUMBERS)
+
+include: "./rules/repeat_mask.smk"
+include: "./rules/align.smk"
