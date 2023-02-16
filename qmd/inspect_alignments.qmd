@@ -4,7 +4,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Inspec genome alignments
+# Inspect genome alignments
 
 ```{r}
 #| message: false
@@ -50,7 +50,12 @@ genome_summary <- sizes |>
 g_height <- .8
 
 align_min_length <- 3e5
+```
 
+
+```{r}
+#| fig-width: 11.
+#| fig-height: 9.
 n_largest <- 37
 sizes |> 
   filter(size_idx < n_largest) |> 
@@ -84,7 +89,10 @@ sizes |>
         axis.text.y = element_blank(),
         axis.ticks.x = element_line(linewidth = .2),
         axis.ticks.length = unit(-4,"pt"))
+```
 
+
+```{r}
 get_psl <- \(file){
   vroom::vroom(here::here("results","psl", file),
                delim = "\t",
