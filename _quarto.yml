@@ -10,9 +10,10 @@ book:
   date: "2022-11-16"
   chapters:
     - index.qmd
+    - qmd/initial_genome_check.qmd
     - qmd/inspect_alignments.qmd
-    - qmd/references.qmd
     - qmd/rna_sample_selection.qmd
+    - qmd/references.qmd
   navbar:
     search: true
     right:

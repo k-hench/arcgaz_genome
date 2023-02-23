@@ -1,23 +1,83 @@
-rule mask:
-    input:
-      'data/genomes/{species}.fa.gz'
-    output:
-      'data/genomes/{species}_masked.fa.gz'
+'''
+snakemake --jobs 10 \
+  --latency-wait 30 \
+  --use-singularity \
+  --use-conda \
+  -p \
+  --configfile workflow/config.yml \
+  --default-resources mem_mb=25600 \
+  --cluster '
+     qsub \
+      -V -cwd \
+      -P fair_share \
+      -l idle=1 \
+      -l si_flag=1 \
+      -pe multislot {threads} \
+      -l vf={resources.mem_mb}' \
+      --cluster-config workflow/cluster_config.yml \
+      --jn job.{name}.{jobid}.sh \
+      -R all_repeat && mv job.* logs/
+'''
+
+GENOMES = config[ 'genomes' ]
+
+rule all_repeat:
+    input: expand("data/genomes/{genome}_hardmasked.fa.gz", genome = GENOMES )
+
+rule build_db:
+    input: 'data/genomes/{genome}.fa.gz'
+    output: touch("data/genomes/waypoints/db_{genome}.done")
     log:
-      'logs/mask_plot_{species}.log'
+      'logs/db/{genome}.log'
+    conda: 'repeat_masking'
     shell:
       """
-      touch {output}
+      mkdir -p data/genomes/{wildcards.genome}_mod/ 
+      BuildDatabase -name data/genomes/{wildcards.genome}_mod/{wildcards.genome}_db -engine ncbi data/genomes/{wildcards.genome}.fa.gz 2>{log}
       """
 
-rule kmer_cout:
+rule model_repeats:
     input:
-      'data/genomes/{species}.fa.gz'
+      db_done = "data/genomes/waypoints/db_{genome}.done"
     output:
-      'results/repeat_maksing/{species}.kat.m20.hist'
+      directory("data/genomes/{genome}_mod/{genome}_model")
+    params:
+      wd = os.getcwd()
     log:
-      'logs/kmer_hist_{species}.log'
+      'logs/mod/{genome}.log'
+    conda: 'repeat_masking'
+    threads: 8
     shell:
       """
-      kat hist -t 12 {input} -m 20 -o {output}
+      cd data/genomes/{wildcards.genome}_mod/
+      RepeatModeler -engine ncbi -pa {threads} -database {wildcards.genome}_db >& {params.wd}/{log}
+      mv RM_* {wildcards.genome}_model
+      """
+
+rule mask_repeats:
+    input: 
+      model = "data/genomes/{genome}_mod/{genome}_model",
+      unmasked_genome = 'data/genomes/{genome}.fa.gz'
+    output: 'data/genomes/{genome}_masked.fa.gz'
+    log:
+      'logs/mask/{genome}.log'
+    conda: 'repeat_masking'
+    threads: 8
+    shell:
+      """
+      RepeatMasker \
+        -e rmblast \
+        -pa {threads} -s \
+        -lib {input.model}/consensi.fa.classified \
+        -xsmall {input.unmasked_genome} 2> {log}
+      mv data/genomes/{wildcards.genome}.fa.masked data/genomes/{wildcards.genome}_masked.fa
+      gzip data/genomes/{wildcards.genome}_masked.fa
+      """
+
+rule convert_to_hardmasked:
+    input: 'data/genomes/{genome}_masked.fa.gz'
+    output: 'data/genomes/{genome}_hardmasked.fa.gz'
+    shell:
+      """
+      zcat {input}| sed '/[>*]/!s/[atgcn]/N/g' | gzip > {output}
       """

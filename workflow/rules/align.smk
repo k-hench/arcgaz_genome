@@ -19,7 +19,7 @@ snakemake \
   --latency-wait 30 \
   --use-conda -p \
   --configfile workflow/config.yml \
-  --default-resources mem_mb=2000 \
+  --default-resources mem_mb=25600 \
   --cluster '
      qsub \
      -V -cwd \
@@ -27,8 +27,7 @@ snakemake \
      -l idle=1 \
      -l si_flag=1 \
      -pe multislot {threads} \
-     -l vf={resources.mem_mb} \
-     -l vf=25:0:0' \
+     -l vf={resources.mem_mb}' \
   -R align
 
 # dryrun

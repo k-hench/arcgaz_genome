@@ -263,7 +263,9 @@ inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 5e2){
     tibble(alignment = aln_name,
            sizes = list(p1),
            circ = list(p2),
-           matrix = list(p5))
+           matrix = list(p5),
+           psl = list(z_psl),
+           sizes_df = list(sizes_az))
 }
 ```
 
@@ -291,3 +293,35 @@ inspections$circ[[2]]
 inspections$matrix[[1]] |
   inspections$matrix[[2]]
 ```
+
+
+```{r}
+zcal <- inspect_alignment("zalcal_v1")
+z_psl <- zcal$psl[[1]] |> 
+  mutate(tlength = tEnd - tStart,
+         qlength = qEnd - qStart) |> 
+  group_by(tName, qName) |> 
+  summarise(t_sum = sum(tlength),
+            q_sum = sum(qlength)) |> 
+  ungroup() |> 
+  left_join(sizes |> select(chr, t_size = size), by = c(tName = 'chr')) |> 
+  left_join(sizes |> select(chr, q_size = size), by = c(qName = 'chr')) |> 
+  mutate(t_rel = t_sum / t_size,
+         q_rel = q_sum / q_size,
+         tName = fct_reorder(tName, -t_size),
+         qName = fct_reorder(qName, -q_size)) 
+
+z_psl |> 
+  ggplot(aes(x = tName, y = qName, fill = -abs(log10(t_rel))))+#between(t_rel, .75,3.75))) +
+  geom_tile(width = .8, height = .8, aes(color = after_scale(clr_darken(fill))), size = .2) +
+  geom_vline(xintercept = 36.5, color = clrs[[1]], size = .4, alpha = .5)+
+  # scale_fill_manual(values = c(`TRUE` = clrs[[1]], `FALSE` = 'gray90'),
+  #                   guide = 'none') +
+  scale_fill_viridis_c()+
+  scale_fill_gradientn(colours = rev(c(clr_lighten(clrs[[1]]), str_c("gray",(1:9)*10))))+
+  coord_equal() +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = "bottom")
+```
+
