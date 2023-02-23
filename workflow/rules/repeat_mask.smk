@@ -1,4 +1,6 @@
 '''
+snakemake -n -R all_repeat
+
 snakemake --jobs 10 \
   --latency-wait 30 \
   --use-singularity \

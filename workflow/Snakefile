@@ -42,4 +42,4 @@ G_ALL = G_QUERY.insert( 0, G_REF )
 #       expand("results/n_{num_in}.txt", num_in = ALL_NUMBERS)
 
 include: "./rules/repeat_mask.smk"
-include: "./rules/align.smk"
+# include: "./rules/align.smk"
