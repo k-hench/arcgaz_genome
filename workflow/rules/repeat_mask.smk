@@ -73,7 +73,7 @@ rule mask_repeats:
         -pa {threads} -s \
         -lib {input.model}/consensi.fa.classified \
         -xsmall data/genomes/tmp/{genome}.tmp.fa 2> {log}
-      mv data/genomes/{wildcards.genome}.fa.masked data/genomes/{wildcards.genome}_masked.fa
+      mv data/genomes/tmp/{genome}.tmp.fa.masked data/genomes/{wildcards.genome}_masked.fa
       rm data/genomes/tmp/{genome}.tmp.fa
       gzip data/genomes/{wildcards.genome}_masked.fa
       """
