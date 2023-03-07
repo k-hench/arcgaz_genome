@@ -1,23 +1,23 @@
 '''
 snakemake -n -R all_repeat
 
-  snakemake --jobs 10 \
-    --latency-wait 30 \
-    --use-singularity \
-    --use-conda \
-    -p \
-    --configfile workflow/config.yml \
-    --default-resources mem_mb=25600 \
-    --cluster '
-      qsub \
-        -V -cwd \
-        -P fair_share \
-        -l idle=1 \
-        -l si_flag=1 \
-        -pe multislot {threads} \
-        -l vf={resources.mem_mb}' \
-        --jn job.{name}.{jobid}.sh \
-        -R all_repeat && mv job.* logs/
+snakemake --jobs 10 \
+  --latency-wait 30 \
+  --use-singularity \
+  --use-conda \
+  -p \
+  --configfile workflow/config.yml \
+  --default-resources mem_mb=25600 \
+  --cluster '
+    qsub \
+      -V -cwd \
+      -P fair_share \
+      -l idle=1 \
+      -l si_flag=1 \
+      -pe multislot {threads} \
+      -l vf={resources.mem_mb}' \
+      --jn job.{name}.{jobid}.sh \
+      -R all_repeat && mv job.* logs/
 '''
 
 GENOMES = config[ 'genomes' ]
@@ -67,14 +67,14 @@ rule mask_repeats:
     shell:
       """
       mkdir -p data/genomes/tmp
-      zcat {input.unmasked_genome} > data/genomes/tmp/{genome}.tmp.fa
+      zcat {input.unmasked_genome} > data/genomes/tmp/{wildcards.genome}.tmp.fa
       RepeatMasker \
         -e rmblast \
         -pa {threads} -s \
         -lib {input.model}/consensi.fa.classified \
-        -xsmall data/genomes/tmp/{genome}.tmp.fa 2> {log}
-      mv data/genomes/tmp/{genome}.tmp.fa.masked data/genomes/{wildcards.genome}_masked.fa
-      rm data/genomes/tmp/{genome}.tmp.fa
+        -xsmall data/genomes/tmp/{wildcards.genome}.tmp.fa 2> {log}
+      mv data/genomes/tmp/{wildcards.genome}.tmp.fa.masked data/genomes/{wildcards.genome}_masked.fa
+      rm data/genomes/tmp/{wildcards.genome}.tmp.fa
       gzip data/genomes/{wildcards.genome}_masked.fa
       """
 
