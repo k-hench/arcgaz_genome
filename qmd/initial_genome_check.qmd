@@ -44,13 +44,17 @@ check_paritions <- \(genome = "arcgaz_v1"){
     ungroup() |>
     mutate(failed = partition %in% c('02', '04', '06'))
 
-  p1 <- data |>
-    ggplot(aes(x = end_pos * 1e-9, y = idx, color = partition)) +
+  p1 <- data |> 
+    ggplot() +
     geom_vline(data = partitions,
                aes(xintercept = end_pos* 1e-9, color = partition),
                alpha =.3) +
-    geom_step(aes(group = 1L))+
-    labs(subtitle = genome)
+    geom_step(aes(group = 1L, x = end_pos * 1e-9, y = idx, color = partition),
+              linewidth = .3, alpha = .3) +
+    geom_linerange(aes(group = 1L, xmin = lag(end_pos * 1e-9, default = 0),
+                       xmax = end_pos * 1e-9,
+                       y = idx, color = partition)) +
+    labs(subtitle = spec)
 
   p2 <- partitions |>
     ggplot(aes(x = partition, y = length, color = partition)) +
