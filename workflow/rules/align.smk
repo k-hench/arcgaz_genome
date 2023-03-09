@@ -127,9 +127,9 @@ rule slim_psl:
     input: 'results/psl/{species}.psl.gz'
     output: 'results/psl/{species}-18.psl.gz'
     shell:
-    """
-    zcat {input} | cut -f 1-18  | gzip > {output}
-    """
+      """
+      zcat {input} | cut -f 1-18  | gzip > {output}
+      """
 
 
 rule plot_alignments:
@@ -144,50 +144,3 @@ rule plot_alignments:
      # Rscript R/plot_alignments.R  2> {log} 1> {log}
      echo 'dummy' > img/alignment.svg
      """
-
-rule lastz_align:
-    container: "docker://khench/map_align:v0.2"
-    input:
-      refFile = "data/genomes/{ref}.fa.gz".format( ref = G_REF ),
-      fastaFile = "data/genomes/{species}.fa.gz"
-    output:
-      maf = "results/lastz/{species}.maf",
-      dplot = "results/lastz/dplot/{species}.tsv"
-    log:
-      'logs/lastz/lastz_{species}.log'
-    conda:
-      'map_align'
-    shell:
-      """
-      mkdir -p tmp
-      
-      TMP_REF=$(mktemp ./tmp/XXXX.fa)
-      TMP_QER=$(mktemp ./tmp/XXXX.fa)
-      
-      zcat {input.refFile} > $TMP_REF
-      zcat {input.fastaFile} > $TMP_QER
-
-      lastz $TMP_REF[multiple] \
-          $TMP_QER[multiple] \
-        --notransition --step=20 --nogapped \
-        --rdotplot={output.dplot} \
-        --format=maf 2>{log} 1>{output.maf}
-      
-      rm $TMP_REF $TMP_QER
-      """
-
-rule plot_lastz_alignments:
-    container: None
-    input:
-      lastz_alignments = expand( 'results/lastz/dplot/{species}.tsv', species = G_QUERY ),
-      genome_sizes = expand( 'results/genome/{x}.size',
-       x = [config[ 'ref' ]] + config[ 'queries' ] )
-    output:
-      "img/lastz_alignments.svg"
-    log:
-      'logs/plots/lastz_plot.log'
-    shell:
-      """
-      # Rscript R/plot_lastz.R  2> {log} 1> {log}
-      echo 'dummy' > img/lastz_alignments.svg
-      """
