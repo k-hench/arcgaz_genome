@@ -22,7 +22,7 @@ clrs <- c( clr_darken("#db4a32",.3),
            clr_darken("#66c2a5",.3))
 
 read_size <- \(genome = "", y_base = 0){
-  read_tsv(here::here("data", "genomes", str_c(genome,".size")),
+  read_tsv(here::here("results", "genome", str_c(genome,".size")),
            col_names = c("chr", "size")) |> 
     arrange(-size) |> 
     mutate(size_idx = row_number(),
@@ -33,13 +33,14 @@ read_size <- \(genome = "", y_base = 0){
            genome = genome)
 }
 
-genomes <- c("arcgaz_dt_h1",
-             "arcgaz_dt_h2",
-             "arcgaz_v1",
-             "zalcal_v1")
+genomes <- c("arcgaz_dt_h1_hardmasked",
+             "arcgaz_dt_h2_hardmasked",
+             "arcgaz_v1_hardmasked",
+             "arcgaz_bp_hardmasked",
+             "zalcal_v1_hardmasked")
 
 sizes <- tibble(genome = genomes,
-       y_base = 0:3) |> 
+       y_base = 0:4) |> 
   pmap_dfr(read_size)
 
 genome_summary <- sizes |> 
@@ -72,7 +73,7 @@ sizes |>
                 fill = after_scale(clr_lighten(color, .5)))) +
   geom_richtext(data = genome_summary,
                 aes(y = y_base + .5 * g_height,
-                    label = glue("{genome}<br>n: {n}"),
+                    label = glue("{str_remove(genome, '_hardmasked')}<br>n: {n}"),
                     x = -.1e9),hjust = 1,
                 fill = NA, label.color = NA, family = fnt_sel,
                 label.padding = grid::unit(rep(0, 4), "pt")) + 
@@ -80,8 +81,8 @@ sizes |>
   scale_x_continuous(NULL, breaks = c(0:3)*1e9,
                      labels = str_c(0:3, " Gb")) + 
   scale_color_manual(values = clrs, guide = "none") +
-  coord_cartesian(xlim = c(-5e8, 2.6e9),
-                  ylim = c(-.1, 4),
+  coord_cartesian(xlim = c(-4.5e8, 2.6e9),
+                  ylim = c(-.1, 5),
                   expand = 0)+
   # coord_polar() +
   theme_minimal(base_family = fnt_sel) +
@@ -109,29 +110,31 @@ get_psl <- \(file){
 simplify_names <- \(str){
   str_remove_all(str, ";.*") |> 
     str_replace("ScDpJTZ_", "A.") |> 
+    str_replace("Sc3htSU_", "HT2.") |> 
     str_replace("NC_045", "Z.") |> 
     str_replace("NW_0233655", "Z.") |> 
-    str_replace("ScWAj4l_", "V1.")
+    str_replace("ScWAj4l_", "V1.")|> 
+    str_replace("ptg000", "PB.")
 }
 
-inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 5e2){
-  z_psl <- get_psl(glue("{aln_name}_1-18.psl.gz"))
+inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 1e3){
+  z_psl <- get_psl(glue("{aln_name}-18.psl.gz"))
   
   sizes_az <- sizes |>
     filter(size_idx < n_largest,
-           genome %in% c("arcgaz_dt_h1", aln_name)) |> 
+           genome %in% c("arcgaz_dt_h1_hardmasked", aln_name)) |> 
     mutate(l_start = 0,
            chr = simplify_names(chr)) |> 
     select(chr, start = l_start, end = size, genome)
   
   z_psl_above <- z_psl |> 
     arrange(-tSize) |> 
-    head(n_alignments) |> 
     # filter(tSize > align_min_length) |> 
     mutate(tName = simplify_names(tName),
            qName = simplify_names(qName)) |> 
     filter(tName %in% sizes_az$chr,
-           qName %in% sizes_az$chr)
+           qName %in% sizes_az$chr) |> 
+    head(n_alignments) 
   
   p1 <- z_psl_above |> 
     ggplot() +
@@ -234,7 +237,7 @@ inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 5e2){
       scale_fill_gradientn(colours = c("gray90", clrs[2] , "black")) +
       guides(fill = guide_colorbar("Alginment Fraction (Target)",
                                    title.position = "top",
-                                   barwidth = unit(.4,"npc"),
+                                   barwidth = unit(.2,"npc"),
                                    barheight = unit(5,"pt"))) +
       coord_equal() +
       theme_minimal(base_family = fnt_sel) +
@@ -251,7 +254,7 @@ inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 5e2){
       scale_fill_gradientn(colours = c("gray90", clrs[1] , "black")) +
       guides(fill = guide_colorbar("Alginment Fraction (Querry)",
                                    title.position = "top",
-                                   barwidth = unit(.4,"npc"),
+                                   barwidth = unit(.2,"npc"),
                                    barheight = unit(5,"pt"))) +
       coord_equal() +
       theme_minimal(base_family = fnt_sel) +
@@ -272,31 +275,30 @@ inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 5e2){
 ```{r}
 #| include: false
 #| echo: false
-inspections <- c("zalcal_v1", "arcgaz_v1") |> 
+inspections <- genomes[2:5] |> 
   map_dfr(inspect_alignment)
 ```
 
 ```{r}
-inspections$sizes[[1]] |
-  inspections$sizes[[2]]
+inspections$sizes |> wrap_plots(ncol = 4)
 ```
 
 ```{r}
 #| layout-ncol: 2
 inspections$circ[[1]]
 inspections$circ[[2]]
+inspections$circ[[3]]
+inspections$circ[[4]]
 ```
 
 ```{r}
 #| fig-width: 12.
 #| fig-height: 12.
-inspections$matrix[[1]] |
-  inspections$matrix[[2]]
+inspections$matrix |> wrap_plots(ncol = 4)
 ```
 
-
 ```{r}
-zcal <- inspect_alignment("zalcal_v1")
+zcal <- inspect_alignment("zalcal_v1_hardmasked")
 z_psl <- zcal$psl[[1]] |> 
   mutate(tlength = tEnd - tStart,
          qlength = qEnd - qStart) |> 

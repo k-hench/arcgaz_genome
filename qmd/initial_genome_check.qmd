@@ -54,7 +54,7 @@ check_paritions <- \(genome = "arcgaz_v1"){
     geom_linerange(aes(group = 1L, xmin = lag(end_pos * 1e-9, default = 0),
                        xmax = end_pos * 1e-9,
                        y = idx, color = partition)) +
-    labs(subtitle = spec)
+    labs(subtitle = genome)
 
   p2 <- partitions |>
     ggplot(aes(x = partition, y = length, color = partition)) +
@@ -95,9 +95,9 @@ check_paritions <- \(genome = "arcgaz_v1"){
             plot.subtitle = element_text(hjust = .5),
             panel.grid = element_blank(),
             panel.grid.minor = element_blank(),
-            axis.ticks = element_line(size = .3, color = clr_ln),
+            axis.ticks = element_line(linewidth = .3, color = clr_ln),
             axis.ticks.length = unit(3, 'pt'),
-            axis.line = element_line(color = clr_ln, size = .4))
+            axis.line = element_line(color = clr_ln, linewidth = .4))
 }
 
 pratition_genome <- \(genome){
@@ -151,7 +151,7 @@ Partition all genomes, where the labels indicate the following:
 
 ```{r}
 all_genomes <- c('arcgaz_bp', 'arcgaz_dt_h1', 'arcgaz_dt_h2', 'arcgaz_v1', 'zalcal_v1')
-n_part <- 19
+n_part <- 20
 all_genomes |> walk(pratition_genome)
 ```
 
