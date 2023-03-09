@@ -39,7 +39,8 @@ container: "docker://khench/msa_envs:v0.1"
 
 rule align:
     input:
-        "img/alignment.svg"
+      expand( 'results/psl/{species}-18.psl.gz', species = G_QUERY )
+      #"img/alignment.svg"
 
 rule lastdb_index:
     input:
@@ -50,7 +51,7 @@ rule lastdb_index:
       indexBase = 'data/genomes/{ref}',
       refSizeFile = 'results/genome/{ref}.size',
     log:
-      'logs/{ref}_lastdbIndex.log'
+      'logs/db_idx/{ref}_lastdbIndex.log'
     conda:
       'msa_align'
     shell:
@@ -71,7 +72,7 @@ rule build_index:
       refFastaFile="data/genomes/{ref}.fa.gz".format( ref = G_REF ),
       refNib2Bit='results/genome/nib/{ref}.2bit'.format( ref = G_REF ),
     log:
-      'logs/{species}_index.log'
+      'logs/db_idx/{species}_index.log'
     conda:
       'msa_ucsc'
     threads: 1
@@ -94,7 +95,7 @@ rule align_single_last:
       lastParams = config[ 'lastParams' ],
       mafBase = 'results/maf/{species}.maf'
     log:
-      'logs/{species}_align.log'
+      'logs/align/{species}_align.log'
     conda:
       'msa_align'
     threads: 1
@@ -112,7 +113,7 @@ rule maf_to_psl:
     params:
       pslBase = 'results/psl/{species}.psl'
     log:
-      'logs/{species}_psl.log'
+      'logs/psl/{species}_psl.log'
     conda:
       'msa_align'
     threads: 1
@@ -137,7 +138,7 @@ rule plot_alignments:
     output:
       "img/alignment.svg"
     log:
-      'logs/alignment_plot.log'
+      'logs/plots/alignment_plot.log'
     shell:
      """
      # Rscript R/plot_alignments.R  2> {log} 1> {log}
@@ -153,7 +154,7 @@ rule lastz_align:
       maf = "results/lastz/{species}.maf",
       dplot = "results/lastz/dplot/{species}.tsv"
     log:
-      'logs/lastz_{species}.log'
+      'logs/lastz/lastz_{species}.log'
     conda:
       'map_align'
     shell:
@@ -184,7 +185,7 @@ rule plot_lastz_alignments:
     output:
       "img/lastz_alignments.svg"
     log:
-      'logs/lastz_plot.log'
+      'logs/plots/lastz_plot.log'
     shell:
       """
       # Rscript R/plot_lastz.R  2> {log} 1> {log}
