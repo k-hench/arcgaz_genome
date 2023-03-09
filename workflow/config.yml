@@ -1,10 +1,10 @@
-ref: arcgaz_dt_h1_hardmasked
+ref: arcgaz_dt_h1
 
 queries:
-  - arcgaz_dt_h2_hardmasked
-  - arcgaz_v1_hardmasked
-  - arcgaz_bp_hardmasked
-  - zalcal_v1_hardmasked
+  - arcgaz_dt_h2
+  - arcgaz_v1
+  - arcgaz_bp
+  - zalcal_v1
 
 lastParams: "-m 1 -j 3 -u 1 -p HOXD70"
 # lastParams: "-j 3"
