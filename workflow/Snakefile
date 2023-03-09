@@ -15,6 +15,7 @@ snakemake \
   -R lettering
 '''
 import os
+from copy import deepcopy
 
 configfile: "workflow/config.yml"
 
@@ -31,10 +32,12 @@ rule all:
 
 U_REF = config[ 'ref' ]
 U_QUERY = config[ 'queries' ]
-U_ALL = U_QUERY.insert( 0, U_REF )
+U_ALL = deepcopy(U_QUERY)
+U_ALL.insert( 0, U_REF )
 G_REF = U_REF + '_masked'
 G_QUERY = [ x + '_masked' for x in U_QUERY ]
-G_ALL = G_QUERY.insert( 0, G_REF )
+G_ALL = deepcopy(G_QUERY)
+G_ALL.insert( 0, G_REF )
 
 # rule complete:
 #     input:
