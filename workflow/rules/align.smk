@@ -37,13 +37,14 @@ snakemake \
 
 snakemake \
     -n \
-    --configfile workflow/config_anchoring.yml
+    --configfile workflow/config_anchoring.yml \
+    -R align
 '''
 container: "docker://khench/msa_envs:v0.1"
 
 rule align:
     input:
-      expand( 'results/psl/{species}_on_{ref}_1-18.psl.gz', species = G_QUERY )
+      expand( 'results/psl/{species}_on_{ref}_1-18.psl.gz', species = G_QUERY, ref = G_REF )
       #"img/alignment.svg"
 
 rule lastdb_index:
