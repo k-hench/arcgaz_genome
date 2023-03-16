@@ -17,8 +17,6 @@ snakemake \
 import os
 from copy import deepcopy
 
-configfile: "workflow/config.yml"
-
 rule all:
     params:
       wd = os.getcwd()

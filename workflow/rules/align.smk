@@ -34,12 +34,16 @@ snakemake \
 snakemake \
     -n \
     --configfile workflow/config.yml
+
+snakemake \
+    -n \
+    --configfile workflow/config_anchoring.yml
 '''
 container: "docker://khench/msa_envs:v0.1"
 
 rule align:
     input:
-      expand( 'results/psl/{species}-18.psl.gz', species = G_QUERY )
+      expand( 'results/psl/{species}_on_{ref}_1-18.psl.gz', species = G_QUERY )
       #"img/alignment.svg"
 
 rule lastdb_index:
@@ -89,13 +93,13 @@ rule align_single_last:
       fastaFile = "data/genomes/{species}.fa.gz",
       speciesSizeFile = 'results/genome/{species}.size',
     output:
-      maf = 'results/maf/{species}.maf.gz'
+      maf = 'results/maf/{species}_on_{ref}.maf.gz'
     params:
       indexBase = 'data/genomes/{ref}'.format( ref = G_REF ),
       lastParams = config[ 'lastParams' ],
-      mafBase = 'results/maf/{species}.maf'
+      mafBase = 'results/maf/{species}_on_{ref}.maf'
     log:
-      'logs/align/{species}_align.log'
+      'logs/align/{species}_on_{ref}_align.log'
     conda:
       'msa_align'
     threads: 1
@@ -107,13 +111,13 @@ rule align_single_last:
 
 rule maf_to_psl:
     input:
-      maf = 'results/maf/{species}.maf.gz'
+      maf = 'results/maf/{species}_on_{ref}.maf.gz'
     output:
-      psl = 'results/psl/{species}.psl.gz'
+      psl = 'results/psl/{species}_on_{ref}.psl.gz'
     params:
-      pslBase = 'results/psl/{species}.psl'
+      pslBase = 'results/psl/{species}_on_{ref}.psl'
     log:
-      'logs/psl/{species}_psl.log'
+      'logs/psl/{species}_on_{ref}_psl.log'
     conda:
       'msa_align'
     threads: 1
@@ -124,8 +128,8 @@ rule maf_to_psl:
       """
 
 rule slim_psl:
-    input: 'results/psl/{species}.psl.gz'
-    output: 'results/psl/{species}-18.psl.gz'
+    input: 'results/psl/{species}_on_{ref}.psl.gz'
+    output: 'results/psl/{species}_on_{ref}_1-18.psl.gz'
     shell:
       """
       zcat {input} | cut -f 1-18  | gzip > {output}
@@ -134,7 +138,7 @@ rule slim_psl:
 
 rule plot_alignments:
     input:
-      expand( 'results/psl/{species}-18.psl.gz', species = G_QUERY )
+      expand( 'results/psl/{species}_on_{ref}_1-18.psl.gz', species = G_QUERY )
     output:
       "img/alignment.svg"
     log:
