@@ -49,7 +49,6 @@ genome_summary <- sizes |>
             toal_length = max(end))
 
 g_height <- .8
-
 align_min_length <- 3e5
 ```
 
