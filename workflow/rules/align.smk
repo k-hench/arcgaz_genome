@@ -44,7 +44,7 @@ container: "docker://khench/msa_envs:v0.1"
 
 rule align:
     input:
-      expand( 'results/psl/{species}_on_{ref}_1-18.psl.gz', species = G_QUERY, ref = G_REF )
+      expand( 'results/psl/slim_{species}_on_' + G_REF + '.psl.gz', species = G_QUERY)
       #"img/alignment.svg"
 
 rule lastdb_index:
@@ -130,7 +130,7 @@ rule maf_to_psl:
 
 rule slim_psl:
     input: 'results/psl/{species}_on_{ref}.psl.gz'
-    output: 'results/psl/{species}_on_{ref}_1-18.psl.gz'
+    output: 'results/psl/slim_{species}_on_{ref}.psl.gz'
     shell:
       """
       zcat {input} | cut -f 1-18  | gzip > {output}
@@ -139,7 +139,7 @@ rule slim_psl:
 
 rule plot_alignments:
     input:
-      expand( 'results/psl/{species}_on_{ref}_1-18.psl.gz', species = G_QUERY )
+      expand( 'results/psl/slim_{species}_on_'+ G_REF +'.psl.gz', species = G_QUERY )
     output:
       "img/alignment.svg"
     log:
@@ -149,3 +149,4 @@ rule plot_alignments:
      # Rscript R/plot_alignments.R  2> {log} 1> {log}
      echo 'dummy' > img/alignment.svg
      """
+
