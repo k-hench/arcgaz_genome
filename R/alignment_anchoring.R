@@ -2,6 +2,7 @@ library(tidyverse)
 library(glue)
 library(prismatic)
 library(patchwork)
+
 read_size <- \(genome = "", y_base = 0){
   read_tsv(here::here("results", "genome", str_c(genome,".size")),
            col_names = c("chr", "size")) |>
@@ -138,6 +139,7 @@ best_hits <- matrix_az |>
   arrange(qName) |>
   mutate(tName = fct_reorder(tName, row_number())) |>
   filter(t_aling_fract > 0.3)
+  # filter(t_aling_fract > 0.5)
 
 matrix_az |>
   mutate(tName = factor(tName, levels = levels(best_hits$tName))) |>
@@ -164,7 +166,6 @@ matrix_az |>
   group_by(tName, qName) |>
   filter(t_aling_fract == max(t_aling_fract)) |>
   ungroup()
-
 
 primary_alignments <- alignment |>
   left_join(best_hits |> dplyr::select(tName_simple = tName, qName_simple = qName) |> mutate(check = TRUE)) |>
@@ -273,5 +274,4 @@ primary_borders |>
          target_label = str_c(tName,":", tPos)) |>
   select(tName, target_start, tPos, querry_label, target_label) |>
   write_tsv("results/anchoring/alignment_anchors.bed", col_names = FALSE)
-
 

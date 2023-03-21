@@ -1,0 +1,11 @@
+# mamba env create -f allmaps.yml
+name: allmaps
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - jcvi=1.2.7
+ - more-itertools=9.0.0
+ - openssl=1.1.1t
+ - ucsc-liftover=377
