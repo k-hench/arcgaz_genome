@@ -25,3 +25,5 @@ results/*
 .snakemake/
 
 /.quarto/
+
+logs

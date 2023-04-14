@@ -12,6 +12,7 @@ book:
     - index.qmd
     - qmd/initial_genome_check.qmd
     - qmd/inspect_alignments.qmd
+    - qmd/anchoring_assessment.qmd
     - qmd/rna_sample_selection.qmd
     - qmd/references.qmd
   navbar:

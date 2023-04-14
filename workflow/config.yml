@@ -15,3 +15,7 @@ genomes:
   - arcgaz_v1
   - arcgaz_bp
   - zalcal_v1
+
+haplotypes:
+  - h1
+  - h2

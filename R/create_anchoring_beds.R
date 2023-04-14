@@ -27,7 +27,7 @@ sizes <- tibble(genome = genomes,
 
 genome_summary <- sizes |>
   group_by(genome, y_base) |>
-  summarise(n = n(),
+  summarise(n = dplyr::n(),
             toal_length = max(end))
 
 align_min_length <- 3e5
@@ -97,7 +97,7 @@ inspect_alignment <- \(aln_name = "arcgaz_dt_h2_hardmasked",
 
   z_psl_matrix <- z_psl_in_top_length |>
     group_by(tName, qName) |>
-    summarize(n = n(),
+    summarize(n = dplyr::n(),
               alignment_length = sum(tSize)) |>
     ungroup() |>
     left_join(sizes_az |> select(qName = chr, qSize = end)) |>
@@ -109,7 +109,7 @@ inspect_alignment <- \(aln_name = "arcgaz_dt_h2_hardmasked",
 
   z_psl_matrix <- z_psl_in_top_length |>
     group_by(tName, qName) |>
-    summarize(n = n(),
+    summarize(n = dplyr::n(),
               alignment_length = sum(tSize)) |>
     ungroup() |>
     left_join(sizes_az |> select(qName = chr, qSize = end)) |>
@@ -189,7 +189,6 @@ get_best_hits <- \(alignment, psl, matrix, sizes_df){
     facet_wrap(qName_simple ~ .) +
     coord_cartesian(xlim = c(0, 1e4))
 
-
   tibble(alignment = alignment,
          best_hits = list(best_hits),
          primary_alignments = list(primary_alignments),
@@ -204,8 +203,8 @@ inspections <- genomes[1:2] |>
 best_hits_df <- inspections |>
   pmap_dfr(get_best_hits)
 
-wrap_plots(best_hits_df$p_frct)
-wrap_plots(best_hits_df$p_hist)
+# wrap_plots(best_hits_df$p_frct)
+# wrap_plots(best_hits_df$p_hist)
 
 plot_primary_borders <- \(alignment, primary_alignments, ...){
   size_cuttoff <- 3500
@@ -306,7 +305,8 @@ plot_primary_borders <- \(alignment, primary_alignments, ...){
   sizes_t <- sizes |> filter(genome == "arcgaz_v1_hardmasked") |> select(tName = chr, tSize = size)
   sizes_q <- sizes |> filter(genome == alignment) |>  select(qName = chr, qSize = size)
   dir.create(glue("results/anchoring/{alignment}"), showWarnings = FALSE)
-  write_lines("ScWAj4l\t1", file = glue("results/anchoring/{alignment}/weights.txt"))
+  write_lines("ScWAj4l\t1",
+              file = glue("results/anchoring/{alignment}/weights.txt"))
 
   export_bed <- primary_borders  |>
     filter(nr %in% (border_ids |> filter(genome == alignment) |> pluck("ids") |> unlist())) |>
@@ -324,7 +324,7 @@ plot_primary_borders <- \(alignment, primary_alignments, ...){
     select(qName, target_start, qPos, querry_label, target_label)
 
   export_bed |>
-   write_tsv(glue("results/anchoring/{alignment}/alignment_anchors.bed"), col_names = FALSE)
+   write_tsv(glue("results/anchoring/{alignment}/anchored_{str_remove(alignment,'_hardmasked')}.bed"), col_names = FALSE)
 
   tibble(alignment = alignment,
          p1 = list(p1),

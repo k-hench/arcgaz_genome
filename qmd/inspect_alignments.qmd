@@ -34,7 +34,7 @@ read_size <- \(genome = "", y_base = 0){
 }
 
 genomes <- c("arcgaz_dt_h1_hardmasked",
-             "arcgaz_dt_h1_anchored",
+            # "arcgaz_dt_h1_anchored",
              "arcgaz_dt_h2_hardmasked",
              "arcgaz_v1_hardmasked",
              "arcgaz_bp_hardmasked",

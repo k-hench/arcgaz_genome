@@ -83,5 +83,5 @@ rule convert_to_hardmasked:
     output: 'data/genomes/{genome}_hardmasked.fa.gz'
     shell:
       """
-      zcat {input}| sed '/[>*]/!s/[atgcn]/N/g' | gzip > {output}
+      zcat {input} | sed '/[>*]/!s/[atgcn]/N/g' | gzip > {output}
       """

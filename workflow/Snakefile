@@ -17,6 +17,8 @@ snakemake \
 import os
 from copy import deepcopy
 
+configfile: "workflow/config.yml"
+
 rule all:
     params:
       wd = os.getcwd()
@@ -37,6 +39,8 @@ G_QUERY = [ x + '_hardmasked' for x in U_QUERY ]
 G_ALL = deepcopy(G_QUERY)
 G_ALL.insert( 0, G_REF )
 
+HAPLOTYPES = config['haplotypes']
+
 # rule complete:
 #     input:
 #       expand("results/l_{let_in}.txt", let_in = ALL_LETTERS),
@@ -44,3 +48,4 @@ G_ALL.insert( 0, G_REF )
 
 include: "./rules/repeat_mask.smk"
 include: "./rules/align.smk"
+include: "./rules/anchor.smk"
