@@ -39,6 +39,11 @@ snakemake \
     -n \
     --configfile workflow/config_anchoring.yml \
     -R align
+
+snakemake \
+    -n \
+    --configfile workflow/config_align_anchored.yml \
+    -R align
 '''
 container: "docker://khench/msa_envs:v0.1"
 

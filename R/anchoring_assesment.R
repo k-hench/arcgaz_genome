@@ -1,19 +1,18 @@
-library(tidyverse)
-library(prismatic)
-library(patchwork)
-library(glue)
+# library(tidyverse)
+# library(prismatic)
+# library(patchwork)
+# library(glue)
 
 fnt_sel <-  "Josefin sans"
-new_prefix <- "mscaf" # beware of alphabetical sorting (< "S")
+new_prefix <- "mscaf_a" # beware of alphabetical sorting (< "S")
 read_fai <- \(file){
   read_tsv(file,
            col_names = c("name", "length", "offset", "linebases", "linewidth"))
 }
 
-scaf_x = str_c(new_prefix, "x")
-
 compile_bed <- \(ht = 1){
-  full_bed <- read_tsv(glue("results/anchoring/arcgaz_dt_h{ht}_hardmasked/anchored_arcgaz_dt_h{ht}.lifted.bed"),
+  scaf_x = str_c(new_prefix, ht,"_x")
+  full_bed <- read_tsv(here(glue("results/anchoring/arcgaz_dt_h{ht}_hardmasked/anchored_arcgaz_dt_h{ht}.lifted.bed")),
                        col_names = c("name", "start", "end", "n1", "n2"))
   data <- full_bed |>
     mutate(org_scaffold_v3 = str_remove(n1, ":.*"),
@@ -29,14 +28,14 @@ compile_bed <- \(ht = 1){
             chr_nr = cumsum(new_chr),
             name_new = case_when(
               is_x ~ scaf_x,
-              .default = str_c(new_prefix, str_pad(chr_nr, width = 2, pad = 0)))) |>
+              .default = str_c(new_prefix, ht,"_",str_pad(chr_nr, width = 2, pad = 0)))) |>
     select(name, name_new, org_scaffold_v3) |>
     group_by(name_new) |>
     mutate(n_scaf = length(name_new) / 2) |>
     ungroup() |>
     filter(!duplicated(name))
 
-  faidx <- read_fai(glue("results/anchoring/arcgaz_dt_h{ht}_hardmasked/anchored_arcgaz_dt_h{ht}.fasta.gz.fai"))
+  faidx <- read_fai(here(glue("results/anchoring/arcgaz_dt_h{ht}_hardmasked/anchored_arcgaz_dt_h{ht}.fasta.gz.fai")))
 
   data_bed <- faidx |>
     left_join(data) |>
@@ -48,7 +47,7 @@ compile_bed <- \(ht = 1){
            gstart = lag(gend, default = 0),
            gmid= (gstart + gend) / 2,
            lg_group = case_when(
-             name_new == glue("{new_prefix}X") ~ "x",
+             name_new == glue("{new_prefix}{ht}_x") ~ "x",
              row_number() > 18 ~ "unplaced",
              .default = c("even", "odd")[1 + (row_number() %% 2)] ) |>
              factor(levels = c("odd", "even", "x", "unplaced")))
@@ -122,7 +121,7 @@ compile_bed <- \(ht = 1){
                        sec.axis = sec_axis(breaks = c(data_bed$gmid[1:18],
                                                       (data_bed$gstart[19] + max(data_bed$gend)) / 2 )* 1e-9,
                                            labels = c(str_c(
-                                             new_prefix, c( str_c(str_pad(1:17, width = 2, pad = 0)), scaf_x),
+                                             new_prefix,ht,"_", c( str_c(str_pad(1:17, width = 2, pad = 0)), scaf_x),
                                                             "\n", data$org_scaffold_v3[1:18]),
                                                       " unplaced"),
                                            trans = identity)) +
@@ -144,7 +143,7 @@ compile_bed <- \(ht = 1){
 both_beds <- 1:2 |>
   map_dfr(compile_bed)
 
-both_beds$plot |>
-  wrap_plots(ncol = 1) &
-  theme(legend.position = "none")
+# both_beds$plot |>
+#   wrap_plots(ncol = 1) &
+#   theme(legend.position = "none")
 

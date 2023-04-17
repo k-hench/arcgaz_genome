@@ -1,7 +1,7 @@
-ref: arcgaz_dt_h1
+ref: arcgaz_anc_h2
 
 queries:
-  - arcgaz_dt_h2
+  - arcgaz_anc_h1
   - arcgaz_v1
   - arcgaz_bp
   - zalcal_v1
@@ -10,8 +10,8 @@ lastParams: "-m 1 -j 3 -u 1 -p HOXD70"
 # lastParams: "-j 3"
 
 genomes:
-  - arcgaz_dt_h1
-  - arcgaz_dt_h2
+  - arcgaz_anc_h1
+  - arcgaz_anc_h2
   - arcgaz_v1
   - arcgaz_bp
   - zalcal_v1
@@ -20,4 +20,4 @@ haplotypes:
   - h1
   - h2
 
-mask_suffix: '_hardmasked'
+mask_suffix: ''

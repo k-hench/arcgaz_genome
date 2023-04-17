@@ -11,7 +11,7 @@ book:
   chapters:
     - index.qmd
     - qmd/initial_genome_check.qmd
-    - qmd/inspect_alignments.qmd
+    - qmd/inspect_initial_alignments.qmd
     - qmd/anchoring_assessment.qmd
     - qmd/rna_sample_selection.qmd
     - qmd/references.qmd

@@ -17,7 +17,7 @@ snakemake \
 import os
 from copy import deepcopy
 
-configfile: "workflow/config.yml"
+# configfile: "workflow/config.yml"
 
 rule all:
     params:
@@ -30,12 +30,13 @@ rule all:
      or the complete pipeline (`rule: complete`).
      '''
 
+MASK_SUFFIX = config[ 'mask_suffix' ]
 U_REF = config[ 'ref' ]
 U_QUERY = config[ 'queries' ]
 U_ALL = deepcopy(U_QUERY)
 U_ALL.insert( 0, U_REF )
-G_REF = U_REF + '_hardmasked'
-G_QUERY = [ x + '_hardmasked' for x in U_QUERY ]
+G_REF = U_REF + MASK_SUFFIX
+G_QUERY = [ x + MASK_SUFFIX for x in U_QUERY ]
 G_ALL = deepcopy(G_QUERY)
 G_ALL.insert( 0, G_REF )
 
