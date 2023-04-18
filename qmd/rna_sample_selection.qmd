@@ -11,10 +11,12 @@ editor_options:
 library(tidyverse)
 library(patchwork)
 library(prismatic)
+library(here)
+source(here("R/plot_defaults.R"))
+
 set.seed(22)
 clr1 <-  "gray20";  clr2 <-  "gray50"
-clrs <- c( clr_darken("#db4a32",.3),
-           clr_darken("#66c2a5",.3))
+
 
 data <- read_tsv(here::here("data/rna/multiqc_general_stats.txt")) |> 
   filter(Sample != "multiqc") |> 
@@ -79,7 +81,7 @@ p2 <- data |>
   labs(x = "number of sequences (Mil)") +
   coord_cartesian(xlim = c(0, 70))
 
-p2 / p1 + plot_layout(heights = c(.3, 1)) & scale_color_manual(values = clrs, guide = "none") & theme_minimal() 
+p2 / p1 + plot_layout(heights = c(.3, 1)) & scale_color_manual(values = clrs, guide = "none") & theme_minimal(base_family = fnt_sel) 
 ```
 
 Selected Individuals

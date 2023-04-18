@@ -1,5 +1,5 @@
 /*-- scss:defaults --*/
-$clr-alert: #db4a32;
+$clr-alert: #1f4971;
 
 // Base document colors
 $navbar-bg: #282828;
@@ -24,12 +24,11 @@ $callout-color-warning: $clr-alert;
 }
 
 h1, h2, h3 {
-  font-family: "Josefin Sans", "Open sans","sans";
-  font-weight: lighter;
+  font-family: "CMU Sans Serif", "Open sans","sans";
 }
 
 .table, table {
-  font-family: Josefin Sans Light;
+  font-family: CMU Sans Serif;
 }
 
 th {

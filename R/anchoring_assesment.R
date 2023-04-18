@@ -3,7 +3,8 @@
 # library(patchwork)
 # library(glue)
 
-fnt_sel <-  "Josefin sans"
+source(here("R/plot_defaults.R"))
+
 new_prefix <- "mscaf_a" # beware of alphabetical sorting (< "S")
 read_fai <- \(file){
   read_tsv(file,
@@ -115,7 +116,7 @@ compile_bed <- \(ht = 1){
                   y = .2 + scaf_type * .6,
                   label = scaf_abbref),
               family = fnt_sel) +
-    scale_color_manual(values = c(clr_darken("#db4a32", .25), "#db4a32", "gray25", "gray90")) +
+    scale_color_manual(values = c(clr_darken(clrs[1], .25), clrs[1], "gray25", "gray90")) +
     scale_fill_manual(values = c("gray65", "black")) +
     scale_x_continuous("genomic position (GB)",
                        sec.axis = sec_axis(breaks = c(data_bed$gmid[1:18],

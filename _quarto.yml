@@ -13,6 +13,7 @@ book:
     - qmd/initial_genome_check.qmd
     - qmd/inspect_initial_alignments.qmd
     - qmd/anchoring_assessment.qmd
+    - qmd/inspect_anchored_alignments.qmd
     - qmd/rna_sample_selection.qmd
     - qmd/references.qmd
   navbar:
@@ -32,7 +33,7 @@ format:
     - styles.scss
     code-fold: true
     code-summary: "toggle code"
-    mainfont: "'TeX Gyre Pagella', 'Crimson Text', 'Noto Serif', serif"
+    mainfont: "'CMU Sans Serif', 'Open sans', sans"
     monofont: "'Fira Code', 'Ubuntu mono', monospace"
     fig-format: "svg"
 
