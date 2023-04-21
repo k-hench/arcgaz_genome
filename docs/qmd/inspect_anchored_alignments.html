@@ -262,8 +262,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>genomes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"arcgaz_anc_h1"</span>,</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>             <span class="st">"arcgaz_anc_h2"</span>,</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>             <span class="st">"arcgaz_v1"</span>, <span class="co">#_hardmasked",</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>             <span class="co"># "arcgaz_bp_hardmasked",</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>             <span class="st">"arcgaz_v1_hardmasked"</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>             <span class="st">"arcgaz_bp_hardmasked"</span>,</span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>             <span class="st">"zalcal_v1"</span>)</span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>sizes <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">genome =</span> genomes,</span>
@@ -345,178 +345,189 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_replace</span>(<span class="st">"ptg000"</span>, <span class="st">"PB."</span>)</span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>aln_name <span class="ot">&lt;-</span> <span class="st">"arcgaz_anc_h1"</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>z_order_pt2 <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">16</span>, <span class="dv">15</span>, <span class="dv">14</span>, <span class="dv">13</span>, <span class="dv">12</span>, <span class="dv">10</span>, <span class="dv">11</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>n_alignments <span class="ot">&lt;-</span> <span class="dv">300</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>aln_name <span class="ot">&lt;-</span> <span class="st">"zalcal_v1"</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>z_order_pt2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">16</span>, <span class="dv">15</span>, <span class="dv">14</span>, <span class="dv">10</span>, <span class="dv">13</span>, <span class="dv">12</span>, <span class="dv">11</span>, <span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>inspect_alignment <span class="ot">&lt;-</span> \(<span class="at">aln_name =</span> <span class="st">"zalcal_v1"</span>,</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>                       <span class="at">z_order_pt2 =</span> <span class="dv">18</span><span class="sc">:</span><span class="dv">1</span>,</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n_alignments =</span> <span class="fl">1e3</span>){</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  z_psl <span class="ot">&lt;-</span> <span class="fu">get_psl</span>(<span class="fu">glue</span>(<span class="st">"slim_{aln_name}_on_{genomes[[2]]}.psl.gz"</span>))</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  sizes_az <span class="ot">&lt;-</span> sizes <span class="sc">|&gt;</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(size_idx <span class="sc">&lt;</span> n_largest,</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>           genome <span class="sc">%in%</span> <span class="fu">c</span>(genomes[[<span class="dv">2</span>]], aln_name)) <span class="sc">|&gt;</span> </span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">l_start =</span> <span class="dv">0</span>,</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>           <span class="at">chr =</span> <span class="fu">simplify_names</span>(chr))  <span class="sc">|&gt;</span> </span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">genome_order =</span> <span class="fu">if_else</span>(<span class="fu">str_sub</span>(chr, <span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">==</span> <span class="st">"a2"</span>, <span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(genome_order, <span class="sc">-</span>size) <span class="sc">|&gt;</span> </span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(chr, <span class="at">start =</span> l_start, <span class="at">end =</span> size, genome)</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  z_psl_above <span class="ot">&lt;-</span> z_psl <span class="sc">|&gt;</span> </span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="sc">-</span>tSize) <span class="sc">|&gt;</span> </span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># filter(tSize &gt; align_min_length) |&gt; </span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">tName =</span> <span class="fu">simplify_names</span>(tName),</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>           <span class="at">qName =</span> <span class="fu">simplify_names</span>(qName)) <span class="sc">|&gt;</span> </span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(tName <span class="sc">%in%</span> sizes_az<span class="sc">$</span>chr,</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>           qName <span class="sc">%in%</span> sizes_az<span class="sc">$</span>chr) <span class="sc">|&gt;</span> </span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(n_alignments) </span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> z_psl_above <span class="sc">|&gt;</span> </span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> tSize), <span class="at">adjust =</span> .<span class="dv">2</span>,</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> clrs[<span class="dv">1</span>], <span class="at">fill =</span> <span class="fu">clr_alpha</span>(clrs[<span class="dv">1</span>])) <span class="sc">+</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> qSize, <span class="at">y =</span> <span class="sc">-</span>..density..),<span class="at">adjust =</span> .<span class="dv">1</span>,</span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> clrs[<span class="dv">2</span>], <span class="at">fill =</span> <span class="fu">clr_alpha</span>(clrs[<span class="dv">2</span>])) <span class="sc">+</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel)</span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>  chr_sel <span class="ot">&lt;-</span> sizes_az <span class="sc">|&gt;</span> </span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(genome <span class="sc">!=</span> genomes[[<span class="dv">2</span>]]) <span class="sc">|&gt;</span> </span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pluck</span>(<span class="st">"chr"</span>)</span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>  chr_sel_a <span class="ot">&lt;-</span> sizes_az <span class="sc">|&gt;</span> </span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(genome <span class="sc">==</span> genomes[[<span class="dv">2</span>]]) <span class="sc">|&gt;</span> </span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pluck</span>(<span class="st">"chr"</span>)</span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>  chr_f <span class="ot">&lt;-</span> <span class="fu">factor</span>(chr_sel, <span class="at">levels =</span> chr_sel[z_order_pt2])</span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="co"># chr_f &lt;- factor(chr_sel, levels = rev(chr_sel))</span></span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>  n_chr <span class="ot">&lt;-</span> <span class="fu">length</span>(chr_sel)</span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>  z_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">18</span>, z_order_pt2 <span class="sc">+</span> <span class="dv">18</span>)</span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>  clr_al <span class="ot">&lt;-</span> \(str){</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    clrs[<span class="dv">1</span> <span class="sc">+</span>(<span class="fu">as.numeric</span>(<span class="fu">factor</span>(str, <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(chr_f)))) <span class="sc">%%</span> <span class="dv">2</span> )]</span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># str &lt;- z_psl_above$qName</span></span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>  clrs_c <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fu">rev</span>(clrs), <span class="dv">9</span>),</span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>              <span class="co"># rep("gray30", sizes_az |&gt;  filter(grepl("a2_", chr)) |&gt; nrow()),</span></span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rep</span>(clrs, <span class="dv">9</span>) <span class="sc">|&gt;</span> <span class="fu">clr_desaturate</span>(.<span class="dv">45</span>) <span class="sc">|&gt;</span> <span class="fu">clr_lighten</span>(.<span class="dv">65</span>))</span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot.new</span>()</span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.clear</span>()</span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>  col_text <span class="ot">&lt;-</span> <span class="st">"white"</span></span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.par</span>(<span class="st">"track.height"</span> <span class="ot">=</span> <span class="fl">0.8</span>,</span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>             <span class="at">gap.degree =</span> <span class="fu">rep</span>(<span class="fu">rep</span>(<span class="fu">c</span>(.<span class="dv">5</span>, <span class="dv">8</span>), <span class="fu">c</span>(<span class="dv">17</span>, <span class="dv">1</span>)), <span class="dv">2</span>),</span>
-<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>             <span class="at">cell.padding=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
-<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>             <span class="at">start.degree =</span> <span class="dv">82</span>)</span>
-<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.initialize</span>(<span class="at">factors =</span> sizes_az<span class="sc">$</span>chr[z_order], </span>
-<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>                    <span class="at">xlim =</span> sizes_az[z_order,<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>] <span class="sc">|&gt;</span></span>
-<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">as.matrix</span>())</span>
-<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>  <span class="co"># clrs_print(labs = sizes_az$chr[z_order][36:19],</span></span>
-<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>  <span class="co">#            clr_in = clr_al(sizes_az$chr[z_order][36:19]))</span></span>
-<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>  <span class="co"># genomes</span></span>
-<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.track</span>(<span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), </span>
-<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>               <span class="at">panel.fun=</span><span class="cf">function</span>(x, y) {</span>
-<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>                 chr<span class="ot">=</span>CELL_META<span class="sc">$</span>sector.index</span>
-<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>                 xlim<span class="ot">=</span>CELL_META<span class="sc">$</span>xlim</span>
-<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>                 ylim<span class="ot">=</span>CELL_META<span class="sc">$</span>ylim</span>
-<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">circos.text</span>(<span class="fu">mean</span>(xlim),</span>
-<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>                             <span class="fu">mean</span>(ylim), </span>
-<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>                             chr,</span>
-<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>                             <span class="at">cex=</span><span class="fl">0.5</span>,</span>
-<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>                             <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"white"</span>)[(<span class="fu">str_sub</span>(chr,<span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">==</span> <span class="st">"a2"</span>)<span class="sc">+</span><span class="dv">1</span>],<span class="co">#col_text, </span></span>
-<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>                             <span class="at">facing =</span> <span class="st">"bending.inside"</span>,</span>
-<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>                             <span class="at">niceFacing =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>                             <span class="at">family =</span> fnt_sel)},</span>
-<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>               <span class="at">bg.col=</span> clrs_c,</span>
-<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>               <span class="at">bg.border =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>               <span class="at">track.height =</span> <span class="fl">0.06</span>)</span>
-<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>  <span class="co"># genomes x axis</span></span>
-<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>  x_scale <span class="ot">&lt;-</span> <span class="fl">1e6</span></span>
-<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>  brk <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>)<span class="sc">*</span>x_scale <span class="sc">*</span> <span class="dv">100</span></span>
-<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.track</span>(<span class="at">track.index =</span> <span class="fu">get.current.track.index</span>(), </span>
-<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>               <span class="at">panel.fun =</span> <span class="cf">function</span>(x, y) {</span>
-<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">circos.axis</span>(<span class="at">h=</span><span class="st">"top"</span>,</span>
-<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>                             <span class="at">major.at=</span>brk,</span>
-<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>                             <span class="at">labels =</span> <span class="fu">round</span>(brk<span class="sc">/</span>x_scale, <span class="dv">1</span>), </span>
-<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>                             <span class="at">labels.cex =</span> <span class="fl">0.4</span>,</span>
-<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>                             <span class="at">col =</span> <span class="st">"black"</span>, </span>
-<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>                             <span class="at">labels.col=</span><span class="st">"black"</span>,</span>
-<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>                             <span class="at">lwd =</span> <span class="fl">0.7</span>, <span class="at">labels.facing=</span><span class="st">"clockwise"</span>)</span>
-<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>               },</span>
-<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>               <span class="at">bg.border =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.genomicLink</span>(z_psl_above[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], z_psl_above[<span class="dv">4</span><span class="sc">:</span><span class="dv">6</span>],</span>
-<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>                     <span class="at">col =</span> <span class="fu">clr_alpha</span>(<span class="fu">clr_al</span>( z_psl_above<span class="sc">$</span>qName),.<span class="dv">3</span>))</span>
-<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>  p2 <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
-<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>  z_psl_in_top_length <span class="ot">&lt;-</span> z_psl <span class="sc">|&gt;</span></span>
-<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">tName =</span> <span class="fu">simplify_names</span>(tName),</span>
-<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>           <span class="at">qName =</span> <span class="fu">simplify_names</span>(qName)) <span class="sc">|&gt;</span></span>
-<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(tName <span class="sc">%in%</span> sizes_az<span class="sc">$</span>chr,</span>
-<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a>           qName <span class="sc">%in%</span> sizes_az<span class="sc">$</span>chr)</span>
-<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a>  z_psl_matrix <span class="ot">&lt;-</span> z_psl_in_top_length <span class="sc">|&gt;</span></span>
-<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(tName, qName) <span class="sc">|&gt;</span></span>
-<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>              <span class="at">alignment_length =</span> <span class="fu">sum</span>(tSize)) <span class="sc">|&gt;</span></span>
-<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(sizes_az <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">qName =</span> chr, <span class="at">qSize =</span> end)) <span class="sc">|&gt;</span></span>
-<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(sizes_az <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">tName =</span> chr, <span class="at">tSize =</span> end)) <span class="sc">|&gt;</span></span>
-<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">tName =</span> <span class="fu">factor</span>(tName, chr_sel_a),</span>
-<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>           <span class="at">qName =</span> <span class="fu">factor</span>(qName, chr_sel[z_order_pt2]),</span>
-<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>           <span class="at">t_aling_fract =</span> alignment_length <span class="sc">/</span> tSize,</span>
-<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>           <span class="at">q_aling_fract =</span> alignment_length <span class="sc">/</span> qSize)</span>
-<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a>  p3 <span class="ot">&lt;-</span> z_psl_matrix <span class="sc">|&gt;</span></span>
-<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tName, <span class="at">y =</span> qName)) <span class="sc">+</span></span>
-<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> t_aling_fract,</span>
-<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>                  <span class="at">width =</span> (.<span class="dv">5</span> <span class="sc">+</span> t_aling_fract) <span class="sc">/</span> <span class="dv">2</span>,</span>
-<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>                  <span class="at">height =</span> <span class="fu">after_stat</span>(width),</span>
-<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>                  <span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_darken</span>(fill)))) <span class="sc">+</span></span>
-<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>    <span class="co"># scale_fill_manual(values = rev(clrs)) +</span></span>
-<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">"gray90"</span>, clrs[<span class="dv">2</span>] , <span class="st">"black"</span>)) <span class="sc">+</span></span>
-<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>    <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_colorbar</span>(<span class="st">"Alginment Fraction (Target)"</span>,</span>
-<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">title.position =</span> <span class="st">"top"</span>,</span>
-<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">barwidth =</span> <span class="fu">unit</span>(.<span class="dv">2</span>,<span class="st">"npc"</span>),</span>
-<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">barheight =</span> <span class="fu">unit</span>(<span class="dv">5</span>,<span class="st">"pt"</span>))) <span class="sc">+</span></span>
-<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
-<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel) <span class="sc">+</span></span>
-<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>),</span>
-<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>          <span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
-<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>  p4 <span class="ot">&lt;-</span> z_psl_matrix <span class="sc">|&gt;</span></span>
-<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tName, <span class="at">y =</span> qName)) <span class="sc">+</span></span>
-<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> q_aling_fract,</span>
-<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>                  <span class="at">width =</span> (.<span class="dv">5</span> <span class="sc">+</span> q_aling_fract) <span class="sc">/</span> <span class="dv">6</span>,</span>
-<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>                  <span class="at">height =</span> <span class="fu">after_stat</span>(width),</span>
-<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>                  <span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_darken</span>(fill)))) <span class="sc">+</span></span>
-<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>    <span class="co"># scale_fill_manual(values = rev(clrs)) +</span></span>
-<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">"gray90"</span>, clrs[<span class="dv">1</span>] , <span class="st">"black"</span>)) <span class="sc">+</span></span>
-<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>    <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_colorbar</span>(<span class="st">"Alginment Fraction (Querry)"</span>,</span>
-<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">title.position =</span> <span class="st">"top"</span>,</span>
-<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">barwidth =</span> <span class="fu">unit</span>(.<span class="dv">2</span>,<span class="st">"npc"</span>),</span>
-<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">barheight =</span> <span class="fu">unit</span>(<span class="dv">5</span>,<span class="st">"pt"</span>))) <span class="sc">+</span></span>
-<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
-<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel) <span class="sc">+</span></span>
-<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="dv">1</span>),</span>
-<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>          <span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
-<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>  p5 <span class="ot">&lt;-</span> p3 <span class="sc">/</span> p4</span>
-<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">alignment =</span> aln_name,</span>
-<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>         <span class="at">sizes =</span> <span class="fu">list</span>(p1),</span>
-<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>         <span class="at">circ =</span> <span class="fu">list</span>(p2),</span>
-<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>         <span class="at">matrix =</span> <span class="fu">list</span>(p5),</span>
-<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>         <span class="at">psl =</span> <span class="fu">list</span>(z_psl),</span>
-<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>         <span class="at">sizes_df =</span> <span class="fu">list</span>(sizes_az))</span>
-<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># aln_name &lt;- "arcgaz_anc_h1"</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># z_order_pt2 &lt;-  c(17, 18, 16, 15, 14, 13, 12, 10, 11, 8, 9, 7, 6, 5, 4, 3, 2, 1)</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># n_alignments &lt;- 300</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># aln_name &lt;- "zalcal_v1"</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># z_order_pt2 &lt;- c(17, 18, 16, 15, 14, 10, 13, 12, 11, 9, 8, 5, 6, 7, 4, 3, 2, 1)</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"># aln_name &lt;- "arcgaz_bp_hardmasked"</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># z_order_pt2 &lt;-  36:1#c(17, 18, 16, 15, 14, 13, 12, 10, 11, 8, 9, 7, 6, 5, 4, 3, 2, 1)</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>inspect_alignment <span class="ot">&lt;-</span> \(<span class="at">aln_name =</span> <span class="st">"zalcal_v1"</span>,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>                       <span class="at">z_order_pt2 =</span> <span class="dv">18</span><span class="sc">:</span><span class="dv">1</span>,</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n_alignments =</span> <span class="dv">15</span>,</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n_largest =</span> <span class="dv">19</span>){</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  z_psl <span class="ot">&lt;-</span> <span class="fu">get_psl</span>(<span class="fu">glue</span>(<span class="st">"slim_{aln_name}_on_{genomes[[2]]}.psl.gz"</span>))</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  sizes_az <span class="ot">&lt;-</span> sizes <span class="sc">|&gt;</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(size_idx <span class="sc">&lt;</span> (<span class="fu">length</span>(z_order_pt2) <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">&amp;</span> genome <span class="sc">==</span> aln_name <span class="sc">|</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>           size_idx <span class="sc">&lt;</span> <span class="dv">19</span> <span class="sc">&amp;</span> genome <span class="sc">==</span> genomes[[<span class="dv">2</span>]]) <span class="sc">|&gt;</span> </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">l_start =</span> <span class="dv">0</span>,</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>           <span class="at">chr =</span> <span class="fu">simplify_names</span>(chr))  <span class="sc">|&gt;</span> </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">genome_order =</span> <span class="fu">if_else</span>(<span class="fu">str_sub</span>(chr, <span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">==</span> <span class="st">"a2"</span>, <span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(genome_order, <span class="sc">-</span>size) <span class="sc">|&gt;</span> </span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(chr, <span class="at">start =</span> l_start, <span class="at">end =</span> size, genome)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  z_psl_above <span class="ot">&lt;-</span> z_psl <span class="sc">|&gt;</span> </span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="sc">-</span>tSize) <span class="sc">|&gt;</span> </span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># filter(tSize &gt; align_min_length) |&gt; </span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">tName =</span> <span class="fu">simplify_names</span>(tName),</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>           <span class="at">qName =</span> <span class="fu">simplify_names</span>(qName)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(tName <span class="sc">%in%</span> sizes_az<span class="sc">$</span>chr,</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>           qName <span class="sc">%in%</span> sizes_az<span class="sc">$</span>chr) <span class="sc">|&gt;</span> </span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(tName) <span class="sc">|&gt;</span> </span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">in_top_n_t =</span> <span class="fu">row_number</span>() <span class="sc">&lt;</span> n_alignments) <span class="sc">|&gt;</span> </span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(qName) <span class="sc">|&gt;</span> </span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">in_top_n_q =</span> <span class="fu">row_number</span>() <span class="sc">&lt;</span> n_alignments) <span class="sc">|&gt;</span> </span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(in_top_n_t <span class="sc">|</span> in_top_n_q)</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> z_psl_above <span class="sc">|&gt;</span> </span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> tSize), <span class="at">adjust =</span> .<span class="dv">2</span>,</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> clrs[<span class="dv">1</span>], <span class="at">fill =</span> <span class="fu">clr_alpha</span>(clrs[<span class="dv">1</span>])) <span class="sc">+</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">x =</span> qSize, <span class="at">y =</span> <span class="sc">-</span>..density..),<span class="at">adjust =</span> .<span class="dv">1</span>,</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> clrs[<span class="dv">2</span>], <span class="at">fill =</span> <span class="fu">clr_alpha</span>(clrs[<span class="dv">2</span>])) <span class="sc">+</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel)</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>  chr_sel <span class="ot">&lt;-</span> sizes_az <span class="sc">|&gt;</span> </span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(genome <span class="sc">!=</span> genomes[[<span class="dv">2</span>]]) <span class="sc">|&gt;</span> </span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pluck</span>(<span class="st">"chr"</span>)</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>  chr_sel_a <span class="ot">&lt;-</span> sizes_az <span class="sc">|&gt;</span> </span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(genome <span class="sc">==</span> genomes[[<span class="dv">2</span>]]) <span class="sc">|&gt;</span> </span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pluck</span>(<span class="st">"chr"</span>)</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>  chr_f <span class="ot">&lt;-</span> <span class="fu">factor</span>(chr_sel, <span class="at">levels =</span> chr_sel[z_order_pt2])</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    <span class="co"># chr_f &lt;- factor(chr_sel, levels = rev(chr_sel))</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>  n_chr <span class="ot">&lt;-</span> <span class="fu">length</span>(chr_sel)</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>  z_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">18</span>, z_order_pt2 <span class="sc">+</span> <span class="dv">18</span>)</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  clr_al <span class="ot">&lt;-</span> \(str){</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>    clrs[<span class="dv">1</span> <span class="sc">+</span>(<span class="fu">as.numeric</span>(<span class="fu">factor</span>(str, <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(chr_f)))) <span class="sc">%%</span> <span class="dv">2</span> )]</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>  <span class="co"># str &lt;- z_psl_above$qName</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>  clrs_c <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fu">rev</span>(clrs), <span class="dv">9</span>),</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>              <span class="co"># rep("gray30", sizes_az |&gt;  filter(grepl("a2_", chr)) |&gt; nrow()),</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rep</span>(clrs, <span class="fu">round</span>(<span class="fu">length</span>(z_order_pt2)<span class="sc">/</span><span class="dv">2</span>)) <span class="sc">|&gt;</span> <span class="fu">clr_desaturate</span>(.<span class="dv">45</span>) <span class="sc">|&gt;</span> <span class="fu">clr_lighten</span>(.<span class="dv">65</span>))</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>  <span class="co"># plot.new()</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.clear</span>()</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>  col_text <span class="ot">&lt;-</span> <span class="st">"white"</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.par</span>(<span class="st">"track.height"</span> <span class="ot">=</span> <span class="fl">0.8</span>,</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>             <span class="at">gap.degree =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fu">c</span>(.<span class="dv">5</span>, <span class="dv">8</span>), <span class="fu">c</span>(<span class="dv">17</span>, <span class="dv">1</span>)),</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">rep</span>(<span class="fu">c</span>(.<span class="dv">5</span>, <span class="dv">8</span>), <span class="fu">c</span>((<span class="fu">length</span>(z_order_pt2)<span class="sc">-</span><span class="dv">1</span>), <span class="dv">1</span>))),</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>             <span class="at">cell.padding=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>             <span class="at">start.degree =</span> <span class="dv">82</span>)</span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.initialize</span>(<span class="at">factors =</span> sizes_az<span class="sc">$</span>chr[z_order], </span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>                    <span class="at">xlim =</span> sizes_az[z_order,<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>] <span class="sc">|&gt;</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">as.matrix</span>())</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>  <span class="co"># clrs_print(labs = sizes_az$chr[z_order][36:19],</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>  <span class="co">#            clr_in = clr_al(sizes_az$chr[z_order][36:19]))</span></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>  <span class="co"># genomes</span></span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.track</span>(<span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), </span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>               <span class="at">panel.fun=</span><span class="cf">function</span>(x, y) {</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>                 chr<span class="ot">=</span>CELL_META<span class="sc">$</span>sector.index</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>                 xlim<span class="ot">=</span>CELL_META<span class="sc">$</span>xlim</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>                 ylim<span class="ot">=</span>CELL_META<span class="sc">$</span>ylim</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">circos.text</span>(<span class="fu">mean</span>(xlim),</span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>                             <span class="fu">mean</span>(ylim), </span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>                             chr,</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>                             <span class="at">cex =</span> <span class="fl">0.5</span>,</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>                             <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"white"</span>)[(<span class="fu">str_sub</span>(chr,<span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">==</span> <span class="st">"a2"</span>)<span class="sc">+</span><span class="dv">1</span>],<span class="co">#col_text, </span></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>                             <span class="at">facing =</span> <span class="st">"bending.inside"</span>,</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>                             <span class="at">niceFacing =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>                             <span class="at">family =</span> fnt_sel)},</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>               <span class="at">bg.col=</span> clrs_c,</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>               <span class="at">bg.border =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>               <span class="at">track.height =</span> <span class="fl">0.06</span>)</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>  <span class="co"># genomes x axis</span></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>  x_scale <span class="ot">&lt;-</span> <span class="fl">1e6</span></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>  brk <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>) <span class="sc">*</span> x_scale <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.track</span>(<span class="at">track.index =</span> <span class="fu">get.current.track.index</span>(), </span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>               <span class="at">panel.fun =</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">circos.axis</span>(<span class="at">h=</span><span class="st">"top"</span>,</span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>                             <span class="at">major.at=</span>brk,</span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>                             <span class="at">labels =</span> <span class="fu">round</span>(brk<span class="sc">/</span>x_scale, <span class="dv">1</span>), </span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>                             <span class="at">labels.cex =</span> <span class="fl">0.4</span>,</span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>                             <span class="at">col =</span> <span class="st">"black"</span>, </span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>                             <span class="at">labels.col=</span><span class="st">"black"</span>,</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>                             <span class="at">lwd =</span> <span class="fl">0.7</span>, <span class="at">labels.facing=</span><span class="st">"clockwise"</span>)</span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>               },</span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>               <span class="at">bg.border =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>  <span class="fu">circos.genomicLink</span>(z_psl_above[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>],</span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a>                     z_psl_above[<span class="dv">4</span><span class="sc">:</span><span class="dv">6</span>],</span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>                     <span class="at">col =</span> <span class="fu">clr_alpha</span>(<span class="fu">clr_al</span>( z_psl_above<span class="sc">$</span>qName),.<span class="dv">3</span>))</span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>  p2 <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>  z_psl_in_top_length <span class="ot">&lt;-</span> z_psl <span class="sc">|&gt;</span></span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">tName =</span> <span class="fu">simplify_names</span>(tName),</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a>           <span class="at">qName =</span> <span class="fu">simplify_names</span>(qName)) <span class="sc">|&gt;</span></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(tName <span class="sc">%in%</span> sizes_az<span class="sc">$</span>chr,</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>           qName <span class="sc">%in%</span> sizes_az<span class="sc">$</span>chr)</span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>  z_psl_matrix <span class="ot">&lt;-</span> z_psl_in_top_length <span class="sc">|&gt;</span></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(tName, qName) <span class="sc">|&gt;</span></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>              <span class="at">alignment_length =</span> <span class="fu">sum</span>(tSize)) <span class="sc">|&gt;</span></span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(sizes_az <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">qName =</span> chr, <span class="at">qSize =</span> end)) <span class="sc">|&gt;</span></span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(sizes_az <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">tName =</span> chr, <span class="at">tSize =</span> end)) <span class="sc">|&gt;</span></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">tName =</span> <span class="fu">factor</span>(tName, chr_sel_a),</span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>           <span class="at">qName =</span> <span class="fu">factor</span>(qName, chr_sel[z_order_pt2]),</span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>           <span class="at">t_aling_fract =</span> alignment_length <span class="sc">/</span> tSize,</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>           <span class="at">q_aling_fract =</span> alignment_length <span class="sc">/</span> qSize)</span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>  p3 <span class="ot">&lt;-</span> z_psl_matrix <span class="sc">|&gt;</span></span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tName, <span class="at">y =</span> qName)) <span class="sc">+</span></span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> t_aling_fract,</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>                  <span class="at">width =</span> (.<span class="dv">5</span> <span class="sc">+</span> t_aling_fract) <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>                  <span class="at">height =</span> <span class="fu">after_stat</span>(width),</span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>                  <span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_darken</span>(fill)))) <span class="sc">+</span></span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>    <span class="co"># scale_fill_manual(values = rev(clrs)) +</span></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">"gray90"</span>, clrs[<span class="dv">2</span>] , <span class="st">"black"</span>)) <span class="sc">+</span></span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>    <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_colorbar</span>(<span class="st">"Alginment Fraction (Target)"</span>,</span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">title.position =</span> <span class="st">"top"</span>,</span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">barwidth =</span> <span class="fu">unit</span>(.<span class="dv">2</span>,<span class="st">"npc"</span>),</span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">barheight =</span> <span class="fu">unit</span>(<span class="dv">5</span>,<span class="st">"pt"</span>))) <span class="sc">+</span></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel) <span class="sc">+</span></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>),</span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>          <span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>  p4 <span class="ot">&lt;-</span> z_psl_matrix <span class="sc">|&gt;</span></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tName, <span class="at">y =</span> qName)) <span class="sc">+</span></span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> q_aling_fract,</span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>                  <span class="at">width =</span> (.<span class="dv">5</span> <span class="sc">+</span> q_aling_fract) <span class="sc">/</span> <span class="dv">6</span>,</span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>                  <span class="at">height =</span> <span class="fu">after_stat</span>(width),</span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>                  <span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_darken</span>(fill)))) <span class="sc">+</span></span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>    <span class="co"># scale_fill_manual(values = rev(clrs)) +</span></span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(<span class="st">"gray90"</span>, clrs[<span class="dv">1</span>] , <span class="st">"black"</span>)) <span class="sc">+</span></span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>    <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_colorbar</span>(<span class="st">"Alginment Fraction (Querry)"</span>,</span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">title.position =</span> <span class="st">"top"</span>,</span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">barwidth =</span> <span class="fu">unit</span>(.<span class="dv">2</span>,<span class="st">"npc"</span>),</span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">barheight =</span> <span class="fu">unit</span>(<span class="dv">5</span>,<span class="st">"pt"</span>))) <span class="sc">+</span></span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel) <span class="sc">+</span></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="dv">1</span>),</span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>          <span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a>  p5 <span class="ot">&lt;-</span> p3 <span class="sc">/</span> p4</span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">alignment =</span> aln_name,</span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>         <span class="at">sizes =</span> <span class="fu">list</span>(p1),</span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a>         <span class="at">circ =</span> <span class="fu">list</span>(p2),</span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a>         <span class="at">matrix =</span> <span class="fu">list</span>(p5),</span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a>         <span class="at">psl =</span> <span class="fu">list</span>(z_psl),</span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a>         <span class="at">sizes_df =</span> <span class="fu">list</span>(sizes_az))</span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -534,7 +545,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>inspections<span class="sc">$</span>circ[[<span class="dv">1</span>]]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>inspections<span class="sc">$</span>circ[[<span class="dv">2</span>]]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>inspections<span class="sc">$</span>circ[[<span class="dv">3</span>]]</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># inspections$circ[[4]]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>inspections<span class="sc">$</span>circ[[<span class="dv">4</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell quarto-layout-panel">
 <div class="quarto-layout-row quarto-layout-valign-top">
@@ -548,6 +559,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <p><img src="inspect_anchored_alignments_files/figure-html/unnamed-chunk-6-3.svg" class="img-fluid"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="inspect_anchored_alignments_files/figure-html/unnamed-chunk-6-4.svg" class="img-fluid"></p>
 </div>
 </div>
 </div>
