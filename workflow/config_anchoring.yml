@@ -10,4 +10,8 @@ lastParams: "-m 1 -j 3 -u 1 -p HOXD70"
 genomes:
   - ""
 
+haplotypes:
+  - h1
+  - h2
+
 mask_suffix: '_hardmasked'
