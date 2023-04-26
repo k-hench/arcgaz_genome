@@ -17,7 +17,7 @@ read_size <- \(genome = "", y_base = 0){
 
 genomes <- c("arcgaz_dt_h1_hardmasked",
              "arcgaz_dt_h2_hardmasked",
-             "arcgaz_v1_hardmasked",
+             "arcgaz_v3_hardmasked",
              "arcgaz_bp_hardmasked",
              "zalcal_v1_hardmasked")
 
@@ -59,13 +59,13 @@ n_largest <- 45
 
 inspect_alignment <- \(aln_name = "arcgaz_dt_h2_hardmasked",
                        n_alignments = 1e3,
-                       ref = "arcgaz_v1_hardmasked"){
-  z_psl <- get_psl(glue("slim_{aln_name}_on_arcgaz_v1_hardmasked.psl.gz"))
+                       ref = "arcgaz_v3_hardmasked"){
+  z_psl <- get_psl(glue("slim_{aln_name}_on_arcgaz_v3_hardmasked.psl.gz"))
 
   sizes_az <- sizes |>
     mutate(in_larges_scaffold = if_else(genome == ref, 25, n_largest)) |>
     filter(size_idx < in_larges_scaffold,
-           genome %in% c("arcgaz_v1_hardmasked", aln_name)) |>
+           genome %in% c("arcgaz_v3_hardmasked", aln_name)) |>
     mutate(l_start = 0,
            chr = simplify_names(chr)) |>
     select(chr, start = l_start, end = size, genome)
@@ -129,7 +129,7 @@ inspect_alignment <- \(aln_name = "arcgaz_dt_h2_hardmasked",
 get_best_hits <- \(alignment, psl, matrix, sizes_df){
 
   alignment_df <- psl |>
-    mutate(across(contains("Name"), simplify_names,.names = "{col}_simple"))
+    mutate(across(contains("Name"), simplify_names, .names = "{col}_simple"))
 
   sizes_az <- sizes_df
   matrix_az <- matrix
@@ -302,7 +302,7 @@ plot_primary_borders <- \(alignment, primary_alignments, ...){
                    linewidth = 2, color = "red") +
     facet_wrap(seqnames ~ ., scales = 'free_x')
 
-  sizes_t <- sizes |> filter(genome == "arcgaz_v1_hardmasked") |> select(tName = chr, tSize = size)
+  sizes_t <- sizes |> filter(genome == "arcgaz_v3_hardmasked") |> select(tName = chr, tSize = size)
   sizes_q <- sizes |> filter(genome == alignment) |>  select(qName = chr, qSize = size)
   dir.create(glue("results/anchoring/{alignment}"), showWarnings = FALSE)
   write_lines("ScWAj4l\t1",
