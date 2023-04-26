@@ -1,4 +1,8 @@
 '''
+snakemake --configfile workflow/config.yml # initial alignments of unmodified (masked) genomes
+snakemake --configfile workflow/config_anchoring.yml # aligning h1 and h2 to v3 for anchoring
+snakemake --configfile workflow/config_align_anchored.yml # final alignments against anchored genomes
+
 # execute
 snakemake \
     --use-conda \
@@ -34,16 +38,6 @@ snakemake \
 snakemake \
     -n \
     --configfile workflow/config.yml
-
-snakemake \
-    -n \
-    --configfile workflow/config_anchoring.yml \
-    -R align
-
-snakemake \
-    -n \
-    --configfile workflow/config_align_anchored.yml \
-    -R align
 '''
 container: "docker://khench/msa_envs:v0.1"
 
