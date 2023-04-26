@@ -18,6 +18,24 @@ snakemake --jobs 10 \
       -l vf={resources.mem_mb}' \
       --jn job.{name}.{jobid}.sh \
       -R all_repeat && mv job.* logs/
+
+snakemake --jobs 10 \
+   --latency-wait 30 \
+   --use-singularity \
+   --use-conda \
+   -p \
+   --configfile workflow/config.yml \
+   --default-resources mem_mb=25600 \
+   --cluster '
+     qsub \
+       -V -cwd \
+       -P fair_share \
+       -l idle=1 \
+       -l si_flag=1 \
+       -pe multislot {threads} \
+       -l vf={resources.mem_mb}' \
+       --jn job.{name}.{jobid}.sh \
+       -R data/genomes/arcgaz_v3_hardmasked.fa.gz
 '''
 
 GENOMES = config[ 'genomes' ]

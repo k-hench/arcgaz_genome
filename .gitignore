@@ -21,6 +21,8 @@ nf/*/*
 # exclude results by default
 results/*
 
+img/*
+img/illustrations
 
 .snakemake/
 

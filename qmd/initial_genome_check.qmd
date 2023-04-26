@@ -139,8 +139,8 @@ pratition_genome <- \(genome){
 
 Partition all genomes, where the labels indicate the following:
 
-- `arcgaz_v1`: *A. gazella*, original reference genome
-- `arcgaz_bp`: *A. gazella*, PacBio based (HighC) reference genome 
+- `arcgaz_v1`: *A. gazella*, previous reference genome (Peart *et al.* 2019)
+- `arcgaz_bp`: *A. gazella*, PacBio based reference genome (?) 
 - `arcgaz_dt_h1`: *A. gazella* dovetail assembly, haplotype 1
 - `arcgaz_dt_h2`: *A. gazella* dovetail assembly, haplotype 2
 - `zalcal_v1`:  *Zalophus californianus* reference genome
