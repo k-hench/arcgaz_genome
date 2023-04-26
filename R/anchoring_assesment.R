@@ -2,6 +2,7 @@
 # library(prismatic)
 # library(patchwork)
 # library(glue)
+# library(here)
 
 source(here("R/plot_defaults.R"))
 
@@ -18,7 +19,7 @@ compile_bed <- \(ht = 1){
   data <- full_bed |>
     mutate(org_scaffold_v3 = str_remove(n1, ":.*"),
            org_scaffold_dt = str_remove(n2, ":.*"),
-           is_x = org_scaffold_v3 == "ScWAj4l-43",
+           is_x = org_scaffold_v3 == "CAAAJK-010000043.1",
            is_single_diget = str_detect(name, "chr[0-9]$"),
            name_prep = case_when(
              is_x ~ scaf_x,
@@ -122,8 +123,8 @@ compile_bed <- \(ht = 1){
                        sec.axis = sec_axis(breaks = c(data_bed$gmid[1:18],
                                                       (data_bed$gstart[19] + max(data_bed$gend)) / 2 )* 1e-9,
                                            labels = c(str_c(
-                                             new_prefix,ht,"_", c( str_c(str_pad(1:17, width = 2, pad = 0)), scaf_x),
-                                                            "\n", data$org_scaffold_v3[1:18]),
+                                             data_bed$name_new[1:18] |> str_remove("mscaf_"),
+                                                            "\n", str_remove(data$org_scaffold_v3[1:18], "CAAAJK-01000") |> str_remove("^0*") %>% str_c("v3_",.)),
                                                       " unplaced"),
                                            trans = identity)) +
     scale_y_continuous(name = glue("haplotype {ht}"),
@@ -143,7 +144,6 @@ compile_bed <- \(ht = 1){
 
 both_beds <- 1:2 |>
   map_dfr(compile_bed)
-
 # both_beds$plot |>
 #   wrap_plots(ncol = 1) &
 #   theme(legend.position = "none")

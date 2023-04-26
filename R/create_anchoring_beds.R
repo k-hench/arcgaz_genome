@@ -305,7 +305,7 @@ plot_primary_borders <- \(alignment, primary_alignments, ...){
   sizes_t <- sizes |> filter(genome == "arcgaz_v3_hardmasked") |> select(tName = chr, tSize = size)
   sizes_q <- sizes |> filter(genome == alignment) |>  select(qName = chr, qSize = size)
   dir.create(glue("results/anchoring/{alignment}"), showWarnings = FALSE)
-  write_lines("ScWAj4l\t1",
+  write_lines("CAAAJK\t1",
               file = glue("results/anchoring/{alignment}/weights.txt"))
 
   export_bed <- primary_borders  |>
@@ -318,7 +318,7 @@ plot_primary_borders <- \(alignment, primary_alignments, ...){
     left_join(sizes_q) |>
     arrange(tName, tPos) |>
     mutate(target_start = qPos - 1,
-           querry_label = str_c(str_remove(tName, ";.*") |> str_replace("_","-"),":", sprintf("%.5f", tPos/tSize)),
+           querry_label = str_c(str_remove(tName, ";.*") |> str_replace("CAAAJK","CAAAJK-"),":", sprintf("%.5f", tPos/tSize)),
            # querry_label = str_c(str_remove(qName, ";.*") |> str_replace("_","-"),":",querry),
            target_label = str_c(qName,":", qPos)) |>
     select(qName, target_start, qPos, querry_label, target_label)

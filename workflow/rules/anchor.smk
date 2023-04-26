@@ -15,7 +15,7 @@ snakemake \
      -l si_flag=1 \
      -pe multislot {threads} \
      -l vf={resources.mem_mb}' \
-  -R align
+  -R anchor
 
 # dryrun
 snakemake \
@@ -93,7 +93,7 @@ rule convert_anchored_fa:
       fa = "results/anchoring/arcgaz_dt_{haplotype}_hardmasked/anchored_arcgaz_dt_{haplotype}.fasta.gz"
     output:
       fa = "data/genomes/arcgaz_anc_{haplotype}.fa.gz"
-    conda: "popgen"
+    conda: "popgen_basics"
     shell:
       '''
       /home/kluk/work/software/bin/bedtools getfasta \
