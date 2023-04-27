@@ -2,6 +2,7 @@
 engine: knitr
 editor_options: 
   chunk_output_type: console
+bibliography: references.bib
 ---
 
 # Initial Genome Check
@@ -96,7 +97,7 @@ check_paritions <- \(genome = "arcgaz_v1"){
             axis.line = element_line(color = clr_ln, linewidth = .4))
 }
 
-pratition_genome <- \(genome){
+partition_genome <- \(genome){
   # read in the scaffold sizes from genome index file
   data <- read_tsv(here("data", "genomes", glue("{genome}.fa.gz.fai")),
                    col_names = c("scaff", "length", "offset",
@@ -139,16 +140,33 @@ pratition_genome <- \(genome){
 
 Partition all genomes, where the labels indicate the following:
 
-- `arcgaz_v1`: *A. gazella*, previous reference genome (Peart *et al.* 2019)
-- `arcgaz_bp`: *A. gazella*, PacBio based reference genome (?) 
 - `arcgaz_dt_h1`: *A. gazella* dovetail assembly, haplotype 1
 - `arcgaz_dt_h2`: *A. gazella* dovetail assembly, haplotype 2
-- `zalcal_v1`:  *Zalophus californianus* reference genome
+- `arcgaz_v3`: *A. gazella*, previous reference genome (@peart2021, [GCA_900642305.1)](https://www.ncbi.nlm.nih.gov/data-hub/genome/GCA_900642305.1/)
+- `zalcal_v1`:  *Zalophus californianus* reference genome (@peart2021, [GCF_009762305.2)](https://www.ncbi.nlm.nih.gov/data-hub/genome/GCF_009762305.2/)
+
+<!---
+zalcal genomes
+--------------
+GCA_009762305.1 (Peart et al 2021) <- GERP list
+GCA_009762305.2 (Peart et al 2021)
+GCA_009762305.2 (current GenBank)
+GCF_009762305.2 (current RefSeq)
+
+GCA_009762295.1 (Peart et al 2021)
+GCA_009762295.2 (Peart et al 2021)
+GCA_009762295.2 (current GenBank)
+
+arcgaz genomes
+--------------
+GCA_900642305.1 (Peart et al 2021) <- GERP list
+GCA_900642305.1 (current GenBank)
+--->
 
 ```{r}
-all_genomes <- c('arcgaz_bp', 'arcgaz_dt_h1', 'arcgaz_dt_h2', 'arcgaz_v1', 'zalcal_v1')
+all_genomes <- c('arcgaz_dt_h1', 'arcgaz_dt_h2', 'arcgaz_v3', 'zalcal_v1')
 n_part <- 20
-all_genomes |> walk(pratition_genome)
+all_genomes |> walk(partition_genome)
 ```
 
 Creating all plots and combining them into a patchwork.

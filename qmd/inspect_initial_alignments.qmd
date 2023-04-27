@@ -33,9 +33,10 @@ read_size <- \(genome = "", y_base = 0){
 genomes <- c("arcgaz_dt_h1_hardmasked",
             # "arcgaz_dt_h1_anchored",
              "arcgaz_dt_h2_hardmasked",
-             "arcgaz_v1_hardmasked",
-             "arcgaz_bp_hardmasked",
-             "zalcal_v1_hardmasked")
+             "arcgaz_v3_hardmasked"#,
+             # "arcgaz_bp_hardmasked",
+             # "zalcal_v1_hardmasked"
+            )
 
 sizes <- tibble(genome = genomes,
                 y_base = seq_along(genomes)-1) |> 
@@ -81,13 +82,14 @@ sizes |>
                   ylim = c(-.1, length(genomes)),
                   expand = 0)+
   # coord_polar() +
+  labs(title = "pre-anchoring genomes") +
   theme_minimal(base_family = fnt_sel) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.x = element_line(linewidth = .2),
-        axis.ticks.length = unit(-4,"pt"))
+        axis.ticks.length = unit(-4,"pt"),
+        plot.title = element_text(hjust = .5))
 ```
-
 
 ```{r}
 get_psl <- \(file){
@@ -114,11 +116,11 @@ simplify_names <- \(str){
 }
 
 inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 1e3){
-  z_psl <- get_psl(glue("{aln_name}-18.psl.gz"))
+  z_psl <- get_psl(glue("slim_{aln_name}_on_{genomes[[3]]}.psl.gz"))
   
   sizes_az <- sizes |>
     filter(size_idx < n_largest,
-           genome %in% c("arcgaz_dt_h1_hardmasked", aln_name)) |> 
+           genome %in% c("arcgaz_v3_hardmasked", aln_name)) |> 
     mutate(l_start = 0,
            chr = simplify_names(chr)) |> 
     select(chr, start = l_start, end = size, genome)
@@ -136,16 +138,16 @@ inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 1e3){
     ggplot() +
     geom_density(aes(x = tSize), adjust = .1,
                  color = clrs[1], fill = clr_alpha(clrs[1])) +
-    geom_density(aes(x = qSize, y = -..density..),adjust = .1,
+    geom_density(aes(x = qSize, y = after_stat(density)), adjust = .1,
                  color = clrs[2], fill = clr_alpha(clrs[2])) +
     theme_minimal(base_family = fnt_sel)
   
   chr_sel <- sizes_az |> 
-    filter(genome != genomes[[1]]) |> 
+    filter(genome != genomes[[3]]) |> 
     pluck("chr")
   
   chr_sel_a <- sizes_az |> 
-    filter(genome == genomes[[1]]) |> 
+    filter(genome == genomes[[3]]) |> 
     pluck("chr")
   chr_f <- factor(chr_sel, levels = chr_sel)
   n_chr <- length(chr_sel)
@@ -271,55 +273,53 @@ inspect_alignment <- \(aln_name = "zalcal_v1", n_alignments = 1e3){
 ```{r}
 #| include: false
 #| echo: false
-inspections <- genomes[2:5] |> 
+inspections <- genomes[1:2] |> 
   map_dfr(inspect_alignment)
 ```
 
 ```{r}
-inspections$sizes |> wrap_plots(ncol = 4)
+inspections$sizes |> wrap_plots(ncol = 2)
 ```
 
 ```{r}
 #| layout-ncol: 2
 inspections$circ[[1]]
 inspections$circ[[2]]
-inspections$circ[[3]]
-inspections$circ[[4]]
 ```
 
 ```{r}
 #| fig-width: 12.
 #| fig-height: 12.
-inspections$matrix |> wrap_plots(ncol = 4)
+inspections$matrix |> wrap_plots(ncol = 2)
 ```
 
 ```{r}
-zcal <- inspect_alignment("zalcal_v1_hardmasked")
-z_psl <- zcal$psl[[1]] |> 
-  mutate(tlength = tEnd - tStart,
-         qlength = qEnd - qStart) |> 
-  group_by(tName, qName) |> 
-  summarise(t_sum = sum(tlength),
-            q_sum = sum(qlength)) |> 
-  ungroup() |> 
-  left_join(sizes |> select(chr, t_size = size), by = c(tName = 'chr')) |> 
-  left_join(sizes |> select(chr, q_size = size), by = c(qName = 'chr')) |> 
-  mutate(t_rel = t_sum / t_size,
-         q_rel = q_sum / q_size,
-         tName = fct_reorder(tName, -t_size),
-         qName = fct_reorder(qName, -q_size)) 
-
-z_psl |> 
-  ggplot(aes(x = tName, y = qName, fill = -abs(log10(t_rel))))+#between(t_rel, .75,3.75))) +
-  geom_tile(width = .8, height = .8, aes(color = after_scale(clr_darken(fill))), size = .2) +
-  geom_vline(xintercept = 36.5, color = clrs[[1]], size = .4, alpha = .5)+
-  # scale_fill_manual(values = c(`TRUE` = clrs[[1]], `FALSE` = 'gray90'),
-  #                   guide = 'none') +
-  scale_fill_viridis_c()+
-  scale_fill_gradientn(colours = rev(c(clr_lighten(clrs[[1]]), str_c("gray",(1:9)*10))))+
-  coord_equal() +
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 90),
-        legend.position = "bottom")
+# zcal <- inspect_alignment("zalcal_v1_hardmasked")
+# z_psl <- zcal$psl[[1]] |> 
+#   mutate(tlength = tEnd - tStart,
+#          qlength = qEnd - qStart) |> 
+#   group_by(tName, qName) |> 
+#   summarise(t_sum = sum(tlength),
+#             q_sum = sum(qlength)) |> 
+#   ungroup() |> 
+#   left_join(sizes |> select(chr, t_size = size), by = c(tName = 'chr')) |> 
+#   left_join(sizes |> select(chr, q_size = size), by = c(qName = 'chr')) |> 
+#   mutate(t_rel = t_sum / t_size,
+#          q_rel = q_sum / q_size,
+#          tName = fct_reorder(tName, -t_size),
+#          qName = fct_reorder(qName, -q_size)) 
+# 
+# z_psl |> 
+#   ggplot(aes(x = tName, y = qName, fill = -abs(log10(t_rel))))+#between(t_rel, .75,3.75))) +
+#   geom_tile(width = .8, height = .8, aes(color = after_scale(clr_darken(fill))), size = .2) +
+#   geom_vline(xintercept = 36.5, color = clrs[[1]], size = .4, alpha = .5)+
+#   # scale_fill_manual(values = c(`TRUE` = clrs[[1]], `FALSE` = 'gray90'),
+#   #                   guide = 'none') +
+#   scale_fill_viridis_c()+
+#   scale_fill_gradientn(colours = rev(c(clr_lighten(clrs[[1]]), str_c("gray",(1:9)*10))))+
+#   coord_equal() +
+#   theme_minimal()+
+#   theme(axis.text.x = element_text(angle = 90),
+#         legend.position = "bottom")
 ```
 

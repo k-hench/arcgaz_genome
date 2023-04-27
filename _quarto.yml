@@ -21,7 +21,6 @@ book:
     right:
       - icon: github
         href: https://github.com/k-hench/arcgaz_genome
-  favicon: img/dummy.svg
 bibliography: references.bib
 
 from: markdown+emoji

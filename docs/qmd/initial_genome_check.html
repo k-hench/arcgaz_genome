@@ -83,6 +83,25 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 
@@ -95,7 +114,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <meta name="quarto:offset" content="../">
 <link href="../qmd/inspect_initial_alignments.html" rel="next">
 <link href="../index.html" rel="prev">
-<link href="../img/dummy.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -206,7 +224,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../qmd/references.html" class="sidebar-item-text sidebar-link">References</a>
+  <a href="../qmd/references.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">References</span></a>
   </div>
 </li>
     </ul>
@@ -326,7 +344,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>            <span class="at">axis.line =</span> <span class="fu">element_line</span>(<span class="at">color =</span> clr_ln, <span class="at">linewidth =</span> .<span class="dv">4</span>))</span>
 <span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>pratition_genome <span class="ot">&lt;-</span> \(genome){</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>partition_genome <span class="ot">&lt;-</span> \(genome){</span>
 <span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>  <span class="co"># read in the scaffold sizes from genome index file</span></span>
 <span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"genomes"</span>, <span class="fu">glue</span>(<span class="st">"{genome}.fa.gz.fai"</span>)),</span>
 <span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>                   <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">"scaff"</span>, <span class="st">"length"</span>, <span class="st">"offset"</span>,</span>
@@ -369,18 +387,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>Partition all genomes, where the labels indicate the following:</p>
 <ul>
-<li><code>arcgaz_v1</code>: <em>A. gazella</em>, original reference genome</li>
-<li><code>arcgaz_bp</code>: <em>A. gazella</em>, PacBio based (HighC) reference genome</li>
 <li><code>arcgaz_dt_h1</code>: <em>A. gazella</em> dovetail assembly, haplotype 1</li>
 <li><code>arcgaz_dt_h2</code>: <em>A. gazella</em> dovetail assembly, haplotype 2</li>
-<li><code>zalcal_v1</code>: <em>Zalophus californianus</em> reference genome</li>
+<li><code>arcgaz_v3</code>: <em>A. gazella</em>, previous reference genome (<span class="citation" data-cites="peart2021">Peart et al. (<a href="references.html#ref-peart2021" role="doc-biblioref">2021</a>)</span>, <a href="https://www.ncbi.nlm.nih.gov/data-hub/genome/GCA_900642305.1/">GCA_900642305.1)</a></li>
+<li><code>zalcal_v1</code>: <em>Zalophus californianus</em> reference genome (<span class="citation" data-cites="peart2021">Peart et al. (<a href="references.html#ref-peart2021" role="doc-biblioref">2021</a>)</span>, <a href="https://www.ncbi.nlm.nih.gov/data-hub/genome/GCF_009762305.2/">GCF_009762305.2)</a></li>
 </ul>
+<!---
+zalcal genomes
+--------------
+GCA_009762305.1 (Peart et al 2021) <- GERP list
+GCA_009762305.2 (Peart et al 2021)
+GCA_009762305.2 (current GenBank)
+GCF_009762305.2 (current RefSeq)
+
+GCA_009762295.1 (Peart et al 2021)
+GCA_009762295.2 (Peart et al 2021)
+GCA_009762295.2 (current GenBank)
+
+arcgaz genomes
+--------------
+GCA_900642305.1 (Peart et al 2021) <- GERP list
+GCA_900642305.1 (current GenBank)
+--->
 <div class="cell">
 <details>
 <summary>toggle code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>all_genomes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'arcgaz_bp'</span>, <span class="st">'arcgaz_dt_h1'</span>, <span class="st">'arcgaz_dt_h2'</span>, <span class="st">'arcgaz_v1'</span>, <span class="st">'zalcal_v1'</span>)</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>all_genomes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'arcgaz_dt_h1'</span>, <span class="st">'arcgaz_dt_h2'</span>, <span class="st">'arcgaz_v3'</span>, <span class="st">'zalcal_v1'</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n_part <span class="ot">&lt;-</span> <span class="dv">20</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>all_genomes <span class="sc">|&gt;</span> <span class="fu">walk</span>(pratition_genome)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>all_genomes <span class="sc">|&gt;</span> <span class="fu">walk</span>(partition_genome)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Creating all plots and combining them into a patchwork.</p>
@@ -400,6 +434,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="ref-peart2021" class="csl-entry" role="doc-biblioentry">
+Peart, Claire R., Christina Williams, Saurabh D. Pophaly, Benjamin A. Neely, Frances M. D. Gulland, David J. Adams, Bee Ling Ng, et al. 2021. <span>“Hi-<span>C</span> Scaffolded Short- and Long-Read Genome Assemblies of the <span>California</span> Sea Lion Are Broadly Consistent for Syntenic Inference Across 45 Million Years of Evolution.”</span> <em>Molecular Ecology Resources</em> 21 (7): 2455–70. <a href="https://doi.org/10.1111/1755-0998.13443">https://doi.org/10.1111/1755-0998.13443</a>.
+</div>
+</div>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
