@@ -1,7 +1,7 @@
-ref: arcgaz_dt_h2
+ref: arcgaz_dt_h1
 
 queries:
-  - arcgaz_dt_h1
+  - arcgaz_dt_h2
   - arcgaz_v3
   - arcgaz_v1_2
   - arcgaz_v1_4

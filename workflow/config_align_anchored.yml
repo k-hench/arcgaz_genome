@@ -1,7 +1,7 @@
-ref: arcgaz_anc_h2
+ref: arcgaz_anc_h1
 
 queries:
-  - arcgaz_anc_h1
+  - arcgaz_anc_h2
   - arcgaz_v3
   - zalcal_v1
 
