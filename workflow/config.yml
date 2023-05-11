@@ -7,7 +7,7 @@ queries:
   - arcgaz_v1_4
   - zalcal_v1
 
-lastParams: "-m 1 -j 3 -u 1 -p HOXD70"
+lastParams: "-v -m 1 -j 3 -u 1 -p HOXD70"
 # lastParams: "-j 3"
 
 genomes:
