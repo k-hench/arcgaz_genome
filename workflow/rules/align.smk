@@ -23,7 +23,7 @@ snakemake \
   --latency-wait 30 \
   --use-conda -p \
   --configfile workflow/config.yml \
-  --default-resources mem_mb=25600 \
+  --default-resources mem_mb=25600 disk_mb=5000 \
   --cluster '
      qsub \
      -V -cwd \

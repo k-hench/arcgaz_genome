@@ -17,23 +17,11 @@ library(glue)
 library(patchwork)
 library(here)
 source(here("R/plot_defaults.R"))
-
-read_size <- \(genome = "", y_base = 0){
-  read_tsv(here::here("results", "genome", str_c(genome,".size")),
-           col_names = c("chr", "size")) |> 
-    arrange(-size) |> 
-    mutate(size_idx = row_number(),
-           end = cumsum(size),
-           start = lag(end,default =  0),
-           eo = size_idx %% 2,
-           y_base = y_base,
-           genome = genome)
-}
+source(here("R/cartesian_alignment_helpers.R"))
 
 genomes <- c("arcgaz_anc_h1",
              "arcgaz_anc_h2",
              "arcgaz_v3_hardmasked",
-             # "arcgaz_bp_hardmasked",
              "zalcal_v1")
 
 sizes <- tibble(genome = genomes,
@@ -49,11 +37,10 @@ g_height <- .8
 align_min_length <- 3e5
 ```
 
-
 ```{r}
 #| fig-width: 11.
 #| fig-height: 9.
-n_largest <- 19
+n_largest <- 18
 sizes |> 
   filter(size_idx < n_largest) |> 
   ggplot() +
@@ -81,535 +68,103 @@ sizes |>
                   ylim = c(-.1, length(genomes)),
                   expand = 0)+
   # coord_polar() +
+  labs(title = "anchored genomes", 
+       subtitle = "(scaffolds sorted by size)") +
   theme_minimal(base_family = fnt_sel) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.x = element_line(linewidth = .2),
-        axis.ticks.length = unit(-4, "pt"))
-```
-
-
-```{r}
-get_psl <- \(file){
-  vroom::vroom(here::here("results","psl", file),
-               delim = "\t",
-               col_names = c("matches", "misMatches", "repMatches", "nCount",
-                             "qNumInsert", "qBaseInsert", "tNumInsert",
-                             "tBaseInsert", "strand", "qName", "qSize", "qStart",
-                             "qEnd", "tName", "tSize", "tStart", "tEnd",
-                             "blockCount")) |> 
-    select( tName, tStart, tEnd, qName, qStart, qEnd, strand ) |> 
-    mutate(tSize = tEnd - tStart,
-           qSize = qEnd - qStart)
-}
-
-simplify_names <- \(str){
-  str_remove_all(str, ";.*") |> 
-    str_replace("mscaf_", "") |> 
-    str_replace("NC_045", "Z.") |> 
-    str_replace("NW_0233655", "Z.") |> 
-    str_replace("ScWAj4l_", "V1.")|> 
-    str_replace("ptg000", "PB.")
-}
-
-# aln_name <- "arcgaz_anc_h1"
-# z_order_pt2 <-  c(17, 18, 16, 15, 14, 13, 12, 10, 11, 8, 9, 7, 6, 5, 4, 3, 2, 1)
-# n_alignments <- 300
-# aln_name <- "zalcal_v1"
-# z_order_pt2 <- c(17, 18, 16, 15, 14, 10, 13, 12, 11, 9, 8, 5, 6, 7, 4, 3, 2, 1)
-# aln_name <- "arcgaz_bp_hardmasked"
-# z_order_pt2 <-  36:1#c(17, 18, 16, 15, 14, 13, 12, 10, 11, 8, 9, 7, 6, 5, 4, 3, 2, 1)
-
-inspect_alignment <- \(aln_name = "zalcal_v1",
-                       z_order_pt2 = 18:1,
-                       n_alignments = 15,
-                       n_largest = 19){
-  z_psl <- get_psl(glue("slim_{aln_name}_on_{genomes[[2]]}.psl.gz"))
-  
-  sizes_az <- sizes |>
-    filter(size_idx < (length(z_order_pt2) + 1) & genome == aln_name |
-           size_idx < 19 & genome == genomes[[2]]) |> 
-    mutate(l_start = 0,
-           chr = simplify_names(chr))  |> 
-    mutate(genome_order = if_else(str_sub(chr, 1,2) == "a2", 1, 2)) |> 
-    arrange(genome_order, -size) |> 
-    select(chr, start = l_start, end = size, genome)
-  
-  z_psl_above <- z_psl |> 
-    arrange(-tSize) |> 
-    # filter(tSize > align_min_length) |> 
-    mutate(tName = simplify_names(tName),
-           qName = simplify_names(qName)) |> 
-    filter(tName %in% sizes_az$chr,
-           qName %in% sizes_az$chr) |> 
-    group_by(tName) |> 
-    mutate(in_top_n_t = row_number() < n_alignments) |> 
-    ungroup() |> 
-    group_by(qName) |> 
-    mutate(in_top_n_q = row_number() < n_alignments) |> 
-    ungroup() |> 
-    filter(in_top_n_t | in_top_n_q)
-
-  p1 <- z_psl_above |> 
-    ggplot() +
-    geom_density(aes(x = tSize), adjust = .2,
-                 color = clrs[1], fill = clr_alpha(clrs[1])) +
-    geom_density(aes(x = qSize, y = -after_stat(density)),adjust = .1,
-                 color = clrs[2], fill = clr_alpha(clrs[2])) +
-    theme_minimal(base_family = fnt_sel)
-  
-  chr_sel <- sizes_az |> 
-    filter(genome != genomes[[2]]) |> 
-    pluck("chr")
-  
-  chr_sel_a <- sizes_az |> 
-    filter(genome == genomes[[2]]) |> 
-    pluck("chr")
-  
-  chr_f <- factor(chr_sel, levels = chr_sel[z_order_pt2])
-    # chr_f <- factor(chr_sel, levels = rev(chr_sel))
-  n_chr <- length(chr_sel)
-
-  z_order <- c(1:18, z_order_pt2 + 18)
-  clr_al <- \(str){
-    clrs[1 +(as.numeric(factor(str, levels = rev(levels(chr_f)))) %% 2 )]
-    
-  }
-  # str <- z_psl_above$qName
-  clrs_c <- c(rep(rev(clrs), 9),
-              # rep("gray30", sizes_az |>  filter(grepl("a2_", chr)) |> nrow()),
-              rep(clrs, round(length(z_order_pt2)/2)) |> clr_desaturate(.45) |> clr_lighten(.65))
-
-  # plot.new()
-  circos.clear()
-  col_text <- "white"
-  circos.par("track.height" = 0.8,
-             gap.degree = c(rep(c(.5, 8), c(17, 1)),
-                            rep(c(.5, 8), c((length(z_order_pt2)-1), 1))),
-             cell.padding=c(0, 0, 0, 0),
-             start.degree = 82)
-  
-  circos.initialize(factors = sizes_az$chr[z_order], 
-                    xlim = sizes_az[z_order,2:3] |>
-                      as.matrix())
-
-  # clrs_print(labs = sizes_az$chr[z_order][36:19],
-  #            clr_in = clr_al(sizes_az$chr[z_order][36:19]))
-  # genomes
-  circos.track(ylim=c(0, 1), 
-               panel.fun=function(x, y) {
-                 chr=CELL_META$sector.index
-                 xlim=CELL_META$xlim
-                 ylim=CELL_META$ylim
-                 circos.text(mean(xlim),
-                             mean(ylim), 
-                             chr,
-                             cex = 0.5,
-                             col = c("black", "white")[(str_sub(chr,1,2) == "a2")+1],#col_text, 
-                             facing = "bending.inside",
-                             niceFacing = TRUE,
-                             family = fnt_sel)},
-               bg.col= clrs_c,
-               bg.border = FALSE, 
-               track.height = 0.06)
-  
-  # genomes x axis
-  x_scale <- 1e6
-  brk <- c(0, 0.5, 1, 1.5, 2) * x_scale * 100
-  circos.track(track.index = get.current.track.index(), 
-               panel.fun = function(x, y) {
-                 circos.axis(h="top",
-                             major.at=brk,
-                             labels = round(brk/x_scale, 1), 
-                             labels.cex = 0.4,
-                             col = "black", 
-                             labels.col="black",
-                             lwd = 0.7, labels.facing="clockwise")
-               },
-               bg.border = FALSE)
-  
-  circos.genomicLink(z_psl_above[1:3],
-                     z_psl_above[4:6],
-                     col = clr_alpha(clr_al( z_psl_above$qName),.3))
-  
-  p2 <- recordPlot()
-  
-  z_psl_in_top_length <- z_psl |>
-    mutate(tName = simplify_names(tName),
-           qName = simplify_names(qName)) |>
-    filter(tName %in% sizes_az$chr,
-           qName %in% sizes_az$chr)
-  
-  z_psl_matrix <- z_psl_in_top_length |>
-    group_by(tName, qName) |>
-    summarize(n = n(),
-              alignment_length = sum(tSize)) |>
-    ungroup() |>
-    left_join(sizes_az |> select(qName = chr, qSize = end)) |>
-    left_join(sizes_az |> select(tName = chr, tSize = end)) |>
-    mutate(tName = factor(tName, chr_sel_a),
-           qName = factor(qName, chr_sel[z_order_pt2]),
-           t_aling_fract = alignment_length / tSize,
-           q_aling_fract = alignment_length / qSize)
-  
-  p3 <- z_psl_matrix |>
-    ggplot(aes(x = tName, y = qName)) +
-    geom_tile(aes(fill = t_aling_fract,
-                  width = (.5 + t_aling_fract) / 2,
-                  height = after_stat(width),
-                  color = after_scale(clr_darken(fill)))) +
-    # scale_fill_manual(values = rev(clrs)) +
-    scale_fill_gradientn(colours = c("gray90", clrs[2] , "black")) +
-    guides(fill = guide_colorbar("Alginment Fraction (Target)",
-                                 title.position = "top",
-                                 barwidth = unit(.2,"npc"),
-                                 barheight = unit(5,"pt"))) +
-    coord_equal() +
-    theme_minimal(base_family = fnt_sel) +
-    theme(axis.text.x = element_text(angle = 90),
-          legend.position = "bottom")
-  
-  p4 <- z_psl_matrix |>
-    ggplot(aes(x = tName, y = qName)) +
-    geom_tile(aes(fill = q_aling_fract,
-                  width = (.5 + q_aling_fract) / 6,
-                  height = after_stat(width),
-                  color = after_scale(clr_darken(fill)))) +
-    # scale_fill_manual(values = rev(clrs)) +
-    scale_fill_gradientn(colours = c("gray90", clrs[1] , "black")) +
-    guides(fill = guide_colorbar("Alginment Fraction (Querry)",
-                                 title.position = "top",
-                                 barwidth = unit(.2,"npc"),
-                                 barheight = unit(5,"pt"))) +
-    coord_equal() +
-    theme_minimal(base_family = fnt_sel) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 1),
-          legend.position = "bottom")
-  
-  p5 <- p3 / p4
-  
-  tibble(alignment = aln_name,
-         sizes = list(p1),
-         circ = list(p2),
-         matrix = list(p5),
-         psl = list(z_psl),
-         sizes_df = list(sizes_az))
-}
+        axis.ticks.length = unit(-4,"pt"),
+        plot.title = element_text(hjust = .5),
+        plot.subtitle = element_text(hjust = .5))
 ```
 
 ```{r}
-#| include: false
-#| echo: false
-inspections <- genomes[c(1, 3:4)] |> 
-  map2_dfr(.y = list(c(17, 18, 16, 15, 14, 13, 12, 10, 11, 8, 9, 7, 6, 5, 4, 3, 2, 1),
-                      c(17, 18, 16, 15, 14, 10, 13, 11, 12, 9, 8, 5, 7, 6, 4, 3, 2, 1),
-                     # c(  27, 
-                     #   32, 31, 30, 29,
-                     #    25, 15,  10, 9,
-                     #   36, 34,
-                     #   19,28, 24, 11, 16,20, 14, 23, 26, 35, 7, 12, 21, 18, 33, 4, 5, 6, 22, 13, 8, 2, 1, 3, 17),
-                      c(17, 18, 16, 15, 14, 10, 13, 12, 11, 9, 8, 5, 6, 7, 4, 3, 2, 1)),
-           inspect_alignment)
-# inspections$matrix[[1]]
-```
-
-```{r}
-inspections$sizes |> wrap_plots(ncol = 3)
-```
-
-```{r}
-#| layout-ncol: 3
-inspections$circ[[1]]
-inspections$circ[[2]]
-inspections$circ[[3]]
-# inspections$circ[[4]]
-```
-
-```{r}
-#| fig-width: 12.
-#| fig-height: 12.
-inspections$matrix |> wrap_plots(ncol = 3)
-```
-
-## Cartesian alignment
-
-```{r}
-library(tidyverse)
-library(ggforce)
-library(prismatic)
-library(here)
-library(glue)
-library(patchwork)
-library(ggtext)
-library(plyranges)
-library(rlang)
-
-source(here("R/plot_defaults.R"))
 clr_genome = "gray50"
-
-genomes <- c("arcgaz_anc_h2", "zalcal_v1")
-
-scaf_order_18 <- list(c(1:18),
-                      rev(c(17, 18, 16, 15, 14, 12, 11, 10, 13, 9, 8, 5, 6, 7, 4, 3, 2, 1))) |>
-  set_names(nm = genomes)
-
-read_size <- \(genome = "", y_base = 0, skip = 0, order_by = "size"){
-  meta_order <- list(size = c(1:18),
-                     name = c( 14, 9, 12, 4, 13, 10, 17, 2, 1,
-                               15, 11, 7, 18, 5, 8, 3, 6, 16))[[order_by]]
-
-  read_tsv(here::here("results", "genome", str_c(genome,".size")),
-           col_names = c("chr", "size")) |>
-    arrange(-size) |>
-    mutate(size_ord = row_number(),
-           size_meta = c(scaf_order_18[[genome]] , 19:length(size_ord))) |>
-    arrange(size_meta) |>
-    mutate(size_idx = c( meta_order[size_meta[1:18]], 19:length(size_ord))) |>
-    arrange(size_idx) |>
-    mutate(end_with_skip = cumsum(size + skip),
-           start = lag(end_with_skip, default =  0),
-           end = start + size,
-           mid = (start + end) /2,
-           eo = size_idx %% 2,
-           y_base = y_base,
-           genome = genome)
-}
-
-get_psl <- \(file){
-  vroom::vroom(here::here("results","psl", file),
-               delim = "\t",
-               col_names = c("matches", "misMatches", "repMatches", "nCount",
-                             "qNumInsert", "qBaseInsert", "tNumInsert",
-                             "tBaseInsert", "strand", "qName", "qSize", "qStart",
-                             "qEnd", "tName", "tSize", "tStart", "tEnd",
-                             "blockCount")) |>
-    select( tName, tStart, tEnd, qName, qStart, qEnd, strand ) |>
-    mutate(tSize = tEnd - tStart,
-           qSize = qEnd - qStart)
-}
-
-diag_to_wide <- \(x_start = 0,
-                  x_end = 1,
-                  ymin_start, ymax_start,
-                  ymin_end, ymax_end,
-                  dir = "+",
-                  group){
-  tibble(`1_x_min` = x_start,
-         `2_x_max` = x_end,
-         `3_x_max` = x_end,
-         `4_x_min` = x_start,
-         `1_y_min` = ymin_start,
-         `2_y_min` = ymin_end,
-         `3_y_max` = ymax_end,
-         `4_y_max` = ymax_start,
-         group = group,
-         dir = dir) |>
-    pivot_longer(cols = -c(group, dir)) |>
-    separate(name,
-             into = c("ord", "axis", "role"),
-             convert = TRUE) |>
-    arrange(ord) |>
-    select(-role) |>
-    pivot_wider(names_from = axis,
-                values_from = value) |>
-    select(-ord)
-}
-
-sizes <- tibble(genome = genomes,
-                y_base = seq_along(genomes)-1) |>
-  pmap_dfr(read_size, skip = 1e7, order_by = "name")  |>
-  mutate(label_sign = 2 * ( .5 - (genome == genomes[[1]])))
-
-genome_summary <- sizes |>
-  group_by(genome, y_base) |>
-  summarise(n = n(),
-            toal_length = max(end))
-
-sizes_18 <- sizes |>
-  filter(size_idx <= 18 )
-
-psl <- get_psl(glue("slim_{genomes[[2]]}_on_{genomes[[1]]}.psl.gz"))
-
-n_alignments <- 20
-align_min_length <- 0.2e6
-
-psl_filtered <- psl |>
-  filter(tName %in% sizes_18$chr,
-         qName %in% sizes_18$chr) |>
-  arrange(-tSize) |>
-  filter(tSize > align_min_length) |>
-  left_join(sizes_18 |> select(tName = chr, tg_start = start, t_eo = eo)) |>
-  left_join(sizes_18 |> select(qName = chr, qg_start = start, q_eo = eo)) |>
-  mutate(ymin_start = tStart + tg_start,
-         ymax_start = tEnd + tg_start,
-         ymin_end = qStart + qg_start,
-         ymax_end = qEnd + qg_start,
-         group = row_number())
-
-psl_diag <- psl_filtered |>
-  select(ymin_start:group, dir = t_eo) |>
-  pmap_dfr(diag_to_wide)
-
-cov_from_psl <- \(prefix, genome){
-  psl |>
-    select(seqnames = str_c(prefix, "Name"),
-           start =  str_c(prefix, "Start"),
-           end =  str_c(prefix, "End"),
-           strand) |>
-    as_granges() |>
-    compute_coverage() |>
-    as_tibble() |>
-    left_join(sizes_18 |> select(seqnames = chr, g_start = start, eo = eo))  |>
-    mutate(gg_start = start + g_start,
-           gg_end = end + g_start,
-           genome = genome) |>
-    arrange(gg_start)
-}
-
-sizes_to_granges <- \(genome_select){
-  sizes |>
-    filter(genome == genome_select) |>
-    select(seqnames = chr, end = size) |>
-    mutate(start = 1) |> as_granges()
-}
-
-genomes_granges <- c("arcgaz_anc_h2", "zalcal_v1") |> map(sizes_to_granges)
-genome_windows <- genomes_granges |> map(\(g){slidingWindows(g, width = 10e4, step = 5e4) |> as_tibble() |>  mutate(window_id = row_number()) |> as_granges()})
-
-data_coverage <- tibble(prefix = c("t", "q"), genome = c("arcgaz", "zalcal")) |>
-  pmap_dfr(cov_from_psl)
-
-  # bind_rows(cov_from_psl(tName, tStart, tEnd, "arcgaz"),
-  #         cov_from_psl(qName, qStart, qEnd, "zalcal")) |
-
-coverage_windows <- \(genome_idx){
-  prefix = c("t", "q")[[genome_idx]]
-  join_overlap_intersect(psl |>
-                  select(seqnames = str_c(prefix, "Name"),
-                         start =  str_c(prefix, "Start"),
-                         end =  str_c(prefix, "End"),
-                         strand) |>
-                  as_granges() |>
-                  compute_coverage(),
-                as_granges(genome_windows[[genome_idx]])) |>
-    as_tibble()  |>
-    group_by(seqnames, window_id) |>
-    summarise(start = min(start),
-              end = max(end),
-              avg_cov = sum(width * score) / sum(width)) |>
-    ungroup() |>
-    arrange(window_id) |>
-    left_join(sizes_18 |> select(seqnames = chr, g_start = start, eo = eo))  |>
-    mutate(gg_start = start + g_start,
-           gg_end = end + g_start,
-           gg_mid = (gg_start + gg_end) / 2,
-           genome_idx = genome_idx,
-           avg_cov_scl = avg_cov / max(avg_cov),
-           avg_cov_25 = avg_cov / 5,
-           avg_cov_25 = if_else(avg_cov_25 > 1, 1, avg_cov_25))
-}
-
-data_cov_windowed <- 1:2 |> map_dfr(coverage_windows)
-
-genome_width <- .1
+genome_width <- .05
 skip <- .025
 
-il_arcgaz <- hypoimg::hypo_read_svg(here("img/illustrations/arcgaz_ln.c.svg")) |>
-  hypoimg::hypo_recolor_svg(layer = 1, "transparent")
-il_zalcal <- hypoimg::hypo_read_svg(here("img/illustrations/zalcal_ln.c.svg")) |>
-  hypoimg::hypo_recolor_svg(layer = 1, "transparent")
-il_height <- .5
+manual_order_18 <- list(c(14, 9, 12, 4, 13, 10, 17, 1, 2, 11, 15, 7, 18, 5, 8, 3, 16, 6),
+                        c(14, 9, 12, 4, 13, 10, 17, 2, 1, 15, 11, 7, 18, 5, 8, 3, 6, 16),
+                        c(14, 9, 12, 4, 17, 13, 10, 2, 1, 18, 11, 15, 7, 5, 8, 3, 16, 6),
+                        c(14, 9, 12, 4, 17, 13, 10, 2, 1, 18, 11, 15, 7, 5, 8, 3, 16, 6),
+                        c(14, 9, 12, 4, 17, 10, 13, 2, 1, 18, 15, 11, 7, 5, 8, 3, 16, 6)) |>
+  set_names(nm = c( "arcgaz_anc_h1", "arcgaz_anc_h2",
+                    "arcgaz_v3_hardmasked", "arcgaz_v3",
+                    "zalcal_v1")); 
 
-p1 <- psl_diag |>
+all_alignments <- tibble(genomes = list(c("arcgaz_anc_h2", "arcgaz_anc_h1"),
+                                        c("arcgaz_anc_h2", "arcgaz_v3_hardmasked"),
+                                        c("arcgaz_anc_h2", "zalcal_v1"),
+                                        c("arcgaz_anc_h1", "arcgaz_v3"),
+                                        c("arcgaz_anc_h1", "zalcal_v1"))) |>
+  pmap_dfr(import_alignment,
+           genome_width = genome_width,
+           skip = skip,
+           manual_order_18 = manual_order_18,
+           n_longest = 25)
+# p1 <- 
+all_alignments |>
+  unnest(cols = psl_diag) |>
   ggplot() +
-  annotation_custom(grob = il_arcgaz, xmin = -2.5e8, xmax = 3e7,
-                    ymax = -.15, ymin = -.15 -il_height) +
-  annotation_custom(grob = il_zalcal, xmin = -2.5e8, xmax = 3e7,
-                    ymax = 1.02 + il_height, ymin = 1.02 ) +
-  geom_diagonal_wide(aes(x = y, y = x, group = group,
+  facet_grid(target + querry ~ .,switch = "y") +
+  geom_diagonal_wide(aes(x = y,
+                         y = x,
+                         group = str_c(querry, "_", target,"_",group),
                          color = factor(dir),
                          fill = after_scale(clr_lighten(color))),
                      orientation = "y", linewidth = plt_lwd)  +
-  geom_linerange(data = tibble(y = c(0 - genome_width - skip,
-                                     1 + skip) + (1/5) * genome_width,
-                               start = -1e7,
-                               end = c(max(sizes_18$end_with_skip[sizes_18$genome == "arcgaz_anc_h2"]),
-                                       max(sizes_18$end_with_skip[sizes_18$genome == "zalcal_v1"]))),
-                 aes(xmin = start, xmax = end,
-                     y = y),
+  geom_linerange(data = all_alignments |> unnest(genome_with_skips),
+                 aes(xmin = start, xmax = end, y = y),
                  color = clr_genome,
                  linewidth = .5 * plt_lwd) +
-  geom_rect(data = sizes_18,
+  geom_rect(data = all_alignments |> unnest(sizes_18),
             aes(xmin = start, xmax = end,
                 ymin = y_base + (label_sign * skip),
                 ymax = y_base + (label_sign * (skip + genome_width))),
             color = clr_genome, fill = clr_lighten(clr_genome,.75),
             linewidth = .5 * plt_lwd) +
-    geom_ribbon(data = data_cov_windowed,
-                aes(x = gg_mid, group = seqnames,
-                    ymin = (genome_idx -1) + 2 * skip *(genome_idx - 1.5) + genome_width *(genome_idx - 2),
-                    ymax = (genome_idx -1) + 2 * skip *(genome_idx - 1.5) + genome_width *(genome_idx - 2) +  genome_width * avg_cov_25),
-                linewidth = plt_lwd,
-                fill = clr_genome) +
-  geom_text(data = sizes_18,
+  # geom_text(data = all_alignments |> unnest(sizes_18),
+  #           aes(x = mid, y = y_base, label = str_c(size_idx,"\n",pre_manual))) +
+  # geom_ribbon(data = all_alignments |> unnest(data_cov_windowed),
+  #             aes(x = gg_mid, group = seqnames,
+  #                 ymin = (genome_idx -1) + 2 * skip *(genome_idx - 1.5) + genome_width *(genome_idx - 2),
+  #                 ymax = (genome_idx -1) + 2 * skip *(genome_idx - 1.5) + genome_width *(genome_idx - 2) +  genome_width * avg_cov_25),
+  #             linewidth = plt_lwd,
+  #             fill = clr_genome) +
+  geom_text(data = all_alignments |> unnest(sizes_18),
             aes(x = mid,
-                y = y_base + (label_sign *  (2.2 * skip + genome_width)),
-                label = chr,
-                hjust = c(1, 0)[as.numeric(factor(label_sign))]),
+                y = y_base + (label_sign *  (4.3 * skip + genome_width)),
+                label = simplify_names(chr)#,
+                # hjust = c(1, 0)[as.numeric(factor(label_sign))]
+            ),
             color = "black",
             family = fnt_sel,
-            size = .35 * fnt_sz,
-            angle = 90)  +
+            size = .35 * fnt_sz * 2,
+            angle = 0)  +
   scale_x_continuous(expand = c(0, 0)) +
-  coord_cartesian(ylim = c(-.1, 1.35),
-                  xlim = c(-2e8, max(sizes_18$end_with_skip)),
+  coord_cartesian(ylim = c(-.2, 1.25),
+                  xlim = c(-1e7, max((all_alignments |> unnest(sizes_18))$end_with_skip)),
                   clip = "off") +
   scale_color_manual(values = clrs |> clr_alpha(.3)) +
   theme_void(base_family = fnt_sel) +
-  theme(legend.position = "none")
-
-p2 <- psl |>
-  ggplot(aes(x = log10(tSize))) +
-  geom_density(color = clrs[2],
-               fill = clr_alpha(clrs[2]),
-               linewidth = plt_lwd)+
-  geom_vline(xintercept = log10(min(psl_filtered$tSize)),
-             color = clrs[2], linetype = 3, linewidth = plt_lwd) +
-  scale_x_continuous(glue("Alignment Size log<sub>10</sub>(bp)<br>{round(range(psl$tSize) / c(1, 1e6), digits = 2) %>% str_c(' ',.,c('bp ', 'Mb '), collapse = '–')}, n: {nrow(psl)}")) +
-  coord_cartesian(expand = 0) +
-  theme_minimal(base_family = fnt_sel) +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.line.x = element_line(color = clr_genome, linewidth = plt_lwd),
-        panel.grid = element_blank(),
-        axis.title.x = element_markdown(lineheight = 1.5))
-
-p3 <- psl_filtered |>
-  ggplot(aes(x = tSize * 1e-6)) +
-  geom_density(color = clrs[2],
-               fill = clr_alpha(clrs[2]),
-               linewidth = plt_lwd) +
-  geom_vline(xintercept = min(psl_filtered$tSize) * 1e-6,
-             color = clrs[2], linetype = 3, linewidth = plt_lwd) +
-  scale_x_continuous(glue("Alignment Size (Mb)<br>{sprintf('%.2f',range(psl_filtered$tSize)/1e6) %>% str_c(' ',.,'Mb ', collapse = '–')}, n: {nrow(psl_filtered)}")) +
-  coord_cartesian(expand = 0) +
-  theme_minimal(base_family = fnt_sel) +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.line.x = element_line(color = clr_genome, linewidth = plt_lwd),
-        panel.grid = element_blank(),
-        axis.title.x = element_markdown(lineheight = 1.5))
-
-p <- p1 +
-  ( p2/ p3 + plot_layout(heights = c(1,1))) +
-  plot_annotation(tag_levels = 'A') +
-  plot_layout(widths = c(1, .2)) &
-  theme(text = element_text(family = fnt_sel,
-                            size = fnt_sz))
+  theme(legend.position = "none",
+        strip.text = element_text(angle = 90))
 ```
-
 
 ```{r}
-p
-```
+#| fig-width: 12.
+#| fig-height: 12.
+matrix_plots <- all_alignments |> 
+  pmap_dfr(psl_matrix) |>
+  arrange(target, querry) |> 
+  pmap_dfr(plot_matrix,
+           cmin = 0,
+           cmax = 1.2,
+           tile_scl = 1,
+           tile_min_sz = .02)
 
+wrap_plots(matrix_plots$p,
+           nrow = 1, guides = "collect") &
+  theme(legend.position = "bottom")
+```
