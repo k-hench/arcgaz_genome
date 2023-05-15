@@ -6,7 +6,7 @@ snakemake \
   --latency-wait 30 \
   --use-conda -p \
   --configfile workflow/config.yml \
-  --default-resources mem_mb=25600 disk_mb=5000 \
+  --default-resources mem_mb=25600 \
   --cluster '
      qsub \
      -V -cwd \
@@ -30,7 +30,7 @@ rule gap_bed:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_gaps.bed.gz"
   conda: "fa_stats"
-  script:
+  shell:
     """
     python py/generate_masked_ranges.py {input} | gzip > {output}
     """
@@ -39,7 +39,7 @@ rule seqkit_stats:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_stats_seqkit.tsv"
   conda: "fa_stats"
-  script:
+  shell:
     """
     seqkit stats -a {input} > {output}
     """
@@ -48,7 +48,7 @@ rule assembly_stats:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_stats_a.json"
   conda: "fa_stats"
-  script:
+  shell:
     """
     zcat {input} | assembly_stats /dev/stdin > {output}
     """
@@ -57,7 +57,7 @@ rule pbjelly_stats:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_stats_pb.txt"
   conda: "pb_jelly_utils"
-  script:
+  shell:
     """
     zcat {input} | python py/summarizeAssembly.py /dev/stdin > {output}
     """
@@ -66,7 +66,7 @@ rule bp_stats:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_stats_bp.yml"
   conda: "fa_stats"
-  script:
+  shell:
     """
     python py/fa_bp_summary.py {input} {output}
     """
