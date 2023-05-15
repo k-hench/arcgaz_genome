@@ -1,0 +1,11 @@
+# mamba env create -f pb_jelly_utils.yml
+name: pb_jelly_utils
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - python=2.7
+ - mamba
+ - networkx
+

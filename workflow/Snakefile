@@ -50,3 +50,4 @@ HAPLOTYPES = config['haplotypes']
 include: "./rules/repeat_mask.smk"
 include: "./rules/align.smk"
 include: "./rules/anchor.smk"
+include: "./rules/genome_stats.smk"

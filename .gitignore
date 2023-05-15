@@ -14,6 +14,9 @@ qmd/*
 styles*
 !styles.scss
 
+py/*
+!py/*.py
+
 # exclude nextflow logs and cache
 nf/*/*
 !nf/*/*.nf

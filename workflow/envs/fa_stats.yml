@@ -1,0 +1,14 @@
+# mamba env create -f fa_stats.yml
+name: fa_stats
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - python=3.11.3
+ - mamba
+ - seqkit=2.4.0
+ - assembly_stats=0.1.4
+ - biopython=1.81
+ - progress=1.6
+

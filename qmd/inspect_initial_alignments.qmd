@@ -19,18 +19,6 @@ library(here)
 source(here("R/plot_defaults.R"))
 source(here("R/cartesian_alignment_helpers.R"))
 
-# read_size <- \(genome = "", y_base = 0){
-#   read_tsv(here::here("results", "genome", str_c(genome,".size")),
-#            col_names = c("chr", "size")) |> 
-#     arrange(-size) |> 
-#     mutate(size_idx = row_number(),
-#            end = cumsum(size),
-#            start = lag(end,default =  0),
-#            eo = size_idx %% 2,
-#            y_base = y_base,
-#            genome = genome)
-# }
-
 genomes <- c("arcgaz_dt_h1_hardmasked",
              "arcgaz_dt_h2_hardmasked",
              "arcgaz_v3_hardmasked")
@@ -50,7 +38,7 @@ align_min_length <- 3e5
 
 ```{r}
 #| fig-width: 11.
-#| fig-height: 9.
+#| fig-height: 3.
 n_largest <- 37
 sizes |> 
   filter(size_idx < n_largest) |> 
@@ -91,6 +79,8 @@ sizes |>
 ```
 
 ```{r}
+#| fig-width: 12.
+#| fig-height: 8.
 clr_genome = "gray50"
 genome_width <- .05
 skip <- .025
@@ -169,7 +159,7 @@ all_alignments <- tibble(genomes = list(c("arcgaz_v3_hardmasked", "arcgaz_dt_h1_
 
 ```{r}
 #| fig-width: 12.
-#| fig-height: 12.
+#| fig-height: 7.
 matrix_plots <- all_alignments |> 
   pmap_dfr(psl_matrix) |>
   arrange(target, querry) |> 

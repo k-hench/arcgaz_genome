@@ -39,7 +39,7 @@ align_min_length <- 3e5
 
 ```{r}
 #| fig-width: 11.
-#| fig-height: 9.
+#| fig-height: 4.
 n_largest <- 18
 sizes |> 
   filter(size_idx < n_largest) |> 
@@ -80,6 +80,8 @@ sizes |>
 ```
 
 ```{r}
+#| fig-width: 12.
+#| fig-height: 8.
 clr_genome = "gray50"
 genome_width <- .05
 skip <- .025
@@ -154,7 +156,7 @@ all_alignments |>
 
 ```{r}
 #| fig-width: 12.
-#| fig-height: 12.
+#| fig-height: 6.
 matrix_plots <- all_alignments |> 
   pmap_dfr(psl_matrix) |>
   arrange(target, querry) |> 
