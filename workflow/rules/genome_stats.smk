@@ -29,44 +29,49 @@ rule fa_stats:
 rule gap_bed:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_gaps.bed.gz"
+  log: 'logs/fa_stats/{genome}_bed.log'
   conda: "fa_stats"
   shell:
     """
-    python py/generate_masked_ranges.py {input} | gzip > {output}
+    python py/generate_masked_ranges.py {input} | gzip > {output} 2>{log}
     """
 
 rule seqkit_stats:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_stats_seqkit.tsv"
+  log: 'logs/fa_stats/{genome}_seqkit.log'
   conda: "fa_stats"
   shell:
     """
-    seqkit stats -a {input} > {output}
+    seqkit stats -a {input} > {output} 2>{log}
     """
 
 rule assembly_stats:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_stats_a.json"
+  log: 'logs/fa_stats/{genome}_astats.log'
   conda: "fa_stats"
   shell:
     """
-    zcat {input} | assembly_stats /dev/stdin > {output}
+    zcat {input} | assembly_stats /dev/stdin > {output} 2>{log}
     """
 
 rule pbjelly_stats:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_stats_pb.txt"
+  log: 'logs/fa_stats/{genome}_pbstats.log'
   conda: "pb_jelly_utils"
   shell:
     """
-    zcat {input} | python py/summarizeAssembly.py /dev/stdin > {output}
+    zcat {input} | python py/summarizeAssembly.py /dev/stdin > {output} 2>{log}
     """
 
 rule bp_stats:
   input: "data/genomes/{genome}.fa.gz"
   output: "results/fa_stats/{genome}_stats_bp.yml"
+  log: 'logs/fa_stats/{genome}_bpstats.log'
   conda: "fa_stats"
   shell:
     """
-    python py/fa_bp_summary.py {input} {output}
+    python py/fa_bp_summary.py {input} {output} 2>{log}
     """
