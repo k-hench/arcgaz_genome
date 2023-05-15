@@ -45,7 +45,7 @@ elif filename.endswith(".fa") or filename.endswith(".fasta"):
     fh = open(filename,'r')
 
 parser = SeqIO.parse(fh, "fasta")
-with Bar('Processing fasta:', max = seq_len, fill = '█') as bar:
+with Bar('Processing fasta:', max = seq_len) as bar:
     for record in parser:
         n_seq+=1
         # print( "%.0f st seq" % (n_seq)) 
