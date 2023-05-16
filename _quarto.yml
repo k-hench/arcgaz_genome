@@ -14,6 +14,7 @@ book:
     - qmd/inspect_initial_alignments.qmd
     - qmd/anchoring_assessment.qmd
     - qmd/inspect_anchored_alignments.qmd
+    - qmd/genome_stats.qmd
     - qmd/rna_sample_selection.qmd
     - qmd/references.qmd
   navbar:
