@@ -1,11 +1,11 @@
 """
-snakemake -n --configfile workflow/config.yml -R fa_stats
+snakemake -n --configfile workflow/config_all_genomes.yml -R fa_stats
 
 snakemake \
   --jobs 10 \
   --latency-wait 30 \
   --use-conda -p \
-  --configfile workflow/config.yml \
+  --configfile workflow/config_all_genomes.yml \
   --default-resources mem_mb=25600 \
   --cluster '
      qsub \
