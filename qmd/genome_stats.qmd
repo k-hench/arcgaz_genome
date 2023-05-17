@@ -241,6 +241,8 @@ snakemake <run-options> \
 MHC (haplotype 1)
 
 ```{r}
+#| fig-width: 7.
+#| fig-height: 12.
 source(here("R/cartesian_alignment_helpers.R"))
 read_blast <- \(gn, querry){
     file <- here("results", "blast", str_c(querry, "_on_", gn, ".csv"))
@@ -248,22 +250,23 @@ read_blast <- \(gn, querry){
     read_csv(file, col_names = c("qaccver", "saccver", "pident", "length",
                                  "mismatch", "gapopen", "qstart", "qend",
                                  "sstart", "send", "evalue", "bitscore")) |> 
+      mutate(genome = gn) |> 
       left_join(gn_plot |> rename(chr = "saccver")) |> 
     mutate(gstart = start + sstart,
            gend = start + send,
            gmid = (gstart + gend) / 2)
 }
 
-gn_plot <- read_size(genomes[[6]],
-                     order_by = "name",
-                     manual_order_18 = list(
-                       arcgaz_anc_h1 = c(14, 9, 12, 4, 13, 10, 17, 1, 2,
-                                         11, 15, 7, 18, 5, 8, 3, 16, 6))) |> 
+gn_plot <- genomes |> 
+  map_dfr(read_size,
+          order_by = "name",
+          manual_order_18 = manual_order_18) |> 
   mutate(plt_grp = if_else(in_top,eo,2))
 
-mhc <- read_blast(gn = genomes[[6]],
-                  querry = "dog_mhc_transcripts") |>
-  group_by(qaccver) |> 
+mhc <- genomes |> 
+  map_dfr(read_blast,
+          querry = "dog_mhc_transcripts") |>
+  group_by(genome, qaccver) |> 
   mutate(y = row_number(),
          id_with_url = str_remove(qaccver, "\\..*")) |> 
   ungroup() |> 
@@ -276,11 +279,12 @@ gb_trans  <- scales::trans_new("gb_trans",
 
 scale_x_arcgaz <- function(...){
   scale_x_continuous("Genomic position (Gb)",
-                     trans = gb_trans, breaks = 0:5 * 5e8,
+                     trans = gb_trans,
+                     breaks = 0:5 * 5e8,
                      ...,
                      sec.axis = sec_axis(trans = identity,
-                                         breaks = gn_plot$mid[1:18], 
-                                         labels = str_remove( gn_plot$chr[1:18], ".*_")))
+                                         breaks = gn_plot$mid[gn_plot$genome == genomes[[6]] ][1:18], 
+                                         labels = str_remove( gn_plot$chr[gn_plot$genome == genomes[[6]] ][1:18], ".*_")))
 }
 
 mhc |> 
@@ -289,20 +293,27 @@ mhc |>
   geom_rect(data = gn_plot,
             aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = factor(plt_grp)),
             color = "transparent", linewidth = 0) +
-  geom_point(aes(y = name, x = gmid, color = log10(evalue)), alpha = .3) +
+  geom_point(aes(y = name, x = gmid, color = log10(evalue)), alpha = .8) +
   scale_fill_manual(values = c(`1` = clr_alpha("gray30",.3),
                                `0` = "transparent", 
                                `2` = "gray50"),
                     guide = "none") +
+  facet_grid(genome ~ ., switch = "y") +
   scale_x_arcgaz() +
-  scale_color_viridis_c(option = "C",
-                        direction = -1,
-                        guide = guide_colorbar(barheight = unit(5,"pt"),
-                                               barwidth = unit(.5,"npc"))) +
+  scale_color_binned(type = "viridis",
+                     option = "C", 
+                     direction = -1,
+                     breaks = c(-Inf, -100, -50, -10, Inf)) +
+  # scale_color_viridis_c(option = "C",
+  #                       direction = -1,
+  #                       guide = guide_colorbar(barheight = unit(5,"pt"),
+  #                                              barwidth = unit(.5,"npc"))) +
   labs(y = NULL) +
   # coord_cartesian(ylim = 0:1) +
   theme_minimal(base_family = fnt_sel) +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
   # geom_linerange(aes(xmin = gstart, xmax = gend),
   #                linewidth = 3, color = "red", alpha = .5) +
   # facet_wrap(y ~ .,
@@ -315,8 +326,10 @@ MT / NUMTs (haplotype 1)
 
 ```{r}
 #| fig-width: 7.
-#| fig-height: 3.
-mt <- read_blast(gn = genomes[[6]], querry = "arcgaz_mt") |> 
+#| fig-height: 8.
+mt <- genomes |> 
+  map_dfr(read_blast,
+          querry = "arcgaz_mt") |> 
   group_by(qaccver) |> 
   mutate(y = row_number()) |> 
   ungroup()
@@ -330,8 +343,11 @@ ggplot(data = gn_plot) +
                                `0` = "transparent", 
                                `2` = "gray50"),
                     guide = "none") +
+  facet_grid(genome ~ ., switch = "y") +
   scale_x_arcgaz() +
   # coord_cartesian(ylim = 0:1) +
-  theme_minimal(base_family = fnt_sel)
+  theme_minimal(base_family = fnt_sel)+
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
 ```
 

@@ -4,13 +4,13 @@ snakemake -n --configfile workflow/config.yml -R all_blast
 snakemake -c 6 --configfile workflow/config.yml --use-conda -R all_blast
 """
 
-B_REF = ["arcgaz_anc_h1", "arcgaz_anc_h2", "zalcal_v1", "arcgaz_v3"]
-BLAST_SEQS = [ "arcgaz_mhc", "arcgaz_mt", "dog_mhc_transcripts" ]
+B_REF = ["arcgaz_anc_h1", "arcgaz_anc_h2", "zalcal_v1", "arcgaz_v3", "arcgaz_v1_2", "arcgaz_v1_4"]
+BLAST_SEQS = [ "arcgaz_mhc", "arcgaz_mt", "dog_mhc_transcripts", "DQB_Haps_Plus_new" ]
 
 rule all_blast:
   input: 
-    expand("results/blast/{que}_on_{ref}.csv", ref = B_REF, que = BLAST_SEQS),
-    expand("results/busco/{ref}", ref = B_REF)
+    expand("results/blast/{que}_on_{ref}.csv", ref = B_REF, que = BLAST_SEQS)#,
+#    expand("results/busco/{ref}", ref = B_REF)
 
 """
 # qaccver saccver pident length mismatch gapopen qstart qend sstart send evalue bitscore
@@ -69,7 +69,7 @@ rule busco_dl:
 rule busco:
   input: 
     ref = "data/genomes/{ref}.fa.gz",
-    busco_db = directory("data/busco_downloads/lineages/carnivora_odb10")
+    busco_db = "data/busco_downloads/lineages/carnivora_odb10"
   output: directory("results/busco/{ref}")
   log: "logs/busco/{ref}.log"
   conda: "busco"
