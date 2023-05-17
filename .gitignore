@@ -6,6 +6,7 @@ data/*
 !data/metadata
 data/metadata/*
 !data/metadata/*.yml
+!data/ncbi_seqs
 
 # exclude quarto compilation side-products but track reports
 qmd/*
