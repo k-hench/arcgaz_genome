@@ -6,6 +6,18 @@ editor_options:
 
 # Genome Stats
 
+## Basic Stats
+
+::: {.callout-note}
+Results for this section are created within `workflow/rules/genome_stats.smk` and can be recreated using:
+
+```sh
+snakemake <run-options> \
+  --configfile workflow/config_all_genomes.yml \
+  -R fa_stats
+```
+:::
+
 ```{r}
 #| message: false
 #| warning: false
@@ -214,8 +226,19 @@ data$data[[2]] |>
   theme_minimal(base_family = fnt_sel)
 ```
 
-MHC (haplotype 1)
+## Genome Content (`blast` results)
 
+::: {.callout-note}
+Results for this section are created within `workflow/rules/busco_and_blast.smk` and can be recreated using:
+
+```sh
+snakemake <run-options> \
+  --configfile workflow/config_all_genomes.yml \
+  -R all_blast
+```
+:::
+
+MHC (haplotype 1)
 
 ```{r}
 source(here("R/cartesian_alignment_helpers.R"))
@@ -239,7 +262,7 @@ gn_plot <- read_size(genomes[[6]],
   mutate(plt_grp = if_else(in_top,eo,2))
 
 mhc <- read_blast(gn = genomes[[6]],
-                  querry = "dog_mhc") |>
+                  querry = "dog_mhc_transcripts") |>
   group_by(qaccver) |> 
   mutate(y = row_number(),
          id_with_url = str_remove(qaccver, "\\..*")) |> 
@@ -293,7 +316,7 @@ MT / NUMTs (haplotype 1)
 ```{r}
 #| fig-width: 7.
 #| fig-height: 3.
-mt <- read_blast(gn = genomes[[6]], querry = "mt") |> 
+mt <- read_blast(gn = genomes[[6]], querry = "arcgaz_mt") |> 
   group_by(qaccver) |> 
   mutate(y = row_number()) |> 
   ungroup()

@@ -57,8 +57,19 @@ rule blast_querry:
       -outfmt 10 > {output}
     """
 
+rule busco_dl:
+  output: directory("data/busco_downloads/lineages/carnivora_odb10")
+  conda: "busco"
+  shell:
+    '''
+    cd data/
+    busco --download carnivora_odb10
+    '''
+
 rule busco:
-  input: "data/genomes/{ref}.fa.gz"
+  input: 
+    ref = "data/genomes/{ref}.fa.gz",
+    busco_db = directory("data/busco_downloads/lineages/carnivora_odb10")
   output: directory("results/busco/{ref}")
   log: "logs/busco/{ref}.log"
   conda: "busco"

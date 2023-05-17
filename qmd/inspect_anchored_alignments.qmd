@@ -6,6 +6,16 @@ editor_options:
 
 # Inspect anchored genome alignments
 
+::: {.callout-note}
+Results for this section are created within `workflow/rules/align.smk` and can be recreated using:
+
+```sh
+snakemake <run-options> \
+  --configfile workflow/config_align_anchored.yml \
+  -R align
+```
+:::
+
 ```{r}
 #| message: false
 #| warning: false

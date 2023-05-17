@@ -6,6 +6,15 @@ editor_options:
 
 # Anchoring Assessment
 
+::: {.callout-note}
+Results for this section are created within `workflow/rules/anchor.smk` and can be recreated using:
+
+```sh
+snakemake <run-options> \
+  --configfile workflow/config.yml \
+  -R anchor
+```
+:::
 
 ```{r}
 #| message: false
