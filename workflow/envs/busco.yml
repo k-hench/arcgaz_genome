@@ -1,0 +1,9 @@
+# mamba env create -f busco.yml
+name: busco
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ -  busco=5.4.7
+
