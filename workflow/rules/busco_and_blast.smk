@@ -9,8 +9,8 @@ BLAST_SEQS = [ "arcgaz_mhc", "arcgaz_mt", "dog_mhc_transcripts", "DQB_Haps_Plus_
 
 rule all_blast:
   input: 
-    expand("results/blast/{que}_on_{ref}.csv", ref = B_REF, que = BLAST_SEQS)#,
-#    expand("results/busco/{ref}", ref = B_REF)
+    expand("results/blast/{que}_on_{ref}.csv", ref = B_REF, que = BLAST_SEQS),
+    expand("results/busco/{ref}", ref = B_REF)
 
 """
 # qaccver saccver pident length mismatch gapopen qstart qend sstart send evalue bitscore

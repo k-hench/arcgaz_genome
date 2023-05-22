@@ -242,7 +242,7 @@ MHC (haplotype 1)
 
 ```{r}
 #| fig-width: 7.
-#| fig-height: 12.
+#| fig-height: 18.
 source(here("R/cartesian_alignment_helpers.R"))
 read_blast <- \(gn, querry){
     file <- here("results", "blast", str_c(querry, "_on_", gn, ".csv"))
@@ -313,7 +313,8 @@ mhc |>
   theme_minimal(base_family = fnt_sel) +
   theme(legend.position = "bottom",
         panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank())
+        panel.grid.minor.x = element_blank(),
+        axis.text.y = element_text(size = 5))
   # geom_linerange(aes(xmin = gstart, xmax = gend),
   #                linewidth = 3, color = "red", alpha = .5) +
   # facet_wrap(y ~ .,
@@ -349,5 +350,58 @@ ggplot(data = gn_plot) +
   theme_minimal(base_family = fnt_sel)+
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank())
+```
+
+## BUSCO scores
+
+These were conducted with the `carnivora_odb10` reference set (compared to the `eukaryota_odb10` of the original Dovetail assemblies)
+
+```{r}
+read_busco_summary <- \(gn){
+  file <- here("results", "busco", gn, "run_carnivora_odb10", "short_summary.txt")
+  
+  read_tsv(file,
+         skip = 9, n_max = 5, col_names = c("n1", "count", "stat","n2","n3","n4")) |> 
+  dplyr::select(count:stat) |> 
+  mutate(stat = str_replace(stat, " \\(", "_") |> str_remove("\\)")) |> 
+  separate(stat, into = c("label", "abbrev"), sep = '_') |> 
+  mutate(abbrev = factor(abbrev, levels = c("C","S", "D", "F", "M"))) |> 
+  arrange(-as.numeric(abbrev)) |> 
+  mutate(genome = gn,
+         prct = count / 14502,
+         lab_y = c(1:4,0) * .2,#lag(cumsum(prct), default = 0) + .5 * prct,
+         x_lab = c(1.6,1.7,1.8,1,.5))
+}
+
+read_busco_full <- \(gn){
+  file <- here("results", "busco", gn, "run_carnivora_odb10", "full_table.tsv")
+  
+  read_tsv(file,
+         skip = 9, n_max = 5, col_names = c("n1", "count", "stat","n2","n3","n4")) |> 
+  mutate(genome = gn)
+}
+```
+
+
+```{r}
+genomes[c(3,6:8)] |> 
+  map_dfr(read_busco_summary) |> 
+  filter(abbrev != "C") |> 
+  ggplot() +
+  ggstance::geom_barh(aes(y = genome, x = prct, fill = abbrev),
+           stat = 'identity') +
+  geom_text(aes(y = as.numeric(factor(genome)) - .5 +  lab_y, 
+                x = 1.05,
+                label = str_c(abbrev,": ", sprintf('%.1f', prct*100), "%"),
+                color = abbrev,
+                family = fnt_sel)) +
+  # facet_wrap(genome ~ ., nrow = 1) +
+  # coord_polar(theta = 'y') +
+  # scale_x_continuous(limits = c(0,2.5)) +
+  theme_void(base_family = fnt_sel) +
+  theme(legend.position = "none",
+      axis.text.y = element_text(angle = 90))
+
+read_busco_full(genomes[[6]])
 ```
 
