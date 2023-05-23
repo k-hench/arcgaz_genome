@@ -72,18 +72,21 @@ rule busco:
     busco_db = "data/busco_downloads/lineages/carnivora_odb10"
   output: directory("results/busco/{ref}")
   log: "logs/busco/{ref}.log"
-  conda: "busco"
+  params:
+    sif = "$CDATA/apptainer_local/busco_v5.4.7_cv1.sif"
   shell:
     """
     mkdir -p results/busco/
     zcat {input.ref} > tmp/{wildcards.ref}.fa
 
-    busco -i tmp/{wildcards.ref}.fa \
-        -l data/busco_downloads/lineages/carnivora_odb10 \
-        --offline \
-        -o {output} \
-        -m genome \
-        -c 3 &> {log}
+    apptainer exec \
+      --bind $(pwd) {params.sif} \
+      busco -i tmp/{wildcards.ref}.fa \
+          -l data/busco_downloads/lineages/carnivora_odb10 \
+          --offline \
+          -o {output} \
+          -m genome \
+          -c 3 &> {log}
     
     rm tmp/{wildcards.ref}.fa
     """
