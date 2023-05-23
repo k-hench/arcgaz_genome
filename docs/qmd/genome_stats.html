@@ -228,6 +228,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
   <li><a href="#basic-stats" id="toc-basic-stats" class="nav-link active" data-scroll-target="#basic-stats"><span class="toc-section-number">5.1</span>  Basic Stats</a></li>
   <li><a href="#genome-content-blast-results" id="toc-genome-content-blast-results" class="nav-link" data-scroll-target="#genome-content-blast-results"><span class="toc-section-number">5.2</span>  Genome Content (<code>blast</code> results)</a></li>
+  <li><a href="#busco-scores" id="toc-busco-scores" class="nav-link" data-scroll-target="#busco-scores"><span class="toc-section-number">5.3</span>  BUSCO scores</a></li>
   </ul>
 </nav>
     </div>
@@ -896,6 +897,79 @@ Note
 <div class="cell-output-display">
 <p><img src="genome_stats_files/figure-html/unnamed-chunk-6-1.svg" class="img-fluid"></p>
 </div>
+</div>
+</section>
+<section id="busco-scores" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="busco-scores"><span class="header-section-number">5.3</span> BUSCO scores</h2>
+<p>These were conducted with the <code>carnivora_odb10</code> reference set (compared to the <code>eukaryota_odb10</code> of the original Dovetail assemblies)</p>
+<div class="cell">
+<details>
+<summary>toggle code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>read_busco_summary <span class="ot">&lt;-</span> \(gn){</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  file <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"results"</span>, <span class="st">"busco"</span>, gn, <span class="st">"run_carnivora_odb10"</span>, <span class="st">"short_summary.txt"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_tsv</span>(file,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">skip =</span> <span class="dv">9</span>, <span class="at">n_max =</span> <span class="dv">5</span>, <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">"n1"</span>, <span class="st">"count"</span>, <span class="st">"stat"</span>,<span class="st">"n2"</span>,<span class="st">"n3"</span>,<span class="st">"n4"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(count<span class="sc">:</span>stat) <span class="sc">|&gt;</span> </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stat =</span> <span class="fu">str_replace</span>(stat, <span class="st">" </span><span class="sc">\\</span><span class="st">("</span>, <span class="st">"_"</span>) <span class="sc">|&gt;</span> <span class="fu">str_remove</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">)"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(stat, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"label"</span>, <span class="st">"abbrev"</span>), <span class="at">sep =</span> <span class="st">'_'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">abbrev =</span> <span class="fu">factor</span>(abbrev, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"C"</span>,<span class="st">"S"</span>, <span class="st">"D"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span><span class="fu">as.numeric</span>(abbrev)) <span class="sc">|&gt;</span> </span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">genome =</span> gn,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">prct =</span> count <span class="sc">/</span> <span class="dv">14502</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">lab_y =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,<span class="dv">0</span>) <span class="sc">*</span> .<span class="dv">2</span>,<span class="co">#lag(cumsum(prct), default = 0) + .5 * prct,</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">x_lab =</span> <span class="fu">c</span>(<span class="fl">1.6</span>,<span class="fl">1.7</span>,<span class="fl">1.8</span>,<span class="dv">1</span>,.<span class="dv">5</span>))</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>read_busco_full <span class="ot">&lt;-</span> \(gn){</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  file <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"results"</span>, <span class="st">"busco"</span>, gn, <span class="st">"run_carnivora_odb10"</span>, <span class="st">"full_table.tsv"</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_tsv</span>(file,</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">skip =</span> <span class="dv">9</span>, <span class="at">n_max =</span> <span class="dv">5</span>, <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">"n1"</span>, <span class="st">"count"</span>, <span class="st">"stat"</span>,<span class="st">"n2"</span>,<span class="st">"n3"</span>,<span class="st">"n4"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">genome =</span> gn)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>toggle code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>genomes[<span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">6</span><span class="sc">:</span><span class="dv">8</span>)] <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(read_busco_summary) <span class="sc">|&gt;</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(abbrev <span class="sc">!=</span> <span class="st">"C"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  ggstance<span class="sc">::</span><span class="fu">geom_barh</span>(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">y =</span> genome, <span class="at">x =</span> prct,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">fill =</span> abbrev,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_darken</span>(fill,.<span class="dv">2</span>))),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(genome)) <span class="sc">-</span> .<span class="dv">5</span> <span class="sc">+</span>  lab_y, </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">x =</span> <span class="fl">1.05</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">label =</span> <span class="fu">str_c</span>(abbrev,<span class="st">": "</span>, <span class="fu">sprintf</span>(<span class="st">'%.1f'</span>, prct<span class="sc">*</span><span class="dv">100</span>), <span class="st">"%"</span>),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">fill =</span> abbrev,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_darken</span>(fill,.<span class="dv">2</span>)),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">family =</span> fnt_sel)) <span class="sc">+</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># facet_wrap(genome ~ ., nrow = 1) +</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># coord_polar(theta = 'y') +</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># scale_x_continuous(limits = c(0,2.5)) +</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> scales<span class="sc">::</span><span class="fu">colour_ramp</span>(<span class="fu">c</span>(clrs[<span class="dv">2</span>],<span class="st">"gray75"</span>, clrs[<span class="dv">1</span>]))((<span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>)<span class="sc">/</span><span class="dv">3</span>)) <span class="sc">+</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">01</span>, <span class="fl">1.1</span>),</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>                  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">4.5</span>),<span class="at">expand =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>(<span class="at">base_family =</span> fnt_sel) <span class="sc">+</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>,</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>),</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.x.bottom =</span> <span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">"gray30"</span>, <span class="at">linewidth =</span> .<span class="dv">2</span>, <span class="at">linetype =</span> <span class="dv">1</span>),</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.length.x.bottom =</span> <span class="fu">unit</span>(<span class="sc">-</span><span class="dv">4</span>,<span class="st">"pt"</span>),</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="genome_stats_files/figure-html/unnamed-chunk-8-1.svg" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>toggle code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_busco_full</span>(genomes[[<span class="dv">6</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 
 

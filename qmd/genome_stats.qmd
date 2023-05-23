@@ -388,20 +388,34 @@ genomes[c(3,6:8)] |>
   map_dfr(read_busco_summary) |> 
   filter(abbrev != "C") |> 
   ggplot() +
-  ggstance::geom_barh(aes(y = genome, x = prct, fill = abbrev),
-           stat = 'identity') +
+  ggstance::geom_barh(
+    aes(y = genome, x = prct,
+        fill = abbrev,
+        color = after_scale(clr_darken(fill,.2))),
+    stat = 'identity') +
   geom_text(aes(y = as.numeric(factor(genome)) - .5 +  lab_y, 
                 x = 1.05,
                 label = str_c(abbrev,": ", sprintf('%.1f', prct*100), "%"),
-                color = abbrev,
+                fill = abbrev,
+                color = after_scale(clr_darken(fill,.2)),
                 family = fnt_sel)) +
   # facet_wrap(genome ~ ., nrow = 1) +
   # coord_polar(theta = 'y') +
   # scale_x_continuous(limits = c(0,2.5)) +
+  scale_fill_manual(values = scales::colour_ramp(c(clrs[2],"gray75", clrs[1]))((0:3)/3)) +
+  coord_cartesian(xlim = c(-.01, 1.1),
+                  ylim = c(0.5, 4.5),expand = 0) +
   theme_void(base_family = fnt_sel) +
   theme(legend.position = "none",
-      axis.text.y = element_text(angle = 90))
+        axis.text.y = element_text(angle = 90),
+        axis.ticks.x.bottom = element_line(color = "gray30", linewidth = .2, linetype = 1),
+        axis.ticks.length.x.bottom = unit(-4,"pt"),
+        axis.text.x = element_text(family = fnt_sel))
+```
 
+
+```{r}
+#| eval: false
 read_busco_full(genomes[[6]])
 ```
 
