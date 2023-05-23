@@ -80,7 +80,7 @@ rule busco:
     zcat {input.ref} > tmp/{wildcards.ref}.fa
 
     apptainer exec \
-      --bind $(pwd) {params.sif} \
+      --bind $CDATA {params.sif} \
       busco -i tmp/{wildcards.ref}.fa \
           -l data/busco_downloads/lineages/carnivora_odb10 \
           --offline \
