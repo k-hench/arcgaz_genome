@@ -76,7 +76,7 @@ rule busco:
   shell:
     """
     mkdir -p results/busco/
-    zcat {input} > tmp/{wildcards.ref}.fa
+    zcat {input.ref} > tmp/{wildcards.ref}.fa
 
     busco -i tmp/{wildcards.ref}.fa \
         -l data/busco_downloads/lineages/carnivora_odb10 \
