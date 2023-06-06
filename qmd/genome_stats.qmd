@@ -13,8 +13,8 @@ Results for this section are created within `workflow/rules/genome_stats.smk` an
 
 ```sh
 snakemake <run-options> \
-  --configfile workflow/config_all_genomes.yml \
-  -R fa_stats
+--configfile workflow/config_all_genomes.yml \
+-R fa_stats
 ```
 :::
 
@@ -46,7 +46,7 @@ seq_levels <- c("scaffold",
 
 read_bed <- \(gn){
   file <- here("results", "fa_stats", str_c(gn, "_gaps.bed.gz"))
-
+  
   read_tsv(file, col_names = c("chr", "start", "end")) |> 
     mutate(gap_length = end - start,
            genome = gn)
@@ -54,7 +54,7 @@ read_bed <- \(gn){
 
 read_seqkit <- \(gn){
   file <- here("results", "fa_stats", str_c(gn, "_stats_seqkit.tsv"))
-
+  
   read_table(file) |> 
     mutate(genome = gn,
            seq_type = factor("scaffold", levels = seq_levels)) |> 
@@ -100,7 +100,7 @@ read_pb_stats <- \(gn){
 
 read_assembly_stats <- \(gn){
   file <- here("results", "fa_stats", str_c(gn, "_stats_a.json"))
-
+  
   js <- read_json(file) 
   
   bind_rows(as_tibble(js$`Contig Stats`) |> mutate(seq_type = "contig"),
@@ -198,6 +198,7 @@ data[c(1,3,4),] |>
   scale_alpha_manual(values = c(`TRUE` = 1,
                                 `FALSE` = .35),
                      guide = "none") +
+  # scale_color_manual(values = clrs_n(7, c(clr_saturate(clrs), "gray20")[c(1,3,2)])) +
   labs(y = "scaffold lenghth (Gb)", x = NULL, color = NULL) +
   theme_minimal(base_family = fnt_sel) +
   theme(axis.text.x = element_text(angle = 90),
@@ -233,8 +234,8 @@ Results for this section are created within `workflow/rules/busco_and_blast.smk`
 
 ```sh
 snakemake <run-options> \
-  --configfile workflow/config_all_genomes.yml \
-  -R all_blast
+--configfile workflow/config_all_genomes.yml \
+-R all_blast
 ```
 :::
 
@@ -245,13 +246,13 @@ MHC (haplotype 1)
 #| fig-height: 18.
 source(here("R/cartesian_alignment_helpers.R"))
 read_blast <- \(gn, querry){
-    file <- here("results", "blast", str_c(querry, "_on_", gn, ".csv"))
-    
-    read_csv(file, col_names = c("qaccver", "saccver", "pident", "length",
-                                 "mismatch", "gapopen", "qstart", "qend",
-                                 "sstart", "send", "evalue", "bitscore")) |> 
-      mutate(genome = gn) |> 
-      left_join(gn_plot |> rename(chr = "saccver")) |> 
+  file <- here("results", "blast", str_c(querry, "_on_", gn, ".csv"))
+  
+  read_csv(file, col_names = c("qaccver", "saccver", "pident", "length",
+                               "mismatch", "gapopen", "qstart", "qend",
+                               "sstart", "send", "evalue", "bitscore")) |> 
+    mutate(genome = gn) |> 
+    left_join(gn_plot |> rename(chr = "saccver")) |> 
     mutate(gstart = start + sstart,
            gend = start + send,
            gmid = (gstart + gend) / 2)
@@ -273,9 +274,9 @@ mhc <- genomes |>
   left_join(read_csv(here("data/ncbi_seqs/dog_mhc_transcripts.csv")))
 
 gb_trans  <- scales::trans_new("gb_trans",
-                transform = function(x){x * 1e-9},
-                inverse = function(y){y * 1e9},
-                format = function(x){x * 1e-9})
+                               transform = function(x){x * 1e-9},
+                               inverse = function(y){y * 1e9},
+                               format = function(x){x * 1e-9})
 
 scale_x_arcgaz <- function(...){
   scale_x_continuous("Genomic position (Gb)",
@@ -301,9 +302,11 @@ mhc |>
   facet_grid(genome ~ ., switch = "y") +
   scale_x_arcgaz() +
   scale_color_binned(type = "viridis",
-                     option = "C", 
+                     option = "C",
                      direction = -1,
                      breaks = c(-Inf, -100, -50, -10, Inf)) +
+  # scale_color_stepsn(colours = c("black", clrs[1], clr_lighten(clrs[2],.2)),
+  #                    breaks = c(-Inf, -100, -50, -10, Inf)) +
   # scale_color_viridis_c(option = "C",
   #                       direction = -1,
   #                       guide = guide_colorbar(barheight = unit(5,"pt"),
@@ -315,10 +318,10 @@ mhc |>
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         axis.text.y = element_text(size = 5))
-  # geom_linerange(aes(xmin = gstart, xmax = gend),
-  #                linewidth = 3, color = "red", alpha = .5) +
-  # facet_wrap(y ~ .,
-  #            scales = "free")
+# geom_linerange(aes(xmin = gstart, xmax = gend),
+#                linewidth = 3, color = "red", alpha = .5) +
+# facet_wrap(y ~ .,
+#            scales = "free")
 ```
 
 MT / NUMTs (haplotype 1)
@@ -361,31 +364,35 @@ read_busco_summary <- \(gn){
   file <- here("results", "busco", gn, "run_carnivora_odb10", "short_summary.txt")
   
   read_tsv(file,
-         skip = 9, n_max = 5, col_names = c("n1", "count", "stat","n2","n3","n4")) |> 
-  dplyr::select(count:stat) |> 
-  mutate(stat = str_replace(stat, " \\(", "_") |> str_remove("\\)")) |> 
-  separate(stat, into = c("label", "abbrev"), sep = '_') |> 
-  mutate(abbrev = factor(abbrev, levels = c("C","S", "D", "F", "M"))) |> 
-  arrange(-as.numeric(abbrev)) |> 
-  mutate(genome = gn,
-         prct = count / 14502,
-         lab_y = c(1:4,0) * .2,#lag(cumsum(prct), default = 0) + .5 * prct,
-         x_lab = c(1.6,1.7,1.8,1,.5))
+           skip = 9, n_max = 5, col_names = c("n1", "count", "stat","n2","n3","n4")) |> 
+    dplyr::select(count:stat) |> 
+    mutate(stat = str_replace(stat, " \\(", "_") |> str_remove("\\)")) |> 
+    separate(stat, into = c("label", "abbrev"), sep = '_') |> 
+    mutate(abbrev = factor(abbrev, levels = c("C","S", "D", "F", "M"))) |> 
+    arrange(-as.numeric(abbrev)) |> 
+    mutate(genome = gn,
+           prct = count / 14502,
+           lab_y = c(1:4,0) * .2,#lag(cumsum(prct), default = 0) + .5 * prct,
+           x_lab = c(1.6,1.7,1.8,1,.5))
 }
 
 read_busco_full <- \(gn){
   file <- here("results", "busco", gn, "run_carnivora_odb10", "full_table.tsv")
   
-  read_tsv(file,
-         skip = 9, n_max = 5, col_names = c("n1", "count", "stat","n2","n3","n4")) |> 
-  mutate(genome = gn)
+  read_tsv(skip = 2, file) |> 
+    mutate(genome = gn) |> 
+    left_join(gn_plot |> rename(chr = "saccver")) |> 
+    mutate(gstart = `Gene Start` + sstart,
+           gend = `Gene End` + send,
+           gmid = (gstart + gend) / 2)
 }
 ```
 
 
 ```{r}
-genomes[c(3,6:8)] |> 
-  map_dfr(read_busco_summary) |> 
+busco_summary <- genomes[c(1:3,6:8)] |> 
+  map_dfr(read_busco_summary)
+busco_summary |> 
   filter(abbrev != "C") |> 
   ggplot() +
   ggstance::geom_barh(
@@ -397,14 +404,23 @@ genomes[c(3,6:8)] |>
                 x = 1.05,
                 label = str_c(abbrev,": ", sprintf('%.1f', prct*100), "%"),
                 fill = abbrev,
-                color = after_scale(clr_darken(fill,.2)),
-                family = fnt_sel)) +
+                color = after_scale(clr_darken(fill,.2))),
+            family = fnt_sel) +
+  geom_text(data = busco_summary |> 
+              filter(abbrev == "C"),
+            aes(y = as.numeric(factor(genome)), 
+                x = .97,
+                label = str_c(abbrev,": ", sprintf('%.1f', prct*100), "%")),
+            family = fnt_sel,
+            color = "white", angle = -90, 
+            fontface = "bold", size = 6) +
   # facet_wrap(genome ~ ., nrow = 1) +
   # coord_polar(theta = 'y') +
   # scale_x_continuous(limits = c(0,2.5)) +
-  scale_fill_manual(values = scales::colour_ramp(c(clrs[2],"gray75", clrs[1]))((0:3)/3)) +
+  scale_fill_manual(values = clrs_n(4, c(clrs[2],"gray75", clrs[1]))) +
+  # scale_fill_manual(values = scales::colour_ramp(c(clrs[2],"gray75", clrs[1]))((0:3)/3)) +
   coord_cartesian(xlim = c(-.01, 1.1),
-                  ylim = c(0.5, 4.5),expand = 0) +
+                  ylim = c(0.5, 6.5),expand = 0) +
   theme_void(base_family = fnt_sel) +
   theme(legend.position = "none",
         axis.text.y = element_text(angle = 90),
@@ -416,6 +432,6 @@ genomes[c(3,6:8)] |>
 
 ```{r}
 #| eval: false
-read_busco_full(genomes[[6]])
+test <- read_busco_full(genomes[[6]])
 ```
 

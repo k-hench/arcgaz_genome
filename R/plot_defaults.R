@@ -6,5 +6,5 @@ fnt_sel <- "CMU Sans Serif"
 fnt_sz <- 12 / ggplot2::.pt
 
 clrs <- c("#1f4971", "#8cce28")
-clrs_n <- \(n){scales::colour_ramp(colors = clrs)((0:(n-1))/(n-1))}
+clrs_n <- \(n, cl = clrs){scales::colour_ramp(colors = cl)((0:(n-1))/(n-1))}
 plt_lwd <- 0.15

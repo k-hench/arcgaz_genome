@@ -1,0 +1,16 @@
+ref: arcgaz_dt_h1
+
+queries:
+  - arcgaz_dt_h2
+
+lastParams: "-m 1 -j 3 -u 1 -p HOXD70"
+# lastParams: "-j 3"
+
+genomes:
+  - ""
+
+haplotypes:
+  - h1
+  - h2
+
+mask_suffix: '_hardmasked'
