@@ -38,6 +38,7 @@ snakemake \
 snakemake \
     -n \
     --configfile workflow/config.yml
+    -R align
 '''
 container: "docker://khench/msa_envs:v0.1"
 
