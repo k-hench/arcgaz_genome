@@ -3,12 +3,6 @@ snakemake --configfile workflow/config.yml --rerun-triggers mtime -n -R cactus_s
 snakemake --configfile workflow/config.yml --dag -R  cactus_stepwise | dot -Tsvg > ../results/img/control/dag_cactus_step.svg
 snakemake --configfile workflow/config.yml --jobs 3 -R  cactus_stepwise
 
-snakemake --configfile workflow/config.yml  \
- --use-singularity \
-  --singularity-args "--bind $CDATA" \
-  --use-conda \
-  --rerun-triggers mtime -c 1 -R cactus_stepwise
-
 snakemake --jobs 30 \
   --configfile workflow/config.yml \
   --latency-wait 30 \
