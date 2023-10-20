@@ -9,7 +9,7 @@ f = open( 'results/cactus/' + snakemake.config["alignment_name"] + ".txt", "a")
 f.writelines('"' + snakemake.config["speciesTree"] + '"\n\n')
 
 for x in snakemake.params["genomes"]:
-  f.writelines(x + ' data/' + x + '.fa.gz\n')
+  f.writelines(x + ' data/genomes/cactus/' + x + '.fa.gz\n')
 
 f.close()
 

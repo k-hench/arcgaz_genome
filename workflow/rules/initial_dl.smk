@@ -123,7 +123,7 @@ rule repack_genome:
     input: 
       zp = 'results/genomes/{spec}/{spec}.zip'
     output:
-      gz = 'data/genomes/{spec,[a-z]+}.fa.gz'
+      gz = 'data/genomes/cactus/{spec,[a-z]+}.fa.gz'
     params:
       name = lambda wc: get_accession(wc, what = "name"),
       accnr = lambda wc: get_accession(wc, what = "accession")
@@ -141,7 +141,7 @@ rule repack_genome:
       """
 
 rule check_if_masked:
-    input: 'data/genomes/{spec}.fa.gz'
+    input: 'data/genomes/cactus/{spec}.fa.gz'
     output: 'results/masking/{spec}_mask_check.tsv'
     log:
       "logs/mask_check/mask_check_{spec}.log"
@@ -166,7 +166,7 @@ rule check_if_masked:
 rule stat_plots:
     input: 
       stats = expand("results/genome_stats/{spec}.tsv", spec = SPEC_ALL),
-      genomes = expand("data/genomes/{spec}.fa.gz", spec = SPEC_ALL)
+      genomes = expand("data/genomes/cactus/{spec}.fa.gz", spec = SPEC_ALL)
     output: "results/img/qc/genomes_n50.svg"
     container: None
     conda: "r_tidy"

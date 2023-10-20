@@ -9,7 +9,7 @@ rule cactus_prep:
 
 rule reformat_arcgaz:
     input: 'data/genomes/arcgaz_anc_h1.fa.gz'
-    output: 'data/genomes/arcgaz.fa.gz'
+    output: 'data/genomes/cactus/arcgaz.fa.gz'
     conda: "msa_align"
     shell:
       """
@@ -17,7 +17,7 @@ rule reformat_arcgaz:
       """
 
 rule parse_cactus_config:
-    input: 'data/genomes/arcgaz.fa.gz'
+    input: 'data/genomes/cactus/arcgaz.fa.gz'
     output: "results/checkpoints/jobstore_setup.txt"
     log: "logs/cactus/parse_config.log"
     params:

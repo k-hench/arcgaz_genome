@@ -25,4 +25,4 @@ mkdir -m 700 -p ${CACTUS_SCRATCH}/tmp/steps-output
 mkdir -p results/cactus/cactus_wd
 
 cd ${CACTUS_SCRATCH}/tmp/steps-output
-ln -s ${CURRENT_DIR}/data/genomes/*.fa.gz ./
+ln -s ${CURRENT_DIR}/data/genomes/cactus/*.fa.gz ./
