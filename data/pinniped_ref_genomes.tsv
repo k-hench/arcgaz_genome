@@ -1,0 +1,26 @@
+Assembly Accession	Assembly Name	Organism Name	Organism Infraspecific Names Breed	Organism Infraspecific Names Strain	Organism Infraspecific Names Cultivar	Organism Infraspecific Names Ecotype	Organism Infraspecific Names Isolate	Organism Infraspecific Names Sex	Annotation Name	Assembly Stats Total Sequence Length	Assembly Level	Assembly Submission Date	WGS project accession
+GCA_000321225.1	Oros_1.0	Odobenus rosmarus divergens					Ivan	male		2400133628	Scaffold	2013-01-16	ANOP01
+GCA_000349705.1	LepWed1.0	Leptonychotes weddellii					WS11-02	female		3156886159	Scaffold	2013-03-29	APMU01
+GCA_002201575.2	ASM220157v2	Neomonachus schauinslandi						male		2419443398	Chromosome	2021-10-20	NINY02
+GCA_003265705.1	ASM326570v1	Callorhinus ursinus					GAN/ISIS: 27379988/994484	female		2706852204	Scaffold	2018-06-26	QLOG01
+GCA_004028035.1	ASM402803v1	Eumetopias jubatus					GAN:26980396	female		2418246527	Scaffold	2019-01-15	SBAQ01
+GCA_004348235.1	GSC_HSeal_1.0	Phoca vitulina					PV1807	female		2363579318	Scaffold	2019-02-11	RXNX01
+GCA_009762305.2	mZalCal1.pri.v2	Zalophus californianus					mZalCal1	male		2409668595	Chromosome	2020-07-14	WPOA02
+GCA_011800145.1	KU_Mleo_1.0	Mirounga leonina					KUSES-001		Annotation submitted by Earth Biogenome Project	2417303335	Scaffold	2020-03-31	JAAMPH01
+GCA_012393455.1	Tufts_HGry_1.1	Halichoerus grypus				Northwest Atlantic	241Hg	male		2338243510	Scaffold	2020-04-16	JAAXOB01
+GCA_021288785.2	ASM2128878v2	Mirounga angustirostris					JK_09032017			2366166981	Scaffold	2021-12-26	JAJSZF01
+GCA_021288785.3	ASM2128878v3	Mirounga angustirostris					JK_09032017			2366166981	Chromosome	2022-12-21	JAJSZF01
+GCA_028646355.1	Arctocephalus_townsendi_HiC	Arctocephalus townsendi					Sample3856	male		2372365934	Chromosome	2023-02-16	JAQQSM01
+GCA_900642305.1	arcGaz3	Arctocephalus gazella								2313585684	Scaffold	2019-02-08	CAAAJK01
+GCA_947044825.1	Saimaa ringed seal draft genome	Pusa hispida saimensis								2350022681	Contig	2023-02-03	CAMRHF01
+GCF_000321225.1	Oros_1.0	Odobenus rosmarus divergens					Ivan	male	NCBI Annotation Release 101	2400133628	Scaffold	2013-01-16	ANOP01
+GCF_000349705.1	LepWed1.0	Leptonychotes weddellii					WS11-02	female	NCBI Annotation Release 101	3156886159	Scaffold	2013-03-29	APMU01
+GCF_002201575.2	ASM220157v2	Neomonachus schauinslandi						male	NCBI Annotation Release 101	2419443398	Chromosome	2021-10-20	NINY02
+GCF_003265705.1	ASM326570v1	Callorhinus ursinus					GAN/ISIS: 27379988/994484	female	NCBI Annotation Release 100	2706852204	Scaffold	2018-06-26	QLOG01
+GCF_004028035.1	ASM402803v1	Eumetopias jubatus					GAN:26980396	female	NCBI Annotation Release 100	2418246527	Scaffold	2019-01-15	SBAQ01
+GCF_004348235.1	GSC_HSeal_1.0	Phoca vitulina					PV1807	female	NCBI Annotation Release 100	2363579318	Scaffold	2019-02-11	RXNX01
+GCF_009762305.2	mZalCal1.pri.v2	Zalophus californianus					mZalCal1	male	NCBI Annotation Release 101	2409668595	Chromosome	2020-07-14	WPOA02
+GCF_011800145.1	KU_Mleo_1.0	Mirounga leonina					KUSES-001		NCBI Annotation Release 100	2417303335	Scaffold	2020-03-31	JAAMPH01
+GCF_012393455.1	Tufts_HGry_1.1	Halichoerus grypus				Northwest Atlantic	241Hg	male	NCBI Annotation Release 100	2338243510	Scaffold	2020-04-15	JAAXOB01
+GCF_021288785.1	ASM2128878v2	Mirounga angustirostris					JK_09032017		NCBI Annotation Release 100	2366166981	Scaffold	2021-12-26	JAJSZF01
+GCF_021288785.2	ASM2128878v3	Mirounga angustirostris					JK_09032017		GCF_021288785.2-RS_2023_03	2366166981	Chromosome	2022-12-21	JAJSZF01

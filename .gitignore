@@ -7,7 +7,8 @@ data/*
 data/metadata/*
 !data/metadata/*.yml
 !data/ncbi_seqs
-
+!data/pinniped_list.nwk
+!data/pinniped_ref_genomes.tsv
 # exclude quarto compilation side-products but track reports
 qmd/*
 !qmd/*.qmd
