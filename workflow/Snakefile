@@ -16,6 +16,8 @@ snakemake \
 '''
 import os
 from copy import deepcopy
+import numpy as np
+import pandas as pd
 
 # configfile: "workflow/config.yml"
 
@@ -52,3 +54,21 @@ include: "./rules/align.smk"
 include: "./rules/anchor.smk"
 include: "./rules/genome_stats.smk"
 include: "./rules/busco_and_blast.smk"
+
+
+c_cactus = config[ 'cactus_sif' ]
+
+P_NAME = config[ 'alignment_name' ]
+SPEC_REF = config[ 'refName' ]
+SPEC_QUERY = config[ 'species' ]
+SPEC_ALL = deepcopy( SPEC_QUERY )
+SPEC_ALL.insert( 0, SPEC_REF )
+CACTUS_CORES=config[ 'cactus_cores' ]
+GENOME_PARTITIONS = [ str(x + 1).zfill(2) for x in np.arange(20)]
+
+include: "./rules/initial_dl.smk"
+include: "./rules/cactus_prep.smk"
+
+# conditional kick-off of the actual cactus alignment
+if os.path.exists("results/cactus/job_inventory.tsv"):
+  include: "./rules/cactus_stepwise.smk"

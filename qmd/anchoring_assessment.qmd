@@ -27,10 +27,22 @@ source(here("R/anchoring_assesment.R"))
 ```
 
 ```{r}
-#| fig-width: 20.8
-#| fig-height: 11.7
-both_beds$plot |>
+#| fig-width: 7
+#| fig-height: 3.5
+p <- both_beds$plot |>
   wrap_plots(ncol = 1) &
   theme(legend.position = "none")
+
+p 
+```
+
+```{r}
+#| eval: false
+#| include: false
+ggsave(plot = p,
+       filename = here("img/fig/fig_s_anchoring.pdf"),
+       width = fwidth,
+       height = fwidth / 2,
+       device = cairo_pdf)
 ```
 

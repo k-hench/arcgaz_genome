@@ -1,0 +1,12 @@
+# mamba env create -f map_align.yml
+name: map_align
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - bwa=0.7.17
+ - bowtie2= 2.5.0
+ - last=1418
+ - blast=2.13.0
+ - lastz=1.04.15

@@ -81,12 +81,14 @@ compile_bed <- \(ht = 1){
     geom_rect(data = tibble(end = max(data_bed$gend)),
               aes(xmin = 0, xmax = end * 1e-9,
                   ymin = 0, ymax = 1),
-              color = "gray80", fill = "gray95") +
+              color = "gray80", fill = "gray95",
+              linewidth = plt_lwd) +
     geom_rect(aes(xmin = gstart * 1e-9,
                   xmax = gend * 1e-9,
                   ymin = 0, ymax = 1,
                   color = lg_group,
-                  fill = after_scale(clr_lighten(color)))) +
+                  fill = after_scale(clr_lighten(color))),
+              linewidth = plt_lwd) +
     geom_rect(data = data_scaf,
               aes(xmin = gstart_s * 1e-9,
                   xmax = gend_s * 1e-9,
@@ -94,10 +96,11 @@ compile_bed <- \(ht = 1){
                   ymax = .5 + scaf_type * .25,
                   fill = factor(scaf_type),
                   color = after_scale(clr_darken(fill))),
-              alpha = .3) +
+              alpha = .3,
+              linewidth = plt_lwd) +
     geom_point(aes(x = gmid * 1e-9,
                    y = .5),
-               shape = 21, size = 10,
+               shape = 21, size = 4.5, stroke = plt_lwd,
                color = "black", fill = "white") +
     geom_text(data = data_bed |>
                 select(name, name_new, gmid, gstart, gend, lg_group, n_scaf) |>
@@ -111,12 +114,12 @@ compile_bed <- \(ht = 1){
                    y = .5,
                   label = n_scaf),
                color = "black",
-              family = fnt_sel) +
+              family = fnt_sel, size = fnt_sz/ggplot2::.pt) +
     geom_text(data = data_scaf,
               aes(x = gmid_s * 1e-9,
                   y = .2 + scaf_type * .6,
                   label = scaf_abbref),
-              family = fnt_sel) +
+              family = fnt_sel, size = fnt_sz/ggplot2::.pt) +
     scale_color_manual(values = c(clr_darken(clrs[1], .25), clrs[1], "gray25", "gray90")) +
     scale_fill_manual(values = c("gray65", "black")) +
     scale_x_continuous("genomic position (GB)",
@@ -132,7 +135,7 @@ compile_bed <- \(ht = 1){
     coord_cartesian(ylim = c(-.01, 1.01),
                     expand = 0) +
     # facet_wrap(name ~ . ) +
-    theme_minimal(base_family = fnt_sel) +
+    theme_minimal(base_family = fnt_sel, base_size = fnt_sz) +
     theme(axis.text.y = element_blank())
 
   tibble(ht = ht,

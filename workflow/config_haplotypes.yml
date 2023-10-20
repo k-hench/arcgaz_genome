@@ -14,3 +14,30 @@ haplotypes:
   - h2
 
 mask_suffix: '_hardmasked'
+
+# cactus section
+singularity_bind_paths: '$(pwd),$CDATA'
+# --------------
+alignment_name: 'pinniped_set'
+refName: arcgaz
+
+species:
+  - calurs
+  - eumjub
+  - halgry
+  - lepwed
+  - mirang
+  - mirleo
+  - neosch
+  - odoros
+  - phovit
+  - zalcal
+
+speciesTree: "((odoros,(calurs,(arcgaz,(eumjub,zalcal)))),(((lepwed,(mirleo,mirang)),neosch),(phovit,halgry)));"
+
+# technical parameters
+# cactus_sif:
+# apptainer pull docker://quay.io/comparative-genomics-toolkit/cactus:v2.5.1
+cactus_sif: '$CDATA/apptainer_local/cactus_v2.5.1.sif'
+# cactus_sif: 'docker://quay.io/comparative-genomics-toolkit/cactus:v2.5.1'
+cactus_cores: "8"

@@ -47,46 +47,65 @@ align_min_length <- 3e5
 ```
 
 ```{r}
-#| fig-width: 11.
-#| fig-height: 3.
+#| fig-width: 7.
+#| fig-height: 1.75
 n_largest <- 37
-sizes |> 
-  filter(size_idx < n_largest) |> 
+p_sizes <- sizes |> 
+  filter(size_idx < n_largest) |>
+  mutate(l18 = size_idx < 19,
+         eo_18 = str_c(eo, as.numeric(l18))) |> 
   ggplot() +
   geom_linerange(data = tibble(end = align_min_length),
                  aes(y = .9, xmin = 0, xmax = end ), size = 1.5) +
   geom_rect(data = genome_summary,
             aes(xmin = 0, xmax = toal_length,
                 ymin = y_base, ymax = y_base + g_height),
-            color = "gray50", fill = "gray90") +
+            color = "gray50", fill = "gray90",
+            linewidth = plt_lwd) +
   geom_rect(aes(xmin = start, xmax = end,
                 ymin = y_base, ymax = y_base + g_height,
-                color = factor(eo),
-                fill = after_scale(clr_lighten(color, .5)))) +
+                color = factor(eo_18),
+                fill = after_scale(clr_lighten(color, .5))),
+            linewidth = plt_lwd) +
   geom_richtext(data = genome_summary,
                 aes(y = y_base + .5 * g_height,
                     label = glue("{str_remove(genome, '_hardmasked')}<br>n: {n}"),
-                    x = -.1e9),hjust = 1,
+                    x = -.1e9),
+                hjust = 1, size = fnt_sz/2,
                 fill = NA, label.color = NA, family = fnt_sel,
                 label.padding = grid::unit(rep(0, 4), "pt")) + 
   scale_y_continuous(NULL) +
   scale_x_continuous(NULL, breaks = c(0:3)*1e9,
                      labels = str_c(0:3, " Gb")) + 
-  scale_color_manual(values = clrs |> clr_lighten(.2) |> clr_desaturate(), guide = "none") +
+  scale_color_manual(values = c(clrs |> clr_lighten(.1) |> clr_desaturate(),
+                                clrs |> clr_lighten(.6) |> clr_desaturate())|> 
+                       set_names(nm = c("01", "11", "00", "10")),
+                     guide = "none") +
   coord_cartesian(xlim = c(-4.5e8, 2.6e9),
                   ylim = c(-.1, length(genomes)),
                   expand = 0)+
   # coord_polar() +
   labs(title = "pre-anchoring genomes", 
        subtitle = "(scaffolds sorted by size)") +
-  theme_minimal(base_family = fnt_sel) +
+  theme_minimal(base_family = fnt_sel, base_size = fnt_sz) +
   theme(panel.grid = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.x = element_line(linewidth = .2),
-        axis.ticks.length = unit(-4,"pt"),
+        axis.ticks.length = unit(-2, "pt"),
         plot.title = element_text(hjust = .5),
         plot.subtitle = element_text(hjust = .5))
+p_sizes
 ```
+
+```{r}
+#| include: false
+#| eval: false
+ggsave(plot = p_sizes,
+       filename = here("img/fig/fig_s_hirise_sizes.pdf"),
+       width = fwidth,  height = fwidth/4,
+       device = cairo_pdf)
+```
+
 
 ```{r}
 #| fig-width: 12.

@@ -1,0 +1,9 @@
+# mamba env create -f bioawk.yml
+name: bioawk
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - bioawk=1.0
+ - samtools=1.17
