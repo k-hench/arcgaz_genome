@@ -105,12 +105,12 @@ rule filter_maf_coverage:
 # (we want to exclude all CDS)
 rule create_cds_mask:
     input:
-      gff = "data/genomes/arcgaz_anc_h1.annotation.gff"
+      gff = "data/genomes/arcgaz_anc_h1.annotation.gff.gz"
     output:
       bed = "results/neutral_tree/masks/cds_{mscaf}.bed.gz"
     shell:
       """
-      grep "CDS" {input.gff} | \
+      zgrep "CDS" {input.gff} | \
         grep {wildcards.mscaf} | \
         cut -f 1,4,5 | \
         gzip > {output.bed}
