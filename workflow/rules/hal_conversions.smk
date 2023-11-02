@@ -2,6 +2,7 @@
 snakemake --configfile workflow/config.yml --rerun-triggers mtime -n -R convert_hal
 
 snakemake --jobs 50 \
+  --configfile workflow/config.yml \
   --latency-wait 30 \
   -p \
   --default-resources mem_mb=51200 threads=1 \
@@ -20,6 +21,8 @@ snakemake --jobs 50 \
       -R convert_hal
 """
 
+REF_SPEC = "arcgaz"
+TIP_SPECS = "calurs,eumjub,halgry,lepwed,mirang,mirleo,neosch,odoros,phovit,zalcal"
 MSCAFS = [ "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "x"]
 
 rule convert_hal:
@@ -36,9 +39,9 @@ rule hal_to_maf:
     shell:
       """
       hal2maf \
-        --refGenome arcgaz \
+        --refGenome {REF_SPEC} \
         --refSequence mscaf_a1_{wildcards.mscaf} \
-        --targetGenomes calurs,eumjub,halgry,lepwed,mirang,mirleo,neosch,odoros,phovit,zalcal \
+        --targetGenomes {TIP_SPECS} \
         {input.hal} {output.maf}
       """
 
@@ -53,6 +56,6 @@ rule hal_to_snps:
       halSnps \
         --refSequence mscaf_a1_{wildcards.mscaf} \
         {input.hal} \
-        arcgaz calurs,eumjub,halgry,lepwed,mirang,mirleo,neosch,odoros,phovit,zalcal \
+        {REF_SPEC} {TIP_SPECS} \
         --tsv {output.tsv}
       """

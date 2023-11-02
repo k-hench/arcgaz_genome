@@ -55,7 +55,6 @@ include: "./rules/anchor.smk"
 include: "./rules/genome_stats.smk"
 include: "./rules/busco_and_blast.smk"
 
-
 c_cactus = config[ 'cactus_sif' ]
 
 P_NAME = config[ 'alignment_name' ]
@@ -69,6 +68,7 @@ GENOME_PARTITIONS = [ str(x + 1).zfill(2) for x in np.arange(20)]
 include: "./rules/initial_dl.smk"
 include: "./rules/cactus_prep.smk"
 include: "./rules/hal_conversions.smk"
+include: "./rules/neutral_branch_lengths.smk"
 
 # conditional kick-off of the actual cactus alignment
 if os.path.exists("results/cactus/job_inventory.tsv"):
