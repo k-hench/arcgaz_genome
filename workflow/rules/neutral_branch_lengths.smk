@@ -81,7 +81,9 @@ rule collapse_cov_bed:
     conda: "r_tidy"
     shell:
       """
-      (set -o posix ; set) > {output}
+      df -h /vol/cluster-data/ > {output}
+      echo "===========================" >> {output}
+      (set -o posix ; set) >> {output}
       echo "===========================" >> {output}
       hostname >> {output}
       echo "-------" >> {output}
