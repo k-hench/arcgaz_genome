@@ -21,8 +21,8 @@ snakemake --jobs 50 \
       -R create_neutral_tree
 """
 
-WIN_SIZE = 5000
-WIN_N = 1000
+WIN_SIZE = 1000
+WIN_N = 5000
 SCFS = expand( "mscaf_a1_{scf}", scf = MSCAFS)
 
 rule create_neutral_tree:
