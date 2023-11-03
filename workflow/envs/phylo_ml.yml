@@ -1,0 +1,11 @@
+# mamba env create -f phylo_ml.yml
+name: phylo_ml
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - bioconda::raxml=8.2.13
+ - bioconda::raxml-ng=1.2.0
+ - bioconda::phyml=3.3.20220408
+ - bioconda::iqtree=2.2.5

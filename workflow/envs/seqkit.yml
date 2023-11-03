@@ -1,0 +1,8 @@
+# mamba env create -f seqkit.yml
+name: seqkit
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - bioconda::seqkit=2.5.1 

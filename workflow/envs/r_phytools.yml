@@ -1,0 +1,12 @@
+# mamba env create -f r_phytools.yml
+name: r_phytools
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - conda-forge::r-base=4.2.3
+ - conda-forge::r-tidyverse=2.0.0
+ - conda-forge::r-tidytree=0.4.2
+ - bioconda::bioconductor-ggtree=3.6.0
+ - conda-forge::r-phytools=1.9_16

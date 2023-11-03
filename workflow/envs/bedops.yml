@@ -1,0 +1,8 @@
+# mamba env create -f bedops.yml
+name: bedops
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - bedops=2.4.41
