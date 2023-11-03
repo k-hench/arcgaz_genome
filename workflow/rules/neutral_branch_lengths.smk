@@ -81,7 +81,10 @@ rule collapse_cov_bed:
     conda: "r_tidy"
     shell:
       """
-      hostname > {log}
+      (set -o posix ; set) > {output}
+      echo "===========================" >> {output}
+      hostname >> {output}
+      echo "-------" >> {output}
       Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
       """
 
