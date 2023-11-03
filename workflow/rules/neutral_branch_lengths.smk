@@ -81,12 +81,7 @@ rule collapse_cov_bed:
     conda: "r_tidy"
     shell:
       """
-      df -h /vol/cluster-data/ > {log}
-      echo "===========================" >> {log}
-      (set -o posix ; set) >> {log}
-      echo "===========================" >> {log}
-      hostname >> {log}
-      echo "-------" >> {log}
+      which Rscript > {log}
       Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
       """
 
