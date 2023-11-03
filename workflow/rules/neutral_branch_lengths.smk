@@ -20,6 +20,7 @@ snakemake --jobs 50 \
       --jn job_c.{name}.{jobid}.sh \
       -R create_neutral_tree
 """
+c_conda = "$CDATA/apptainer_local/conda_byoe.sif"
 
 WIN_SIZE = 1000
 WIN_N = 5000
@@ -78,6 +79,7 @@ rule collapse_cov_bed:
     output:
       bed = "results/neutral_tree/cov/{mscaf}.collapsed.bed.gz"
     log: "logs/collapse_cov_bed_{mscaf}.log"
+    container: c_conda
     conda: "r_tidy"
     shell:
       """
@@ -116,23 +118,19 @@ rule create_cds_mask:
         gzip > {output.bed}
       """
 
-rule create_windows:
+rule proto_windows:
     input:
       bed_cov = expand( "results/neutral_tree/cov/filtered/{mscaf}.bed.gz", mscaf = SCFS ),
       bed_cds = expand( "results/neutral_tree/masks/cds_{mscaf}.bed.gz", mscaf = SCFS ),
-      genome = "data/genomes/arcgaz_anc_h1.genome"
     output:
       bed_cov = "results/neutral_tree/cov/filtered/cov.bed.gz",
       bed_cds = "results/neutral_tree/masks/cds.bed.gz",
-      win_proto = "results/neutral_tree/win/proto.bed.gz",
-      bed_win = "results/neutral_tree/win/windows.bed.gz",
-      win_n_scaf = "results/neutral_tree/win/win_n_scaf.txt"
+      win_proto = "results/neutral_tree/win/proto.bed.gz"
     params:
       win_size = WIN_SIZE,
       win_n = WIN_N,
       win_proto_prefix = "results/neutral_tree/win/proto.bed",
       win_seed = 42
-    conda: "popgen_basics"
     log: "logs/win.log"
     shell:
       """
@@ -142,12 +140,29 @@ rule create_windows:
       mkdir -p results/neutral_tree/win/
       for k in $(seq 1 {params.win_n}); do echo -e "{SCFS[0]}\t0\t{params.win_size}" >> {params.win_proto_prefix}; done
       gzip {params.win_proto_prefix}
+      """
 
+rule shuffle_windows:
+    input:
+      genome = "data/genomes/arcgaz_anc_h1.genome",
+      bed_cov = "results/neutral_tree/cov/filtered/cov.bed.gz",
+      bed_cds = "results/neutral_tree/masks/cds.bed.gz",
+      win_proto = "results/neutral_tree/win/proto.bed.gz",
+    output:
+      bed_win = "results/neutral_tree/win/windows.bed.gz",
+      win_n_scaf = "results/neutral_tree/win/win_n_scaf.txt"
+    params:
+      win_seed = 42
+    container: c_conda
+    conda: "popgen_basics"
+    log: "logs/win.log"
+    shell:
+      """
       bedtools shuffle \
-        -i {output.win_proto} \
+        -i {input.win_proto} \
         -g {input.genome} \
-        -incl {output.bed_cov} \
-        -excl {output.bed_cds} \
+        -incl {input.bed_cov} \
+        -excl {input.bed_cds} \
         -seed {params.win_seed} \
         -noOverlapping 2>> {log} | \
         sort -k 1,1 -k2,2n | \
