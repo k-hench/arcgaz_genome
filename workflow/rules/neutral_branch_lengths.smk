@@ -12,7 +12,7 @@ snakemake --jobs 50 \
   --rerun-triggers mtime \
   --cluster '
     sbatch \
-      --export ALL \
+      --export=ALL \
       -n {threads} \
       -e logs/{name}.{jobid}.err \
       -o logs/{name}.{jobid}.out \
@@ -78,15 +78,10 @@ rule collapse_cov_bed:
     output:
       bed = "results/neutral_tree/cov/{mscaf}.collapsed.bed.gz"
     log: "logs/collapse_cov_bed_{mscaf}.log"
-    params:
-      c = "r_tidy"
+    conda: "r_tidy"
     shell:
       """
-      which conda > {log}
-      bash sh/e_path >> {log}
-      conda run -n r_tidy bash sh/e_path >> {log}
-      conda run -n r_tidy which Rscript >> {log}
-      conda run -n r_tidy Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
+      Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
       """
 
 # now we filter the coverage bed to a minimum coverage
