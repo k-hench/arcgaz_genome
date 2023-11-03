@@ -82,8 +82,8 @@ rule collapse_cov_bed:
       c = "r_tidy"
     shell:
       """
-      which Rscript > {log}
-      conda run -n {params.c} Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
+      conda run -n r_tidy which Rscript > {log}
+      conda run -n r_tidy Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
       """
 
 # now we filter the coverage bed to a minimum coverage
