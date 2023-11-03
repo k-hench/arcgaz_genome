@@ -79,11 +79,11 @@ rule collapse_cov_bed:
       bed = "results/neutral_tree/cov/{mscaf}.collapsed.bed.gz"
     log: "logs/collapse_cov_bed_{mscaf}.log"
     params:
-      conda = "r_tidy"
+      c = "r_tidy"
     shell:
       """
       which Rscript > {log}
-      conda run -n {params.conda} Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
+      conda run -n {params.c} Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
       """
 
 # now we filter the coverage bed to a minimum coverage
