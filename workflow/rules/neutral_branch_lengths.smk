@@ -82,7 +82,8 @@ rule collapse_cov_bed:
       c = "r_tidy"
     shell:
       """
-      conda run -n r_tidy which Rscript > {log}
+      which conda >> {log}
+      conda run -n r_tidy which Rscript >> {log}
       conda run -n r_tidy Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
       """
 
