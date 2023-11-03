@@ -81,7 +81,8 @@ rule collapse_cov_bed:
     conda: "r_tidy"
     shell:
       """
-      Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &> {log}
+      hostname > {log}
+      Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
       """
 
 # now we filter the coverage bed to a minimum coverage
