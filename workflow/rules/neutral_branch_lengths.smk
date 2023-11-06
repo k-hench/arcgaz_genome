@@ -1,24 +1,24 @@
 """
 snakemake --configfile workflow/config.yml --rerun-triggers mtime -n -R create_neutral_tree
 
-snakemake --jobs 50 \
-  --configfile workflow/config.yml \
-  --latency-wait 30 \
-  -p \
-  --default-resources mem_mb=51200 threads=1 \
-  --use-singularity \
-  --singularity-args "--bind $CDATA" \
-  --use-conda \
-  --rerun-triggers mtime \
-  --cluster '
-    sbatch \
-      --export=ALL \
-      -n {threads} \
-      -e logs/{name}.{jobid}.err \
-      -o logs/{name}.{jobid}.out \
-      --mem={resources.mem_mb}' \
-      --jn job_c.{name}.{jobid}.sh \
-      -R create_neutral_tree
+  snakemake --jobs 50 \
+    --configfile workflow/config.yml \
+    --latency-wait 30 \
+    -p \
+    --default-resources mem_mb=51200 threads=1 \
+    --use-singularity \
+    --singularity-args "--bind $CDATA" \
+    --use-conda \
+    --rerun-triggers mtime \
+    --cluster '
+      sbatch \
+        --export=ALL \
+        -n {threads} \
+        -e logs/{name}.{jobid}.err \
+        -o logs/{name}.{jobid}.out \
+        --mem={resources.mem_mb}' \
+        --jn job_c.{name}.{jobid}.sh \
+        -R create_neutral_tree
 """
 c_conda = "$CDATA/apptainer_local/conda_byoe.sif"
 
@@ -103,6 +103,24 @@ rule filter_maf_coverage:
        gzip > {output.bed}
      """
 
+rule negative_coverage_mask:
+    input:
+      genome = "data/genomes/arcgaz_anc_h1.genome",
+      bed = expand( "results/neutral_tree/cov/filtered/{mscaf}.bed.gz", mscaf = SCFS )
+    output:
+      bed_cov = "results/neutral_tree/cov/filtered/whole_genome.bed.gz",
+      bed_genome = "data/genomes/arcgaz_anc_h1.bed",
+      bed_neg_cov = "results/neutral_tree/cov/filtered/whole_genome_exclude.bed.gz"
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      zcat {input.bed} | gzip > {output.bed_cov}
+      awk '{{print $1"\t"0"\t"$2}}' {input.genome} > {output.bed_genome}
+      bedtools subtract -a {output.bed_genome} -b {output.bed_cov} | gzip > {output.bed_neg_cov}
+      """
+      
+
 # a second mask is created from the genome annotation
 # (we want to exclude all CDS)
 rule create_cds_mask:
@@ -120,10 +138,8 @@ rule create_cds_mask:
 
 rule proto_windows:
     input:
-      bed_cov = expand( "results/neutral_tree/cov/filtered/{mscaf}.bed.gz", mscaf = SCFS ),
-      bed_cds = expand( "results/neutral_tree/masks/cds_{mscaf}.bed.gz", mscaf = SCFS ),
+      bed_cds = expand( "results/neutral_tree/masks/cds_{mscaf}.bed.gz", mscaf = SCFS )
     output:
-      bed_cov = "results/neutral_tree/cov/filtered/cov.bed.gz",
       bed_cds = "results/neutral_tree/masks/cds.bed.gz",
       win_proto = "results/neutral_tree/win/proto.bed.gz"
     params:
@@ -134,7 +150,6 @@ rule proto_windows:
     log: "logs/win.log"
     shell:
       """
-      zcat {input.bed_cov} | gzip > {output.bed_cov}
       zcat {input.bed_cds} | gzip > {output.bed_cds}
 
       mkdir -p results/neutral_tree/win/
@@ -145,10 +160,12 @@ rule proto_windows:
 rule shuffle_windows:
     input:
       genome = "data/genomes/arcgaz_anc_h1.genome",
-      bed_cov = "results/neutral_tree/cov/filtered/cov.bed.gz",
       bed_cds = "results/neutral_tree/masks/cds.bed.gz",
-      win_proto = "results/neutral_tree/win/proto.bed.gz",
+      bed_neg_cov = "results/neutral_tree/cov/filtered/whole_genome_exclude.bed.gz",
+      win_proto = "results/neutral_tree/win/proto.bed.gz"
     output:
+      bed_tmp = temp( "results/neutral_tree/win/exclude_tmp.bed.gz" ),
+      bed_exclude = "results/neutral_tree/win/exclude.bed.gz",
       bed_win = "results/neutral_tree/win/windows.bed.gz",
       win_n_scaf = "results/neutral_tree/win/win_n_scaf.txt"
     params:
@@ -158,11 +175,16 @@ rule shuffle_windows:
     log: "logs/win.log"
     shell:
       """
+      zcat {input.bed_cds} {input.bed_neg_cov} | \
+        sort -k 1,1 -k2,2n | \
+        gzip > {output.bed_tmp}
+
+      bedtools merge -i {output.bed_tmp} | gzip > {output.bed_exclude}
+
       bedtools shuffle \
         -i {input.win_proto} \
         -g {input.genome} \
-        -incl {input.bed_cov} \
-        -excl {input.bed_cds} \
+        -excl {output.bed_exclude} \
         -seed {params.win_seed} \
         -noOverlapping 2>> {log} | \
         sort -k 1,1 -k2,2n | \
