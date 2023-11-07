@@ -284,7 +284,7 @@ rule reroot_tree:
 
 rule call_gerp:
     input:
-      maf = "results/maf/{mscaf}.maf",
+      maf = lambda wc: "results/pinniped/maf/pinniped_set_" + scaf_to_nr(wc) + ".maf",
       tree = "results/neutral_tree/rerooted.tree"
     output:
       rates = "results/neutral_tree/gerp/{mscaf}.maf.rates"
