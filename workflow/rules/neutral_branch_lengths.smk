@@ -289,7 +289,7 @@ rule call_gerp:
     output:
       rates = "results/neutral_tree/gerp/{mscaf}.maf.rates"
     params:
-      refname = "sep_chr_1"
+      refname = "arcgaz"
     conda: "msa_phast"
     log: "logs/gerp_{mscaf}.log"
     shell:
