@@ -219,6 +219,7 @@ rule maf_to_fasta:
     params:
       ref_spec = REF_SPEC
     log: "logs/maf2fa_{mscaf}.log"
+    container: c_conda
     conda: "maffilter"
     shell:
       """
@@ -232,6 +233,7 @@ rule single_multi_fasta:
       fas = expand( "results/neutral_tree/multifa/{mscaf}.fa.gz", mscaf = SCFS )
     output:
       fa = "results/neutral_tree/multifa/combined_windows.fa"
+    container: c_conda
     conda: "seqkit"
     shell:
       """
@@ -244,6 +246,7 @@ rule estimate_branchlengths:
       tree = "data/topology.tree"
     output:
       tree = "results/neutral_tree/multifa/combined_windows.fa.treefile"
+    container: c_conda
     conda: "phylo_ml"
     shell:
       """
