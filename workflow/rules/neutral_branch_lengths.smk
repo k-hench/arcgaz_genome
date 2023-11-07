@@ -1,7 +1,7 @@
 """
 snakemake --configfile workflow/config.yml --rerun-triggers mtime -n -R create_neutral_tree
 
-  snakemake --jobs 50 \
+snakemake --jobs 50 \
     --configfile workflow/config.yml \
     --latency-wait 30 \
     -p \
@@ -264,4 +264,34 @@ rule estimate_branchlengths:
         --seed 42 \
         -g {input.tree}\
         --tree-fix 
+      """
+
+rule reroot_tree:
+    input:
+      tree = "results/neutral_tree/multifa/combined_windows.fa.treefile"
+    output:
+      tree = "results/neutral_tree/rerooted.tree"
+    container: c_conda
+    conda: "r_phytools"
+    params:
+      root_node = 6
+    log: "logs/reroot_tree.log"
+    shell:
+      """
+      Rscript --vanilla R/reroot_tree.R {input.tree} {params.root_node} {output.tree} &> {log}
+      """
+
+rule call_gerp:
+    input:
+      maf = "results/maf/{mscaf}.maf",
+      tree = "results/neutral_tree/rerooted.tree"
+    output:
+      rates = "results/maf/{mscaf}.maf.rates"
+    params:
+      refname = "sep_chr_1"
+    conda: "msa_phast"
+    log: "logs/gerp_{mscaf}.log"
+    shell:
+      """
+      gerpcol -t {input.tree} -f {input.maf} -e {params.refname} -j -z -x ".rates" &> {log}
       """
