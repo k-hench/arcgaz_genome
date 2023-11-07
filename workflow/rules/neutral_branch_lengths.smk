@@ -28,7 +28,7 @@ rule create_neutral_tree:
     input:
       win_bed = expand( "results/neutral_tree/win/windows_{mscaf}.bed.gz", mscaf = SCFS ),
       tree = "results/neutral_tree/multifa/combined_windows.fa.treefile",
-      gerp = expand( "results/neutral_tree/gerp/{mscaf}.maf.rates", mscaf = SCFS )
+      gerp = expand( "results/pinniped/maf/pinniped_set_{mscaf_nr}.maf.rates", mscaf_nr = MSCAFS )
 
 # we need to determine what part of the genome is covered 
 # by a the alignment of all other (tip) species
@@ -273,14 +273,14 @@ rule reroot_tree:
 
 rule call_gerp:
     input:
-      maf = lambda wc: "results/pinniped/maf/pinniped_set_" + scaf_to_nr(wc) + ".maf",
+      maf = "results/pinniped/maf/pinniped_set_{mscaf_nr}.maf",
       tree = "results/neutral_tree/rerooted.tree"
     output:
-      rates = "results/neutral_tree/gerp/{mscaf}.maf.rates"
+      rates = "results/pinniped/maf/pinniped_set_{mscaf_nr}.maf.rates"
     params:
       refname = "arcgaz"
     conda: "msa_phast"
-    log: "logs/gerp_{mscaf}.log"
+    log: "logs/gerp_{mscaf_nr}.log"
     shell:
       """
       gerpcol -t {input.tree} -f {input.maf} -e {params.refname} -j -z -x ".rates" &> {log}

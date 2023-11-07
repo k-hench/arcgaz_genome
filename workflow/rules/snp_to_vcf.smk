@@ -1,5 +1,24 @@
 """
 snakemake --configfile workflow/config.yml --rerun-triggers mtime -n -R fsts
+
+snakemake --jobs 50 \
+    --configfile workflow/config.yml \
+    --latency-wait 30 \
+    -p \
+    --default-resources mem_mb=51200 threads=1 \
+    --use-singularity \
+    --singularity-args "--bind $CDATA" \
+    --use-conda \
+    --rerun-triggers mtime \
+    --cluster '
+      sbatch \
+        --export=ALL \
+        -n {threads} \
+        -e logs/{name}.{jobid}.err \
+        -o logs/{name}.{jobid}.out \
+        --mem={resources.mem_mb}' \
+        --jn job_c.{name}.{jobid}.sh \
+        -R fsts
 """
 
 rule fsts:
