@@ -4,7 +4,16 @@ args <- commandArgs(trailingOnly = TRUE)
 
 tree <- ape::read.tree(file = args[[1]])
 tree_rerooted <- reroot(tree, node.number = as.numeric(args[[2]]))
-ape::write.tree(phy = purrr::reduce(c(12, 18, 19, 20, 13, 14, 21, 17),
-                                    ape::rotate,
-                                    .init = tree_rerooted),
+
+tree_rotated <- tree_rerooted |>
+    ape::rotate(12) |>
+    ape::rotate(18) |>
+    ape::rotate(19) |>
+    ape::rotate(20) |>
+    ape::rotate(13) |>
+    ape::rotate(14) |>
+    ape::rotate(21) |>
+    ape::rotate(17)
+
+ape::write.tree(phy = tree_rotated,
                 file = args[[3]], digits = 6)
