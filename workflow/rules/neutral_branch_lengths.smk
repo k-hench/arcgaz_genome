@@ -275,7 +275,7 @@ rule reroot_tree:
     container: c_conda
     conda: "r_phytools"
     params:
-      root_node = 6
+      root_node = 15
     log: "logs/reroot_tree.log"
     shell:
       """
