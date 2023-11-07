@@ -20,9 +20,6 @@ snakemake --jobs 50 \
         --jn job_c.{name}.{jobid}.sh \
         -R create_neutral_tree
 """
-import re
-c_conda = "$CDATA/apptainer_local/conda_byoe.sif"
-
 WIN_SIZE = 1000
 WIN_N = 5000
 SCFS = expand( "mscaf_a1_{scf}", scf = MSCAFS)
@@ -32,13 +29,6 @@ rule create_neutral_tree:
       win_bed = expand( "results/neutral_tree/win/windows_{mscaf}.bed.gz", mscaf = SCFS ),
       tree = "results/neutral_tree/multifa/combined_windows.fa.treefile",
       gerp = expand( "results/neutral_tree/gerp/{mscaf}.maf.rates", mscaf = SCFS )
-      #,
-      #multifa = "results/neutral_tree/multifa/combined_windows.fa",
-      #rooted_tree = "results/neutral_tree/rerooted.tree",
-      #gerp = expand( "results/maf/{mscaf}.maf.rates", mscaf = SCFS )
-      #winmaf = "results/neutral_tree/win/windows.maf.gz"
-      #stats = expand( "results/neutral_tree/stats/{mscaf}_statistics.csv", mscaf = SCFS )
-
 
 # we need to determine what part of the genome is covered 
 # by a the alignment of all other (tip) species
@@ -122,7 +112,6 @@ rule negative_coverage_mask:
       awk '{{print $1"\t"0"\t"$2}}' {input.genome} > {output.bed_genome}
       bedtools subtract -a {output.bed_genome} -b {output.bed_cov} | gzip > {output.bed_neg_cov}
       """
-      
 
 # a second mask is created from the genome annotation
 # (we want to exclude all CDS)

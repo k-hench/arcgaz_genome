@@ -11,6 +11,8 @@ data/metadata/*
 !data/pinniped_ref_genomes.tsv
 !data/topology.tree
 !data/maffilter_templ.txt
+!data/proto.vcf
+!data/*.pop
 # exclude quarto compilation side-products but track reports
 qmd/*
 !qmd/*.qmd
