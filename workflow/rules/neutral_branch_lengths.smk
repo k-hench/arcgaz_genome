@@ -30,7 +30,8 @@ SCFS = expand( "mscaf_a1_{scf}", scf = MSCAFS)
 rule create_neutral_tree:
     input:
       win_bed = expand( "results/neutral_tree/win/windows_{mscaf}.bed.gz", mscaf = SCFS ),
-      tree = "results/neutral_tree/multifa/combined_windows.fa.treefile"
+      tree = "results/neutral_tree/multifa/combined_windows.fa.treefile",
+      gerp = expand( "results/neutral_tree/gerp/{mscaf}.maf.rates", mscaf = SCFS )
       #,
       #multifa = "results/neutral_tree/multifa/combined_windows.fa",
       #rooted_tree = "results/neutral_tree/rerooted.tree",
@@ -286,7 +287,7 @@ rule call_gerp:
       maf = "results/maf/{mscaf}.maf",
       tree = "results/neutral_tree/rerooted.tree"
     output:
-      rates = "results/maf/{mscaf}.maf.rates"
+      rates = "results/neutral_tree/gerp/{mscaf}.maf.rates"
     params:
       refname = "sep_chr_1"
     conda: "msa_phast"
