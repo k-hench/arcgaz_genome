@@ -28,7 +28,8 @@ SCFS = expand( "mscaf_a1_{scf}", scf = MSCAFS)
 
 rule create_neutral_tree:
     input:
-      win_bed = expand( "results/neutral_tree/win/windows_{mscaf}.bed.gz", mscaf = SCFS )
+      win_bed = expand( "results/neutral_tree/win/windows_{mscaf}.bed.gz", mscaf = SCFS ),
+      tree = "results/neutral_tree/multifa/combined_windows.fa.treefile"
       #,
       #multifa = "results/neutral_tree/multifa/combined_windows.fa",
       #rooted_tree = "results/neutral_tree/rerooted.tree",
@@ -207,3 +208,50 @@ rule windows_by_scaffold:
       gzip {params.bed_prefix}
       """
 
+rule maf_to_fasta:
+    input:
+      maf = "results/pinniped/maf/{mscaf}.maf",
+      conf = "data/maffilter_templ.txt",
+      windows = "results/neutral_tree/win/windows_{mscaf}.bed.gz",
+      win_n_scaf = "results/neutral_tree/win/win_n_scaf.txt"
+    output:
+      fasta = "results/neutral_tree/multifa/{mscaf}.fa.gz"
+    params:
+      ref_spec = REF_SPEC
+    log: "logs/maf2fa_{mscaf}.log"
+    conda: "maffilter"
+    shell:
+      """
+      N_WIN=$(grep {wildcards.mscaf} {input.win_n_scaf} | cut -f 2)
+      BP_WIN=$((${{N_WIN}} * {WIN_SIZE}))
+      maffilter param={input.conf} DATA={wildcards.mscaf} FASIZE=${{BP_WIN}} REF_SPEC={params.ref_spec} &> {log}
+      """
+
+rule single_multi_fasta:
+    input:
+      fas = expand( "results/neutral_tree/multifa/{mscaf}.fa.gz", mscaf = SCFS )
+    output:
+      fa = "results/neutral_tree/multifa/combined_windows.fa"
+    conda: "seqkit"
+    shell:
+      """
+      seqkit concat {input.fas} --full > {output.fa}
+      """
+
+rule estimate_branchlengths:
+    input:
+      fa = "results/neutral_tree/multifa/combined_windows.fa",
+      tree = "data/topology.tree"
+    output:
+      tree = "results/neutral_tree/multifa/combined_windows.fa.treefile"
+    conda: "phylo_ml"
+    shell:
+      """
+      iqtree \
+        -s {input.fa}\
+        -m GTR+G \
+        --threads-max 1 \
+        --seed 42 \
+        -g {input.tree}\
+        --tree-fix 
+      """

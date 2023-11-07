@@ -9,6 +9,8 @@ data/metadata/*
 !data/ncbi_seqs
 !data/pinniped_list.nwk
 !data/pinniped_ref_genomes.tsv
+!data/topology.tree
+!data/maffilter_templ.txt
 # exclude quarto compilation side-products but track reports
 qmd/*
 !qmd/*.qmd
