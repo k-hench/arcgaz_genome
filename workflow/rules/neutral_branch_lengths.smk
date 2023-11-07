@@ -214,6 +214,12 @@ def scaf_to_nr(wildcards):
   out = re.findall(pattern, wildcards.mscaf)
   return out[0]
 
+def scaf_to_nr_direct(x):
+  pattern = re.compile(r'mscaf_a1_(.*?)$')
+  out = re.findall(pattern, x)
+  return out[0]
+
+
 rule maf_to_fasta:
     input:
       maf = lambda wc: "results/pinniped/maf/pinniped_set_" + scaf_to_nr(wc) + ".maf",
@@ -231,7 +237,7 @@ rule maf_to_fasta:
       """
       N_WIN=$(grep {wildcards.mscaf} {input.win_n_scaf} | cut -f 2)
       BP_WIN=$((${{N_WIN}} * {WIN_SIZE}))
-      maffilter param={input.conf} DATA={wildcards.mscaf} FASIZE=${{BP_WIN}} REF_SPEC={params.ref_spec} &> {log}
+      maffilter param={input.conf} NR={scaf_to_nr_direct(wildcards.mscaf)} DATA={wildcards.mscaf} FASIZE=${{BP_WIN}} REF_SPEC={params.ref_spec} &> {log}
       """
 
 rule single_multi_fasta:
