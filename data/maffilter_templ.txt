@@ -1,4 +1,4 @@
-input.file=results/maf/$(DATA).maf      // Input maf file (path)
+input.file=results/pinniped/maf/$(DATA).maf      // Input maf file (path)
 input.file.compression=none             // input.file.compression=[none|zip|gzip|bzip2]
 output.log=results/neutral_tree/multifa/$(DATA).maffilter.log        //Output log file
 //A coma separated list of filters, here empty (the programs only read the input file and exits).

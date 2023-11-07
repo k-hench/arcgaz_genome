@@ -20,6 +20,7 @@ snakemake --configfile workflow/config.yml --rerun-triggers mtime -n -R create_n
         --jn job_c.{name}.{jobid}.sh \
         -R create_neutral_tree
 """
+import re
 c_conda = "$CDATA/apptainer_local/conda_byoe.sif"
 
 WIN_SIZE = 1000
@@ -208,9 +209,14 @@ rule windows_by_scaffold:
       gzip {params.bed_prefix}
       """
 
+def scaf_to_nr(wildcards):
+  pattern = re.compile(r'mscaf_a1_(.*?)$')
+  out = re.findall(pattern, wildcards.mscaf)
+  return out[0]
+
 rule maf_to_fasta:
     input:
-      maf = "results/pinniped/maf/{mscaf}.maf",
+      maf = lambda wc: "results/pinniped/maf/pinniped_set_" + scaf_to_nr(wc) + ".maf",
       conf = "data/maffilter_templ.txt",
       windows = "results/neutral_tree/win/windows_{mscaf}.bed.gz",
       win_n_scaf = "results/neutral_tree/win/win_n_scaf.txt"
