@@ -3,7 +3,8 @@ args <- commandArgs(trailingOnly = TRUE)
 tsv_in <- args[[1]]
 vcf_out <- args[[2]]
 
-data <- read_tsv(tsv_in)
+data <- read_tsv(tsv_in) |> 
+  mutate(across(-c(refSequence, refPosition), str_to_upper)) 
 
 ref <- names(data)[[3]]
 select_alleles <- \(x, a){replace_na(as.character(a[x]), ".")}
