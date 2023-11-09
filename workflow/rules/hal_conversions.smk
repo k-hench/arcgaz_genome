@@ -34,19 +34,23 @@ rule hal_to_maf:
     input:
       hal = 'results/cactus/{name}.hal'.format(name = P_NAME)
     output:
-      maf = "results/pinniped/maf/{name}_{mscaf}.maf",
-      js = temp(dir("./results/cactus/scratch/pinniped_set/tmp/js_{name}_{mscaf}"))
+      maf = "results/pinniped/maf/{name}_{mscaf}.maf"
+    params:
+      js = "results/cactus/scratch/pinniped_set/tmp/js_{name}_{mscaf}"
     container: c_cactus
     shell:
       """
+      mkdir -p {params.js}
       cactus-hal2maf \
-        {output.js} \
+        {params.js} \
         {input.hal} \
         {output.maf} \
         --refGenome {REF_SPEC} \
         --refSequence mscaf_a1_{wildcards.mscaf} \
         --chunkSize 1000000 \
         --noAncestors
+      
+      rm -r {params.js}
       """
 
 rule hal_to_snps:
