@@ -36,6 +36,7 @@ rule hal_to_maf:
       hal = 'results/cactus/{name}.hal'.format(name = P_NAME)
     output:
       maf = "results/pinniped/maf/{name}_{mscaf}.maf"
+    log: "logs/hal_to_maf_{name}_{mscaf}.log"
     params:
       sif = c_cactus,
       js = "results/cactus/scratch/pinniped_set/",
@@ -57,7 +58,7 @@ rule hal_to_maf:
         --refGenome {REF_SPEC} \
         --refSequence mscaf_a1_{wildcards.mscaf} \
         --chunkSize 1000000 \
-        --noAncestors
+        --noAncestors 2> {log}
       """
 
 rule hal_to_snps:
