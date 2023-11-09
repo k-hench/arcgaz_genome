@@ -56,7 +56,7 @@ rule create_busco_bed:
     input:
       dir_busco = "results/busco/arcgaz_anc_h1"
     output:
-      bed = "results/pinniped/complete_buscos.bed"
+      bed = "results/pinniped/complete_buscos.bed.gz"
     params:
       tsv_busco = "run_carnivora_odb10/full_table.tsv"
     container: c_conda
@@ -107,7 +107,7 @@ rule sliding_gerp:
 rule busco_gerp:
     input:
       gerp = "results/pinniped/gerp/beds/gerp_{mscaf}.bed.gz",
-      busco = "results/pinniped/complete_buscos.bed"
+      busco = "results/pinniped/complete_buscos.bed.gz"
     output:
       tsv = "results/pinniped/gerp/beds/gerp_busco_{mscaf}.tsv.gz"
     container: c_conda
