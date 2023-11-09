@@ -40,15 +40,18 @@ rule hal_to_maf:
     params:
       sif = c_cactus,
       js = "results/cactus/scratch/pinniped_set/",
-      local_js = "js_{name}_{mscaf}"
+      local_js = "js_{name}_{mscaf}",
+      run = "run_{name}_{mscaf}"
     shell:
       """
       readonly CACTUS_IMAGE={params.sif} 
-      readonly CACTUS_SCRATCH={params.js}
+      readonly CACTUS_SCRATCH={params.js}\
+
+      mkdir -p {params.js}{params.run}
 
       apptainer exec --cleanenv \
         --fakeroot --overlay ${{CACTUS_SCRATCH}} \
-        --bind ${{CACTUS_SCRATCH}}/tmp:/tmp,$(pwd),{s_bind_paths} \
+        --bind ${{CACTUS_SCRATCH}}/tmp:/tmp,{params.js}{params.run}:/run,$(pwd),{s_bind_paths} \
         --env PYTHONNOUSERSITE=1 \
         {params.sif} \
         cactus-hal2maf \
