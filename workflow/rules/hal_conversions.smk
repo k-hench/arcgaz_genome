@@ -34,12 +34,13 @@ rule hal_to_maf:
     input:
       hal = 'results/cactus/{name}.hal'.format(name = P_NAME)
     output:
-      maf = "results/pinniped/maf/{name}_{mscaf}.maf"
+      maf = "results/pinniped/maf/{name}_{mscaf}.maf",
+      js = temp(dir("./results/cactus/scratch/pinniped_set/tmp/js_{mscaf}"))
     container: c_cactus
     shell:
       """
       cactus-hal2maf \
-        ./results/cactus/scratch/pinniped_set/tmp/js \
+        {output.js} \
         {input.hal} \
         {output.maf} \
         --refGenome {REF_SPEC} \
