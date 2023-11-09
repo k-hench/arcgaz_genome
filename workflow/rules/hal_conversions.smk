@@ -51,7 +51,7 @@ rule hal_to_maf:
         --env PYTHONNOUSERSITE=1 \
         {params.sif} \
         cactus-hal2maf \
-        {params.local_js} \
+        /tmp/{params.local_js} \
         {input.hal} \
         {output.maf} \
         --refGenome {REF_SPEC} \
