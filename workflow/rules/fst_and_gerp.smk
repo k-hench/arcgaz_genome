@@ -67,6 +67,7 @@ rule create_busco_bed:
         grep "Complete" | \
         awk -v OFS="\t" '{{print $3,$4,$5,$1}}' | \
         sort -k 1,1 -k2,2n | \
+        grep "mscaf_a1" | \
         gzip > {output.bed}
       """
 
