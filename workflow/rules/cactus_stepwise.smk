@@ -142,7 +142,7 @@ rule single_job:
       readonly SEQFILE={params.seqfile}
       readonly SEQNAME=${{SEQFILE##*/}}
       readonly RUN_ID=${{SEQNAME%.txt}}
-      readonly CACTUS_SCRATCH=../results/cactus/scratch/${{RUN_ID}}
+      readonly CACTUS_SCRATCH=results/cactus/scratch/${{RUN_ID}}
 
       echo "file: " ${{SEQFILE}} &>> {log}
       echo "==================" &>> {log}

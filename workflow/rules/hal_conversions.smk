@@ -24,6 +24,7 @@ snakemake --jobs 50 \
 REF_SPEC = "arcgaz"
 TIP_SPECS = "calurs,eumjub,halgry,lepwed,mirang,mirleo,neosch,odoros,phovit,zalcal"
 MSCAFS = [ "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "x"]
+s_bind_paths="$CDATA"
 
 rule convert_hal:
     input: 
@@ -36,20 +37,27 @@ rule hal_to_maf:
     output:
       maf = "results/pinniped/maf/{name}_{mscaf}.maf"
     params:
-      js = "results/cactus/scratch/pinniped_set/tmp/js_{name}_{mscaf}"
-    container: c_cactus
+      sif = c_cactus,
+      js = "results/cactus/scratch/pinniped_set/",
+      local_js = "js_{name}_{mscaf}"
     shell:
       """
-      cactus-hal2maf \
-        {params.js} \
+      readonly CACTUS_IMAGE={params.sif} 
+      readonly CACTUS_SCRATCH={params.js}
+
+      apptainer exec --cleanenv \
+        --fakeroot --overlay ${{CACTUS_SCRATCH}} \
+        --bind ${{CACTUS_SCRATCH}}/tmp:/tmp,$(pwd),{s_bind_paths} \
+        --env PYTHONNOUSERSITE=1 \
+        {params.sif} \
+        cactus-hal2maf \
+        {params.local_js} \
         {input.hal} \
         {output.maf} \
         --refGenome {REF_SPEC} \
         --refSequence mscaf_a1_{wildcards.mscaf} \
         --chunkSize 1000000 \
         --noAncestors
-      
-      rm -r {params.js}
       """
 
 rule hal_to_snps:
