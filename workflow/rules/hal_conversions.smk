@@ -40,7 +40,6 @@ rule hal_to_maf:
     container: c_cactus
     shell:
       """
-      mkdir -p {params.js}
       cactus-hal2maf \
         {params.js} \
         {input.hal} \
