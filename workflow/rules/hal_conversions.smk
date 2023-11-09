@@ -38,11 +38,14 @@ rule hal_to_maf:
     container: c_cactus
     shell:
       """
-      hal2maf \
+      cactus-hal2maf \
+        ./results/cactus/scratch/pinniped_set/tmp/js \
+        {input.hal} \
+        {output.maf} \
         --refGenome {REF_SPEC} \
         --refSequence mscaf_a1_{wildcards.mscaf} \
-        --targetGenomes {TIP_SPECS} \
-        {input.hal} {output.maf}
+        --chunkSize 1000000 \
+        --noAncestors
       """
 
 rule hal_to_snps:
