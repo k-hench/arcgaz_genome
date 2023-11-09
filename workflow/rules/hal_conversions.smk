@@ -35,7 +35,7 @@ rule hal_to_maf:
       hal = 'results/cactus/{name}.hal'.format(name = P_NAME)
     output:
       maf = "results/pinniped/maf/{name}_{mscaf}.maf",
-      js = temp(dir("./results/cactus/scratch/pinniped_set/tmp/js_{mscaf}"))
+      js = temp(dir("./results/cactus/scratch/pinniped_set/tmp/js_{name}_{mscaf}"))
     container: c_cactus
     shell:
       """
