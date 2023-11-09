@@ -60,6 +60,8 @@ rule hal_to_maf:
         {output.maf} \
         --refGenome {REF_SPEC} \
         --refSequence mscaf_a1_{wildcards.mscaf} \
+        --dupeMode single \
+        --filterGapCausingDupes \
         --chunkSize 1000000 \
         --noAncestors 2> {log}
       """
