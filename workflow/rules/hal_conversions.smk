@@ -78,7 +78,7 @@ rule hal_to_snps:
         --refSequence mscaf_a1_{wildcards.mscaf} \
         {input.hal} \
         {REF_SPEC} {TIP_SPECS} \
-        --no-dupes \
+        --noDupes \
         --unique \
         --tsv {output.tsv}
       """
