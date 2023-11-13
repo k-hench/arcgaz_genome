@@ -47,5 +47,5 @@ speciesTree: "((odoros,(calurs,(arcgaz,(eumjub,zalcal)))),(((lepwed,(mirleo,mira
 # technical parameters
 # cactus_sif:
 # apptainer pull docker://quay.io/comparative-genomics-toolkit/cactus:v2.5.1
-cactus_sif: '$CDATA/apptainer_local/cactus_v2.5.1.sif'
+cactus_sif: '$CDATA/apptainer_local/cactus_v2.6.12.sif'
 cactus_cores: "8"
