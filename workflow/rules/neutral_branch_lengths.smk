@@ -11,7 +11,7 @@ snakemake --jobs 50 \
     --use-conda \
     --rerun-triggers mtime \
     --cluster '
-      sbatch \
+      sbatch_delay \
         --export=ALL \
         -n {threads} \
         -e logs/{name}.{jobid}.err \
@@ -264,7 +264,7 @@ rule reroot_tree:
     container: c_conda
     conda: "r_phytools"
     params:
-      root_node = 15
+      root_node = 16
     log: "logs/reroot_tree.log"
     shell:
       """
