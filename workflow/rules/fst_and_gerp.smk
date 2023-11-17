@@ -23,7 +23,7 @@ snakemake --jobs 50 \
 
 rule win_and_busco:
   input:
-    gerp_win = expand( "results/pinniped/gerp/beds/gerp_snps_{mscaf}.tsv.gz", mscaf = SCFS ),
+    gerp_win = expand( "results/pinniped/gerp/tsv/gerp_snps_{mscaf}_summary.tsv.gz", mscaf = SCFS ),
     gerp_busco = expand( "results/pinniped/gerp/tsv/gerp_busco_{mscaf}_summary.tsv.gz", mscaf = SCFS )
 
 def name_to_win_size(wildcards):
@@ -131,6 +131,19 @@ rule summarize_gerp_busco:
       tsv = "results/pinniped/gerp/tsv/gerp_busco_{mscaf}_summary.tsv.gz"
     container: c_conda
     conda: "r_tidy"
+    shell:
       """
       Rscript --vanilla R/summarize_gerp_busco.R {input.tsv} {output.tsv}
+      """
+
+rule summarize_gerp_win:
+    input:
+      tsv = "results/pinniped/gerp/beds/gerp_snps_{mscaf}.tsv.gz"
+    output:
+      tsv = "results/pinniped/gerp/tsv/gerp_snps_{mscaf}_summary.tsv.gz"
+    container: c_conda
+    conda: "r_tidy"
+    shell:
+      """
+      Rscript --vanilla R/summarize_gerp_win.R {input.tsv} {output.tsv}
       """
