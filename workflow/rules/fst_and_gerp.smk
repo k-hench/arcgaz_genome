@@ -65,7 +65,7 @@ rule create_busco_bed:
       """
       tail -n +3  {input.dir_busco}/{params.tsv_busco} | \
         grep "Complete" | \
-        awk -v OFS="\t" '{{print $3,$4,$5,$1}}' | \
+        awk -v OFS="\t" '{{ if ($4<$5) {{s = $4; e = $5}} else {{s =$5; e = $4}} {{print $3,s,e,$1}} }}' | \
         sort -k 1,1 -k2,2n | \
         grep "mscaf_a1" | \
         gzip > {output.bed}
@@ -105,20 +105,10 @@ rule sliding_gerp:
         gzip > {output.tsv}
       """
 
-rule unpack_busco:
-    input: 
-      gz = "results/pinniped/complete_buscos.bed.gz"
-    output:
-      bed = temp( "results/pinniped/complete_buscos.bed" )
-    shell:
-      """
-      zcat {input.gz} > {output.bed}
-      """
-
 rule busco_gerp:
     input:
       gerp = "results/pinniped/gerp/beds/gerp_{mscaf}.bed.gz",
-      busco = "results/pinniped/complete_buscos.bed"
+      busco = "results/pinniped/complete_buscos.bed.gz"
     output:
       tsv = "results/pinniped/gerp/beds/gerp_busco_{mscaf}.tsv.gz"
     container: c_conda
