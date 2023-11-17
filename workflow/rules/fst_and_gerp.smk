@@ -105,10 +105,20 @@ rule sliding_gerp:
         gzip > {output.tsv}
       """
 
+rule unpack_busco:
+    input: 
+      gz = "results/pinniped/complete_buscos.bed.gz"
+    output:
+      bed = temp( "results/pinniped/complete_buscos.bed" )
+    shell:
+      """
+      zcat {input.gz} > {ouput.bed}
+      """
+
 rule busco_gerp:
     input:
       gerp = "results/pinniped/gerp/beds/gerp_{mscaf}.bed.gz",
-      busco = "results/pinniped/complete_buscos.bed.gz"
+      busco = "results/pinniped/complete_buscos.bed"
     output:
       tsv = "results/pinniped/gerp/beds/gerp_busco_{mscaf}.tsv.gz"
     container: c_conda
