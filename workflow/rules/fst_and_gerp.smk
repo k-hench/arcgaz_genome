@@ -120,7 +120,7 @@ rule busco_gerp:
         -a {input.gerp} \
         -b {input.busco} \
         -wa -wb | \
-        cut -f 1,3,4,5,8 | \
+        cut -f 1,3,4,5,9 | \
         gzip > {output.tsv}
       """
 
