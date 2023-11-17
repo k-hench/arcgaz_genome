@@ -112,7 +112,7 @@ rule unpack_busco:
       bed = temp( "results/pinniped/complete_buscos.bed" )
     shell:
       """
-      zcat {input.gz} > {ouput.bed}
+      zcat {input.gz} > {output.bed}
       """
 
 rule busco_gerp:
