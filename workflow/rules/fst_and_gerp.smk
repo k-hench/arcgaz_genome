@@ -147,3 +147,16 @@ rule summarize_gerp_win:
       """
       Rscript --vanilla R/summarize_gerp_win.R {input.tsv} {output.tsv}
       """
+
+rule fst_to_bed:
+    input:
+      tsv = "results/fst_bp.tsv.gz"
+    output:
+      bed = "results/pinniped/fst/bed/fst_bp_{mscaf}.bed.gz"
+    shell:
+      """
+      zgrep {wildcards.mscaf} {input.tsv} | \
+        grep -v "nan" | \
+        awk -v OFS="\t" '{{print $1,$2-1,$2,$3}}' | \
+        gzip > {output.bed}
+      """
