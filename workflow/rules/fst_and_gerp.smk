@@ -24,7 +24,7 @@ snakemake --jobs 50 \
 rule win_and_busco:
   input:
     gerp_win = expand( "results/pinniped/gerp/tsv/gerp_snps_{mscaf}_summary.tsv.gz", mscaf = SCFS ),
-    gerp_busco = expand( "results/pinniped/gerp/tsv/gerp_busco_{mscaf}_summary.tsv.gz", mscaf = SCFS )
+    busco_summaries = expand( "results/pinniped/{stat}/tsv/{stat}_busco_{mscaf}_summary.tsv.gz", mscaf = SCFS, stat = ["gerp", "fst"] )
 
 def name_to_win_size(wildcards):
   pattern1 = re.compile(r'_w(.*?)k')
@@ -159,4 +159,35 @@ rule fst_to_bed:
         grep -v "nan" | \
         awk -v OFS="\t" '{{print $1,$2-1,$2,$3}}' | \
         gzip > {output.bed}
+      """
+
+rule busco_fst:
+    input:
+      fst = "results/pinniped/fst/bed/fst_bp_{mscaf}.bed.gz",
+      busco = "results/pinniped/complete_buscos.bed.gz"
+    output:
+      tsv = "results/pinniped/fst/beds/fst_busco_{mscaf}.tsv.gz"
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      # chr, pos, fst, busco_id
+      bedtools intersect \
+        -a {input.fst} \
+        -b {input.busco} \
+        -wa -wb | \
+        cut -f 1,3,4,8 | \
+        gzip > {output.tsv}
+      """
+
+rule summarize_fst_busco:
+    input:
+      tsv = "results/pinniped/fst/beds/fst_busco_{mscaf}.tsv.gz"
+    output:
+      tsv = "results/pinniped/fst/tsv/fst_busco_{mscaf}_summary.tsv.gz"
+    container: c_conda
+    conda: "r_tidy"
+    shell:
+      """
+      Rscript --vanilla R/summarize_fst_busco.R {input.tsv} {output.tsv}
       """
