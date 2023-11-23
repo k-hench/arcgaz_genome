@@ -23,7 +23,7 @@ snakemake --jobs 50 \
 
 rule win_and_busco:
   input:
-    gerp_win = expand( "results/pinniped/gerp/tsv/gerp_snps_{mscaf}_summary.tsv.gz", mscaf = SCFS ),
+    win_summaries = expand( "results/pinniped/{stat}/tsv/{stat}_snps_{mscaf}_summary.tsv.gz", mscaf = SCFS, stat = ["gerp", "fst"] ),
     busco_summaries = expand( "results/pinniped/{stat}/tsv/{stat}_busco_{mscaf}_summary.tsv.gz", mscaf = SCFS, stat = ["gerp", "fst"] )
 
 def name_to_win_size(wildcards):
@@ -209,4 +209,16 @@ rule sliding_fst_manual:
         -wa -wb | \
         cut -f 1-3,4,8 | \
         gzip > {output.tsv}
+      """
+
+rule summarize_fst_win:
+    input:
+      tsv = "results/pinniped/fst/beds/fst_snps_{mscaf}.tsv.gz"
+    output:
+      tsv = "results/pinniped/fst/tsv/fst_snps_{mscaf}_summary.tsv.gz"
+    container: c_conda
+    conda: "r_tidy"
+    shell:
+      """
+      Rscript --vanilla R/summarize_fst_win.R {input.tsv} {output.tsv}
       """
