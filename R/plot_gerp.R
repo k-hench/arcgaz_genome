@@ -5,7 +5,6 @@ library(patchwork)
 library(ggtext)
 source("R/plot_defaults.R")
 
-
 fs <- 9
 clr_l_gray <- rgb(.85,.85,.85)
 scfs <- str_c("mscaf_a1_",
@@ -23,7 +22,7 @@ genome <- read_tsv("data/genomes/arcgaz_anc_h1.genome",
 
 busco_meta <- read_tsv("results/busco/arcgaz_anc_h1/run_carnivora_odb10/full_table.tsv", skip = 2) |>
   filter(Status == "Complete") |>
-  select(buco_id = `# Busco id`,
+  select(busco_id = `# Busco id`,
          bstart = `Gene Start`,
          bend = `Gene End`)
 
@@ -56,17 +55,17 @@ p1 <- ggplot() +
               color = "white",
               linewidth = .5,
               span = 0.5,
-             aes(x = gmid, y = gerp_rs_mean,
-                 group = chr#,
-                 # fill = factor(eo),
-                 # color = after_scale(fill)
-                 ),
-             se = FALSE) +
+              aes(x = gmid, y = gerp_rs_mean,
+                  group = chr#,
+                  # fill = factor(eo),
+                  # color = after_scale(fill)
+              ),
+              se = FALSE) +
   scale_fill_manual(values = c(`1` = "white",
                                `0` = clr_l_gray),
                     guide = "none") +
   scale_color_manual(values = clr_alpha(clrs),
-                    guide = "none") +
+                     guide = "none") +
   scale_x_continuous(name = "Genomic Position",
                      labels = \(x){sprintf("%.1f", x * 1e-9)},
                      sec.axis = sec_axis(name = "Scaffold Id",
@@ -76,18 +75,6 @@ p1 <- ggplot() +
   labs(y = "average RS score (GERP)") +
   coord_cartesian(xlim = c(0, max(genome$end)),
                   expand = 0)+
-  theme_ms(fontsize = fs)
-
-data_buso |>
-  ggplot(aes(x = gerp_rs_mean)) +
-  geom_vline(xintercept = mean(data_buso$gerp_rs_mean),
-             color = clrs[[1]], linetype = 3)+
-  geom_histogram(boundary = 0,
-                 color = clrs[[2]],
-                 fill = clr_alpha(clrs[[2]], .6),
-                 size = plt_lwd,
-                 binwidth = .001) +
-  coord_cartesian(expand = 0)+
   theme_ms(fontsize = fs)
 
 data_fst_win <- read_tsv("results/fst_win.tsv.gz") |>
@@ -178,11 +165,11 @@ pb <- ggplot() +
                   ylim = c(-1,1),
                   expand = 0)+
   theme_void(base_family = fnt_sel, base_size = fs)#+
-  # theme(axis.title.y = element_text(angle = 90))
+# theme(axis.title.y = element_text(angle = 90))
 
 pp1 <- p1 +
   theme(axis.title.x.bottom = element_blank(),
-           axis.text.x.bottom = element_blank(),
+        axis.text.x.bottom = element_blank(),
         axis.ticks.x.bottom = element_blank()) +
   pb +
   p2 +
@@ -216,6 +203,167 @@ p3 <- data_win_combined |>
 
 p3 + pp1 +
   plot_layout(widths = c(.5, 1)) +
-  plot_annotation(tag_levels = "a",
-                  theme = theme(plot.tag = element_text(family = fnt_sel)))
+  plot_annotation(#tag_levels = "a",
+    tag_levels = list(c('a', 'b', "", "c")),
+    theme = theme(plot.tag = element_text(family = fnt_sel),
+                  plot.tag.position = c(-.1,.5))) &
+  theme(plot.tag = element_text(family = fnt_sel),
+        plot.tag.position = c(-.01, 1))
 
+read_busco_fst <- \(scf){read_tsv(glue("results/pinniped/fst/tsv/fst_busco_{scf}_summary.tsv.gz"))}
+
+data_fst_buso <- scfs |>
+  map_dfr(read_busco_fst) |>
+  left_join(busco_meta) |>
+  left_join(genome |> select(chr, scaf_start = start, eo)) |>
+  mutate(gstart = bstart + scaf_start,
+         gend = bend + scaf_start,
+         gmid = (gstart + gend)/2)
+
+
+
+p4 <- data_buso |>
+  ggplot(aes(x = gerp_rs_mean)) +
+  geom_histogram(boundary = 0,
+                 color = clrs[[2]],
+                 fill = clr_alpha(clrs[[2]], .6),
+                 size = plt_lwd,
+                 binwidth = .001) +
+  geom_vline(xintercept = mean(data_buso$gerp_rs_mean),
+             color = "black", linetype = 3) +
+  theme_ms(fontsize = fs)
+
+p5 <- data_fst_buso |>
+  ggplot(aes(x = fst_mean)) +
+  geom_histogram(boundary = 0,
+                 color = clrs[[1]],
+                 fill = clr_alpha(clrs[[1]], .6),
+                 size = plt_lwd,
+                 binwidth = .01,
+                 aes(y = after_stat(-count))) +
+  geom_vline(xintercept = mean(data_fst_buso$fst_mean),
+             color = "black", linetype = 3) +
+  scale_x_continuous(sec.axis = sec_axis(name = "*F<sub>ST</sub>*",
+                                         trans = identity)) +
+  scale_y_continuous("count", labels = \(x){-x})+
+  theme_ms(fontsize = fs) +
+  theme(axis.line.x.bottom = element_blank(),
+        axis.ticks.x.bottom = element_blank(),
+        axis.text.x.bottom = element_blank(),
+        axis.title.x.bottom = element_blank(),
+        axis.title.x.top = element_markdown())
+
+p4 + p5 +
+  plot_layout(ncol = 1)  &
+  coord_cartesian(expand = 0)
+
+data_busco_combined <- data_buso |>
+  left_join(data_fst_buso |>
+              select(busco_id,
+                     n_snps_fst = n_snps,
+                     fst_mean,
+                     fst_med,
+                     fst_sd))
+
+data_busco_combined <- data_buso |>
+  full_join(data_fst_buso |>
+              select(busco_id,
+                     n_snps_fst = n_snps,
+                     fst_mean,
+                     fst_med,
+                     fst_sd))
+
+p4b <- data_busco_combined |>
+  ggplot(aes(x = gerp_rs_mean)) +
+  geom_histogram(boundary = 0,
+                 color = clrs[[2]],
+                 fill = clr_alpha(clrs[[2]], .6),
+                 size = plt_lwd,
+                 binwidth = .001) +
+  geom_vline(xintercept = mean(data_busco_combined$gerp_rs_mean),
+             color = "black", linetype = 3) +
+  coord_cartesian(expand = 0,
+                  xlim = c(1.1, 1.05) * range(data_busco_combined$gerp_rs_mean)) +
+  theme_ms(fontsize = fs) +
+  theme(axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank())
+
+p5b <- data_busco_combined |>
+  ggplot(aes(x = fst_med)) +
+  geom_histogram(boundary = 0,
+                 color = clrs[[2]],
+                 fill = clr_alpha(clrs[[2]], .6),
+                 size = plt_lwd,
+                 binwidth = .015) +
+  geom_vline(xintercept = mean(data_busco_combined$fst_mean, na.rm = TRUE),
+             color = "black", linetype = 3)  +
+  coord_flip(expand = 0,
+             xlim = c(-.025,1.025)) +
+  theme_ms(fontsize = fs) +
+  theme(axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank())
+
+p6 <- data_busco_combined |>
+  ggplot(aes(x = gerp_rs_mean, y = fst_med)) +
+  # ggpointdensity::geom_pointdensity(aes(color = after_stat(n_neighbors)))+
+  # scale_color_gradientn(colours = c(clr_l_gray,
+  #                                   clrs[2],
+  #                                   clrs[1]))+
+  geom_hex(aes(fill = after_stat(log10(count)),
+               color = after_scale(clr_darken(fill,.2))),
+           linewidth = .2,
+           bins = 100) +
+  ggdensity::geom_hdr_lines(probs = c(0.95, 0.66),
+                            aes(linewidth = after_stat(probs),
+                                linetype = after_stat(probs)),
+                            alpha = 1) +
+  scale_fill_gradientn(colours = c(clr_l_gray,
+                                   clrs[2],
+                                   clrs[1])) +
+  scale_linetype_manual(values = c(`95%` = 3,
+                                   `66%` = 1),
+                        guide = "none") +
+  scale_linewidth_manual(values = c(`95%` = .5,
+                                   `66%` = .25),
+                        guide = "none") +
+  labs(x = "average RS score (GERP)",
+       y = "average *F<sub>ST</sub>*") +
+  guides(fill = guide_colorbar(title.position = "left",
+                               barwidth = unit(5, "pt"),
+                               barheight = unit(100, "pt"))) +
+  coord_cartesian(xlim = c(1.1, 1.05) * range(data_busco_combined$gerp_rs_mean),
+                  ylim = c(-.025, 1.025),#1.1 * range(data_busco_combined$fst_mean),
+                  expand = 0) +
+  theme_ms(fontsize = fs) +
+  theme(legend.position = c(0.01,0.01),
+        legend.justification = c(0,0),
+        legend.box = "horizontal",
+        legend.title = element_text(angle = 90, hjust = .5),
+        axis.title.y = element_markdown())
+
+p4b + plot_spacer() +
+  p6 + p5b +
+  plot_layout(widths = c(1,.2), heights = c(.2, 1))
+
+
+data_busco_combined |>
+  ggplot(aes(x = fst_mean, y = fst_med)) +
+  geom_hex(aes(fill = after_stat(log10(count)),
+               color = after_scale(clr_darken(fill,.2))),
+           linewidth = .2,
+           bins = 100) +
+  ggdensity::geom_hdr_lines(probs = c(0.95, 0.66),
+                            aes(linewidth = after_stat(probs),
+                                linetype = after_stat(probs)),
+                            alpha = 1)+
+  scale_fill_gradientn(colours = c(clr_l_gray,
+                                   clrs[2],
+                                   clrs[1])) +
+  scale_linetype_manual(values = c(`95%` = 3,
+                                   `66%` = 1),
+                        guide = "none") +
+  scale_linewidth_manual(values = c(`95%` = .5,
+                                    `66%` = .25),
+                         guide = "none")

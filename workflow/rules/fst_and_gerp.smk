@@ -191,3 +191,22 @@ rule summarize_fst_busco:
       """
       Rscript --vanilla R/summarize_fst_busco.R {input.tsv} {output.tsv}
       """
+
+rule sliding_fst_manual:
+    input:
+      fst = "results/pinniped/fst/bed/fst_bp_{mscaf}.bed.gz",
+      win = "data/genomes/arcgaz_anc_h1_w50k_s25k.bed.gz"
+    output:
+      tsv = "results/pinniped/fst/beds/fst_snps_{mscaf}.tsv.gz"
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      # chr, start(-1), end, win_idx, fst
+      bedtools intersect \
+        -a {input.win} \
+        -b {input.fst} \
+        -wa -wb | \
+        cut -f 1-3,4,8 | \
+        gzip > {output.tsv}
+      """
