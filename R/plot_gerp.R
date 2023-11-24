@@ -3,6 +3,7 @@ library(glue)
 library(prismatic)
 library(patchwork)
 library(ggtext)
+library(ggrastr)
 source("R/plot_defaults.R")
 
 fs <- 9
@@ -46,11 +47,11 @@ p1 <- ggplot() +
             aes(xmin = start, xmax = end,
                 ymin = -Inf, ymax = Inf,
                 fill = factor(eo))) +
-  geom_point(data = data_win,
+  rasterize(geom_point(data = data_win,
              aes(x = gmid, y = gerp_rs_mean,
                  color = factor(eo),
                  group = chr),
-             size = .3) +
+             size = .3), dpi = 300) +
   geom_smooth(data = data_win,
               color = "white",
               linewidth = .5,
@@ -93,17 +94,17 @@ p2 <- ggplot() +
             aes(xmin = start, xmax = end,
                 ymin = -Inf, ymax = Inf,
                 fill = factor(eo))) +
-  geom_point(data = data_fst_win,
-             aes(x = gmid, y = fst_w_0,
+  rasterize(geom_point(data = data_fst_win,
+             aes(x = gmid, y = fst_m_0,
                  color = factor(eo),
                  group = CHROM),
-             size = .3) +
+             size = .3), dpi = 300) +
   geom_smooth(data = data_fst_win,
               color = "white",
               linewidth = .5,
               span = 0.5,
               aes(x = gmid,
-                  y = fst_w_0,
+                  y = fst_m_0,
                   group = CHROM#,
                   # fill = factor(eo),
                   # color = after_scale(fill)
@@ -121,7 +122,7 @@ p2 <- ggplot() +
   scale_alpha_manual(values = c(`TRUE` = 6,
                                 `FALSE` = 1),
                      guide = "none") +
-  labs(y = "*F<sub>ST</sub>* (weighted mean)") +
+  labs(y = "*F<sub>ST</sub>* (mean)") +
   coord_cartesian(xlim = c(0, max(genome$end)),
                   expand = 0)+
   theme_ms(fontsize = fs)+
@@ -145,9 +146,9 @@ pb <- ggplot() +
             aes(xmin = start, xmax = end,
                 ymin = -Inf, ymax = Inf,
                 fill = factor(eo))) +
-  geom_point(data = plain_busco,
+  rasterize(geom_point(data = plain_busco,
              aes(x = gmid, y = 0, color = factor(eo)),
-             shape = "|", alpha = .3) +
+             shape = "|", alpha = .3), dpi = 300) +
   scale_fill_manual(values = c(`1` = "white",
                                `0` = clr_l_gray),
                     guide = "none") +
@@ -178,11 +179,11 @@ pp1 <- p1 +
   plot_layout(ncol = 1, heights = c(1,.1,1))
 
 data_win_combined <- data_fst_win |>
-  select(chr = CHROM, end = BIN_END, fst_w_0) |>
+  select(chr = CHROM, end = BIN_END, fst_w_0, fst_m_0) |>
   left_join(data_win |> select(chr, start, end, gmid, gerp_rs_mean))
 
 p3 <- data_win_combined |>
-  ggplot(aes(x = gerp_rs_mean, y = fst_w_0)) +
+  ggplot(aes(x = gerp_rs_mean, y = fst_m_0)) +
   geom_hex(aes(fill = after_stat(log10(count)),
                color = after_scale(clr_darken(fill,.2))),
            linewidth = .2,
@@ -191,7 +192,7 @@ p3 <- data_win_combined |>
                                    clrs[2],
                                    clrs[1]))+
   labs(x = "average RS score (GERP)",
-       y = "*F<sub>ST</sub>* (weighted mean)") +
+       y = "*F<sub>ST</sub>* (mean)") +
   guides(fill = guide_colorbar(title.position = "left",
                                barwidth = unit(5, "pt"),
                                barheight = unit(100, "pt"))) +
@@ -210,6 +211,8 @@ p3 + pp1 +
   theme(plot.tag = element_text(family = fnt_sel),
         plot.tag.position = c(-.01, 1))
 
+ggsave("~/Downloads/arcgaz_genome_gerp_fst_whg_mean.pdf", width = 10, height = 5, device = cairo_pdf)
+
 read_busco_fst <- \(scf){read_tsv(glue("results/pinniped/fst/tsv/fst_busco_{scf}_summary.tsv.gz"))}
 
 data_fst_buso <- scfs |>
@@ -219,8 +222,6 @@ data_fst_buso <- scfs |>
   mutate(gstart = bstart + scaf_start,
          gend = bend + scaf_start,
          gmid = (gstart + gend)/2)
-
-
 
 p4 <- data_buso |>
   ggplot(aes(x = gerp_rs_mean)) +
@@ -367,3 +368,13 @@ data_busco_combined |>
   scale_linewidth_manual(values = c(`95%` = .5,
                                     `66%` = .25),
                          guide = "none")
+
+data_test <- read_tsv("results/pinniped/fst/beds/fst_busco_mscaf_a1_01.tsv.gz",col_names = c("chr", "pos", "fst", "busco_id"))
+bs <- data_test |> pluck("busco_id") |> unique()
+bs_check <- sample(bs, 49, replace = FALSE)
+
+data_test |>
+  filter(busco_id %in% bs_check) |>
+  ggplot(aes(x = fst)) +
+  geom_histogram(binwidth = .1) +
+  facet_wrap(busco_id ~ ., ncol = 7)
