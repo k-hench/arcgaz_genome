@@ -1,9 +1,14 @@
+# input:
+# - "results/neutral_tree/rerooted.tree"
+# output:
+# - "results/img/neutral_tree.pdf"
 library(tidyverse)
 library(ggtree)
 library(prismatic)
+library(here)
 source("R/plot_defaults.R")
 
-tree <- read.tree(file = "results/neutral_tree/rerooted.tree")
+tree <- read.tree(file = here("results/neutral_tree/rerooted.tree"))
 
 spec_long <- c(odoros = "Odobenus rosmarus",
           calurs = "Callorhinus ursinus",
@@ -30,11 +35,11 @@ specs_short <- str_replace(spec_long, "([A-Z])[a-z]* ([[a-z]*])", "\\1. \\2") |>
 y_offfset <- .1
 i_h <- 2.4/2
 
-ott <- hypoimg::hypo_read_svg("results/img/illustrations/arcgaz.c.svg") |>
+ott <- hypoimg::hypo_read_svg(here("results/img/illustrations/arcgaz.c.svg")) |>
   hypoimg::hypo_recolor_svg(color = "white")
-pho <- hypoimg::hypo_read_svg("results/img/illustrations/halgry.c.svg") |>
+pho <- hypoimg::hypo_read_svg(here("results/img/illustrations/halgry.c.svg")) |>
   hypoimg::hypo_recolor_svg(color = "white")
-odo <- hypoimg::hypo_read_svg("results/img/illustrations/odoros.c.svg") |>
+odo <- hypoimg::hypo_read_svg(here("results/img/illustrations/odoros.c.svg")) |>
   hypoimg::hypo_recolor_svg(color = clr_alpha("black"))
 
 ggtree(tree, color = NA) +
@@ -86,5 +91,7 @@ ggtree(tree, color = NA) +
                   ylim = c(0.75, 11.5),
                   expand = 0)
 
-ggsave("results/img/neutral_tree.pdf", width = 8, height = 6, device = cairo_pdf)
+ggsave(here("results/img/neutral_tree.pdf"),
+       width = 8, height = 6,
+       device = cairo_pdf)
 

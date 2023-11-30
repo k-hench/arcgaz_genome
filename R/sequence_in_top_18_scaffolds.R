@@ -8,8 +8,8 @@ read_fai <- \(file, h = 1){
 
 # scaffold_summary
 
-data <- c("data/genomes/arcgaz_anc_h1.fa.gz.fai",
-          "data/genomes/arcgaz_anc_h2.fa.gz.fai") |>
+data <- c(here("data/genomes/arcgaz_anc_h1.fa.gz.fai"),
+          here("data/genomes/arcgaz_anc_h2.fa.gz.fai")) |>
   map2_dfr(1:2, read_fai)
 
 
@@ -22,7 +22,8 @@ data |>
 
 # busco summary
 read_busco <- \(h){
-  read_tsv(glue::glue("results/busco/arcgaz_anc_h{h}/run_carnivora_odb10/full_table.tsv"), skip = 2) |>
+  read_tsv(here(glue::glue("results/busco/arcgaz_anc_h{h}/run_carnivora_odb10/full_table.tsv")),
+           skip = 2) |>
     arrange(`# Busco id`, Score) |>
     group_by(`# Busco id`) |>
     filter(!duplicated(`# Busco id`)) |>
@@ -54,3 +55,4 @@ sprintf("%.2f", 100 * 32136216 / sum(data$length[data$hap == 1]) )
 
 # percentage of gene predictions in to 18 scaffolds
 sprintf("%.1f", 100 * sum(grepl("mscaf", data_anno$seq)) / length(data_anno$seq))
+
