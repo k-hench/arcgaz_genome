@@ -46,7 +46,7 @@ rule alignment_coverage_fam:
       wig = "results/neutral_tree/wig/fam/{fam}-{mscaf}.wig.gz"
     params:
       prefix = "results/neutral_tree/wig/fam/{fam}-{mscaf}.wig",
-      specs = lambda wc: "{f}".format(f = [wc.fam] )
+      specs = lambda wc: "{f}".format(f = fams_c[wc.fam] )
     container: c_cactus
     shell:
       """
