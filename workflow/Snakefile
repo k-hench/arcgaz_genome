@@ -76,6 +76,7 @@ include: "./rules/hal_conversions.smk"
 include: "./rules/neutral_branch_lengths.smk"
 include: "./rules/snp_to_vcf.smk"
 include: "./rules/fst_and_gerp.smk"
+include: "./rules/coverage_check.smk"
 
 # conditional kick-off of the actual cactus alignment
 if os.path.exists("results/cactus/job_inventory.tsv"):
