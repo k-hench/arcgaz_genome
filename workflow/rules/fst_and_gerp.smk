@@ -26,6 +26,9 @@ rule win_and_busco:
     win_summaries = expand( "results/pinniped/{stat}/tsv/{stat}_snps_{mscaf}_summary.tsv.gz", mscaf = SCFS, stat = ["gerp", "fst"] ),
     busco_summaries = expand( "results/pinniped/{stat}/tsv/{stat}_busco_{mscaf}_summary.tsv.gz", mscaf = SCFS, stat = ["gerp", "fst"] )
 
+rule fine_windows:
+  input: expand( "results/pinniped/{stat}/tsv/fine/{stat}_snps_{mscaf}_w10k_s5k_summary.tsv.gz", mscaf = SCFS, stat = ["gerp", "fst"]  )
+
 def name_to_win_size(wildcards):
   pattern1 = re.compile(r'_w(.*?)k')
   pattern2 = re.compile(r'_s(.*?)k')
@@ -216,6 +219,70 @@ rule summarize_fst_win:
       tsv = "results/pinniped/fst/beds/fst_snps_{mscaf}.tsv.gz"
     output:
       tsv = "results/pinniped/fst/tsv/fst_snps_{mscaf}_summary.tsv.gz"
+    container: c_conda
+    conda: "r_tidy"
+    shell:
+      """
+      Rscript --vanilla R/summarize_fst_win.R {input.tsv} {output.tsv}
+      """
+
+# fine windows for zoom plot
+
+rule sliding_gerp_fine:
+    input:
+      gerp = "results/pinniped/gerp/beds/gerp_{mscaf}.bed.gz",
+      win = "data/genomes/arcgaz_anc_h1_w10k_s5k.bed.gz"
+    output:
+      tsv = "results/pinniped/gerp/beds/fine/gerp_snps_{mscaf}_w10k_s5k.tsv.gz"
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      # chr, start(-1), end, win_idx, neutral_n, gerp_rs
+      bedtools intersect \
+        -a {input.win} \
+        -b {input.gerp} \
+        -wa -wb | \
+        cut -f 1-3,4,8,9 | \
+        gzip > {output.tsv}
+      """
+
+rule summarize_gerp_win_fine:
+    input:
+      tsv = "results/pinniped/gerp/beds/fine/gerp_snps_{mscaf}_w10k_s5k.tsv.gz"
+    output:
+      tsv = "results/pinniped/gerp/tsv/fine/gerp_snps_{mscaf}_w10k_s5k_summary.tsv.gz"
+    container: c_conda
+    conda: "r_tidy"
+    shell:
+      """
+      Rscript --vanilla R/summarize_gerp_win.R {input.tsv} {output.tsv}
+      """
+
+rule sliding_fst_manual_fine:
+    input:
+      fst = "results/pinniped/fst/bed/fst_bp_{mscaf}.bed.gz",
+      win = "data/genomes/arcgaz_anc_h1_w10k_s5k.bed.gz"
+    output:
+      tsv = "results/pinniped/fst/beds/fine/fst_snps_{mscaf}_w10k_s5k.tsv.gz"
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      # chr, start(-1), end, win_idx, fst
+      bedtools intersect \
+        -a {input.win} \
+        -b {input.fst} \
+        -wa -wb | \
+        cut -f 1-3,4,8 | \
+        gzip > {output.tsv}
+      """
+
+rule summarize_fst_win_fine:
+    input:
+      tsv = "results/pinniped/fst/beds/fine/fst_snps_{mscaf}_w10k_s5k.tsv.gz"
+    output:
+      tsv = "results/pinniped/fst/tsv/fine/fst_snps_{mscaf}_w10k_s5k_summary.tsv.gz"
     container: c_conda
     conda: "r_tidy"
     shell:
