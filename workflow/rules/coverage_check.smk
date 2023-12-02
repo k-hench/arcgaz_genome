@@ -26,7 +26,7 @@ rule cov_by_fam:
       collapsed_cov = expand( "results/neutral_tree/cov/fam/{fam}-{mscaf}.collapsed.bed.gz", fam = ["pho", "ota"], mscaf = SCFS ),
       cov_by = expand( "results/neutral_tree/cov/by_{by}/{mscaf}.tsv.gz", mscaf = SCFS, by = [ "win", "busco" ] ),
       cov_by_fam = expand( "results/neutral_tree/cov/by_{by}/fam/{fam}-{mscaf}.tsv.gz", fam = ["pho", "ota"], mscaf = SCFS, by = [ "win", "busco" ] ),
-      cov_combined_win = expand( "results/neutral_tree/cov/by_win/combined/combined-{mscaf}.tsv.gz", mscaf = SCFS )
+      cov_combined_win = expand( "results/neutral_tree/cov/by_{sum_type}/combined/combined-{mscaf}.tsv.gz", mscaf = SCFS, sum_type = [ "win", "busco" ])
 
 wildcard_constraints:
     fam = "[^_]*",
@@ -134,21 +134,6 @@ rule coverage_50k_intersect_fam:
       gzip {params.prefix}
       """
 
-rule comine_win_coverage:
-    input:
-      a  = "results/neutral_tree/cov/by_win/{mscaf}.tsv.gz",
-      ota = "results/neutral_tree/cov/by_win/fam/ota-{mscaf}.tsv.gz",
-      pho = "results/neutral_tree/cov/by_win/fam/pho-{mscaf}.tsv.gz"
-    output:
-      tsv = "results/neutral_tree/cov/by_win/combined/combined-{mscaf}.tsv.gz"
-    log: "logs/comine_win_coverage_{mscaf}.log"
-    container: c_conda
-    conda: "r_tidy"
-    shell:
-      """
-      Rscript --vanilla R/combine_alignment_coverage.R {wildcards.mscaf} &>> {log}
-      """
-
 rule coverage_busco_intersect:
     input:
       win = "results/pinniped/complete_buscos.bed.gz",
@@ -193,4 +178,19 @@ rule coverage_busco_intersect_fam:
           cut -f 1,2,3,4,6,7,8 >> {params.prefix}
       
       gzip {params.prefix}
+      """
+
+rule combine_coverages:
+    input:
+      a  =  "results/neutral_tree/cov/by_{sum_type}/{mscaf}.tsv.gz",
+      ota = "results/neutral_tree/cov/by_{sum_type}/fam/ota-{mscaf}.tsv.gz",
+      pho = "results/neutral_tree/cov/by_{sum_type}/fam/pho-{mscaf}.tsv.gz"
+    output:
+      tsv = "results/neutral_tree/cov/by_{sum_type}/combined/combined-{mscaf}.tsv.gz"
+    log: "logs/combine_{sum_type}_coverage_{mscaf}.log"
+    container: c_conda
+    conda: "r_tidy"
+    shell:
+      """
+      Rscript --vanilla R/combine_alignment_coverage.R {wildcards.mscaf} &>> {log}
       """
