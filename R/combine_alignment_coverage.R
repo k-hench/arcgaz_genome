@@ -1,7 +1,7 @@
 library(tidyverse)
 library(here)
 library(glue)
-
+args <- commandArgs(trailingOnly = TRUE)
 mscaf <- args[[1]]
 
 read_and_summarize <- \(file, type = "all"){
