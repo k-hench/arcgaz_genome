@@ -21,12 +21,17 @@ snakemake --jobs 50 \
         -R cov_by_fam
 """
 
+rule cov_by_fam:
+    input: 
+      collapsed_cov = expand( "results/neutral_tree/cov/fam/{fam}-{mscaf}.collapsed.bed.gz", fam = ["pho", "ota"], mscaf = SCFS ),
+      cov_by_win = expand( "results/neutral_tree/cov/by_win/{mscaf}.tsv.gz", mscaf = SCFS ),
+      cov_by_win_fam = expand( "results/neutral_tree/cov/by_win/fam/{fam}-{mscaf}.tsv.gz", fam = ["pho", "ota"], mscaf = SCFS ),
+
 
 wildcard_constraints:
     fam = "[^_]*",
     mscaf = "[^-]*"
     
-
 
 fams = { "pho": ["halgry", "lepwed", "mirang", "mirleo", "neosch", "odoros", "phovit"],
          "ota": ["calurs", "eumjub", "arcgaz", "zalcal"]}
@@ -34,9 +39,6 @@ fams = { "pho": ["halgry", "lepwed", "mirang", "mirleo", "neosch", "odoros", "ph
 
 fams_c = { "pho": "halgry,lepwed,mirang,mirleo,neosch,odoros,phovit",
            "ota": "calurs,eumjub,arcgaz,zalcal"}
-
-rule cov_by_fam:
-    input: expand( "results/neutral_tree/cov/fam/{fam}-{mscaf}.collapsed.bed.gz", fam = ["pho", "ota"], mscaf = SCFS )
 
 
 rule alignment_coverage_fam:
@@ -84,4 +86,50 @@ rule collapse_cov_bed_fam:
     shell:
       """
       Rscript --vanilla R/collapse_bed_coverage.R {input.bed} {output.bed} &>> {log}
+      """
+
+rule coverage_50k_intersect:
+    input:
+      win = "data/genomes/arcgaz_anc_h1_w50k_s25k.bed.gz",
+      cov = "results/neutral_tree/cov/{mscaf}.collapsed.bed.gz"
+    output:
+      tsv = "results/neutral_tree/cov/by_win/{mscaf}.tsv.gz"
+    params:
+      prefix = ""
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      echo -e "chr\tstart\tend\twin_idx\tc_start\tc_end\tcov" > {params.prefix}
+
+      bedtools intersect \
+          -a {input.win} \
+          -b {input.cov} \
+          -wa -wb | \
+          cur -f 1,2,3,4,6,7,8 >> {params.prefix}
+      
+      gzip {params.prefix}
+      """
+
+rule coverage_50k_intersect_fam:
+    input:
+      win = "data/genomes/arcgaz_anc_h1_w50k_s25k.bed.gz",
+      cov = "results/neutral_tree/cov/fam/{fam}-{mscaf}.collapsed.bed.gz"
+    output:
+      tsv = "results/neutral_tree/cov/by_win/fam/{fam}-{mscaf}.tsv.gz"
+    params:
+      prefix = ""
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      echo -e "chr\tstart\tend\twin_idx\tc_start\tc_end\tcov" > {params.prefix}
+
+      bedtools intersect \
+          -a {input.win} \
+          -b {input.cov} \
+          -wa -wb | \
+          cur -f 1,2,3,4,6,7,8 >> {params.prefix}
+      
+      gzip {params.prefix}
       """
