@@ -24,9 +24,9 @@ snakemake --jobs 50 \
 rule cov_by_fam:
     input: 
       collapsed_cov = expand( "results/neutral_tree/cov/fam/{fam}-{mscaf}.collapsed.bed.gz", fam = ["pho", "ota"], mscaf = SCFS ),
-      cov_by_win = expand( "results/neutral_tree/cov/by_win/{mscaf}.tsv.gz", mscaf = SCFS ),
-      cov_by_win_fam = expand( "results/neutral_tree/cov/by_win/fam/{fam}-{mscaf}.tsv.gz", fam = ["pho", "ota"], mscaf = SCFS ),
-
+      cov_by = expand( "results/neutral_tree/cov/by_{by}/{mscaf}.tsv.gz", mscaf = SCFS, by = [ "win", "busco" ] ),
+      cov_by_fam = expand( "results/neutral_tree/cov/by_{by}/fam/{fam}-{mscaf}.tsv.gz", fam = ["pho", "ota"], mscaf = SCFS, by = [ "win", "busco" ] ),
+      cov_combined_win = expand( "results/neutral_tree/cov/by_win/combined_{mscaf}.tsv.gz", mscaf = SCFS )
 
 wildcard_constraints:
     fam = "[^_]*",
@@ -124,6 +124,67 @@ rule coverage_50k_intersect_fam:
     shell:
       """
       echo -e "chr\tstart\tend\twin_idx\tc_start\tc_end\tcov" > {params.prefix}
+
+      bedtools intersect \
+          -a {input.win} \
+          -b {input.cov} \
+          -wa -wb | \
+          cut -f 1,2,3,4,6,7,8 >> {params.prefix}
+      
+      gzip {params.prefix}
+      """
+
+rule comine_win_coverage:
+    input:
+      a  = "results/neutral_tree/cov/by_win/{mscaf}.tsv.gz",
+      ota = "results/neutral_tree/cov/by_win/fam/ota-{mscaf}.tsv.gz",
+      pho = "results/neutral_tree/cov/by_win/fam/pho-{mscaf}.tsv.gz"
+    output:
+      tsv = "results/neutral_tree/cov/by_win/combined-{mscaf}.tsv.gz"
+    log: "logs/comine_win_coverage_{mscaf}.log"
+    container: c_conda
+    conda: "r_tidy"
+    shell:
+      """
+      Rscript --vanilla R/combine_alignment_coverage.R {wildcards.mscaf} &>> {log}
+      """
+
+rule coverage_busco_intersect:
+    input:
+      win = "results/pinniped/complete_buscos.bed.gz",
+      cov = "results/neutral_tree/cov/{mscaf}.collapsed.bed.gz"
+    output:
+      tsv = "results/neutral_tree/cov/by_busco/{mscaf}.tsv.gz"
+    params:
+      prefix = "results/neutral_tree/cov/by_busco/{mscaf}.tsv"
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      echo -e "chr\tstart\tend\tbusco_id\tc_start\tc_end\tcov" > {params.prefix}
+
+      bedtools intersect \
+          -a {input.win} \
+          -b {input.cov} \
+          -wa -wb | \
+          cut -f 1,2,3,4,6,7,8 >> {params.prefix}
+      
+      gzip {params.prefix}
+      """
+
+rule coverage_busco_intersect_fam:
+    input:
+      win = "results/pinniped/complete_buscos.bed.gz",
+      cov = "results/neutral_tree/cov/fam/{fam}-{mscaf}.collapsed.bed.gz"
+    output:
+      tsv = "results/neutral_tree/cov/by_busco/fam/{fam}-{mscaf}.tsv.gz"
+    params:
+      prefix = "results/neutral_tree/cov/by_busco/fam/{fam}-{mscaf}.tsv"
+    container: c_conda
+    conda: "popgen_basics"
+    shell:
+      """
+      echo -e "chr\tstart\tend\tbusco_id\tc_start\tc_end\tcov" > {params.prefix}
 
       bedtools intersect \
           -a {input.win} \
