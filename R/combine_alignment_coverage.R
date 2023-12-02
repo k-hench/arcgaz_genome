@@ -5,16 +5,20 @@ args <- commandArgs(trailingOnly = TRUE)
 mscaf <- args[[1]]
 sum_type <- args[[2]]
 
+
+
 read_and_summarize <- \(file, type = "all"){
   miv_cov <- c(all = 4, pho = 2, ota = 2)
 
   read_table(here(file)) |>
+    set_names(nm = c("chr", "start", "end", "summarize_id",
+                     "c_start", "c_end", "cov")) |>
     mutate(c_length = c_end - c_start ) |>
-    group_by(chr, start, end, win_idx) |>
+    group_by(chr, start, end, summarize_id) |>
     summarise(average_cov = sum(cov * c_length) / sum(c_length),
               prcent_smaller_2 = sum(c_length[cov > (miv_cov[type] - 1)]) / sum(c_length)) |>
     ungroup() |>
-    set_names(nm = c("chr", "start", "end", "summarize_id",
+    set_names(nm = c("chr", "start", "end", glue("{sum_type}_id"),
                      str_c(c("cov_", "cov_min_"),
                            c("", miv_cov[type]),
                            c("", "_"),
