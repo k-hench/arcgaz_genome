@@ -95,7 +95,7 @@ rule coverage_50k_intersect:
     output:
       tsv = "results/neutral_tree/cov/by_win/{mscaf}.tsv.gz"
     params:
-      prefix = ""
+      prefix = "results/neutral_tree/cov/by_win/{mscaf}.tsv"
     container: c_conda
     conda: "popgen_basics"
     shell:
@@ -118,7 +118,7 @@ rule coverage_50k_intersect_fam:
     output:
       tsv = "results/neutral_tree/cov/by_win/fam/{fam}-{mscaf}.tsv.gz"
     params:
-      prefix = ""
+      prefix = "results/neutral_tree/cov/by_win/fam/{fam}-{mscaf}.tsv"
     container: c_conda
     conda: "popgen_basics"
     shell:
