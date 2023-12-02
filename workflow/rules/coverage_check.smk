@@ -140,7 +140,7 @@ rule comine_win_coverage:
       ota = "results/neutral_tree/cov/by_win/fam/ota-{mscaf}.tsv.gz",
       pho = "results/neutral_tree/cov/by_win/fam/pho-{mscaf}.tsv.gz"
     output:
-      tsv = "results/neutral_tree/cov/by_win/combined-{mscaf}.tsv.gz"
+      tsv = "results/neutral_tree/cov/by_win/combined/combined_{mscaf}.tsv.gz"
     log: "logs/comine_win_coverage_{mscaf}.log"
     container: c_conda
     conda: "r_tidy"
