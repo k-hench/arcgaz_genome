@@ -192,5 +192,5 @@ rule combine_coverages:
     conda: "r_tidy"
     shell:
       """
-      Rscript --vanilla R/combine_alignment_coverage.R {wildcards.mscaf} &>> {log}
+      Rscript --vanilla R/combine_alignment_coverage.R {wildcards.mscaf} {wildcards.sum_type} &>> {log}
       """
