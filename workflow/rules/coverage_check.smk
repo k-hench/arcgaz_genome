@@ -106,7 +106,7 @@ rule coverage_50k_intersect:
           -a {input.win} \
           -b {input.cov} \
           -wa -wb | \
-          cur -f 1,2,3,4,6,7,8 >> {params.prefix}
+          cut -f 1,2,3,4,6,7,8 >> {params.prefix}
       
       gzip {params.prefix}
       """
@@ -129,7 +129,7 @@ rule coverage_50k_intersect_fam:
           -a {input.win} \
           -b {input.cov} \
           -wa -wb | \
-          cur -f 1,2,3,4,6,7,8 >> {params.prefix}
+          cut -f 1,2,3,4,6,7,8 >> {params.prefix}
       
       gzip {params.prefix}
       """
