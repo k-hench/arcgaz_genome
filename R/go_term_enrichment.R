@@ -22,7 +22,8 @@ library(ggtext)
 source(here("R/plot_defaults.R"))
 
 go_bp <- readMappings(here("results/pinniped/go_terms/busco_id_to_go_term_bp.tsv"))
-busco_data <- read_tsv(here("results/pinniped/busco_gerp_fst.tsv"))
+busco_data <- read_tsv(here("results/pinniped/busco_gerp_fst.tsv")) |>
+  filter(all_min_2)
 
 gerp_top_scores <- factor(as.numeric(busco_data$gerp_top_10)) |> set_names(busco_data$busco_id)
 fst_scores <- factor(as.numeric(busco_data$fst_top_10)) |> set_names(busco_data$busco_id)
@@ -260,7 +261,6 @@ pbd_t <- go_and_busco |>
   theme_ms()  +
   theme(axis.title.x = element_blank())
 
-
 pbd_f <- go_and_busco |>
   filter(fst_rank <= top_n) |>
   ggplot(aes(x = gerp_rs_mean, y = fst_mean)) +
@@ -280,8 +280,6 @@ pbd_f <- go_and_busco |>
   facet_grid(. ~ glue::glue("{str_pad(fst_rank, width = 2, pad = 0)}: {go_term}")) +
   labs(subtitle = "High *F<sub>ST</sub>* GO Terms") +
   theme_ms()
-
-
 
 pp_2d_dens <- pbd_0 + (pbd_t + pbd_f + plot_layout(heights = c(.95, 1))) +
   plot_layout(guides = "collect",

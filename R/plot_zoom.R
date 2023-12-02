@@ -29,8 +29,8 @@ read_10k <- \(scf, type = "gerp", win = "GERP"){
 
 data_gerp_10k <- map_dfr(scfs, read_10k)
 data_fst_10k <- map_dfr(scfs, read_10k, type = "fst", win = "*F<sub>ST</sub>*")
-# data_fst_bp <- read_tsv(here("results/fst_bp.tsv.gz")) |>
-#   filter(!is.na(WEIR_AND_COCKERHAM_FST))
+data_fst_bp <- read_tsv(here("results/fst_bp.tsv.gz")) |>
+  filter(!is.na(WEIR_AND_COCKERHAM_FST))
 
 data_cov <- scfs |>
   map(\(scf){read_tsv(here(glue("results/neutral_tree/cov/{scf}.collapsed.bed.gz")),
@@ -202,6 +202,9 @@ p_list <- data_outlier[c(4,8,9,10,11,15,16,17,19,20,
                          30,31,32,33,34,35),] |>
   pmap(plot_zoom, focal_genes = c("HOXA5"))
 
+p_list <- data_outlier |>
+  pmap(plot_zoom, focal_genes = c("HOXA5"))
+
 # p_list[c(4,8,9,10,11,15,16,17,19,20,
 #          21,22,23,24,25,26,27,28,29,
 #          30,31,32,33,34,35)] |>
@@ -209,8 +212,7 @@ p_list |>
   map(\(x){x$p}) |>
   wrap_plots(nrow = 4, guides = "collect")
 
-p_list[[1]]$p
-
+p_list[[20]]$p
 
 random_buscos <- data_busco |>
   select(chr, start = bstart, end = bend, outlier_label = busco_id) |>

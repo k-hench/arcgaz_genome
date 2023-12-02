@@ -64,16 +64,24 @@ data_win_fst <- scfs |>
          gend = end + scaf_start,
          gmid = (gstart + gend)/2)
 
+
+read_coverages <- \(scf, type){
+  read_tsv(here(glue("results/neutral_tree/cov/by_{type}/combined/combined-{scf}.tsv.gz")))
+}
+
+coverage_win <- scfs |> map_dfr(read_coverages, type = "win")
+
 data_win <- data_win_gerp |>
   select(chr, start, end, eo, gstart,gend, gmid, gerp_rs_mean, gerp_rs_med) |>
   left_join(data_win_fst_vt |>
               select(chr = CHROM, end = BIN_END, fst_w_0, fst_m_0) |>
               left_join(data_win_fst |>
                           select(chr, end, fst_mean, fst_med),
-                        by = c("chr", "end")))
+                        by = c("chr", "end"))) |>
+  left_join(coverage_win |> select(chr, start, all_min_2),
+            by = c("chr", "start"))
 
-data_win |>
-  write_tsv(here("results/pinniped/win_gerp_fst.tsv"))
+data_win |> write_tsv(here("results/pinniped/win_gerp_fst.tsv"))
 
 data_buso_gerp <- scfs |>
   map_dfr(read_busco_gerp) |>
@@ -81,6 +89,8 @@ data_buso_gerp <- scfs |>
 
 data_buso_fst <- scfs |>
   map_dfr(read_busco_fst)
+
+coverage_busco <- scfs |> map_dfr(read_coverages, type = "busco")
 
 data_busco <- data_buso_gerp |>
   select(busco_id, chr,
@@ -92,7 +102,8 @@ data_busco <- data_buso_gerp |>
               select(busco_id,
                      n_snps_fst = n_snps,
                      fst_mean,
-                     fst_med))
+                     fst_med)) |>
+  left_join(coverage_busco |> select(busco_id, all_min_2))
 
 # focal_gerp <- "gerp_rs_mean"
 # gerp_lab <- "average RS score (GERP)"
@@ -103,8 +114,8 @@ data_busco <- data_buso_gerp |>
 
 # within BUSCO comparison
 querry_thresholds <- \(stat, type, by = "BUSCO"){
-  dat <- list(BUSCO  = data_busco,
-              win = data_win)
+  dat <- list(BUSCO  = data_busco |> filter(all_min_2),
+              win = data_win |> filter(all_min_2))
   prbs <- list(gerp = 1 - c(.99, .95, .975, .995, .5, .025, .01,.0001),
                fst = c(.5, .95, .975, .99, .995, .999, .9995, .9999, .99995))
   trs <- quantile(dat[[by]][[stat]],
@@ -156,6 +167,7 @@ data_win_tr |>
 
 outlier_summary_gerp <- data_win_tr |>
   filter(complete.cases(gerp_ol_id)) |>
+  filter(all_min_2) |>
   group_by(gerp_ol_id) |>
   summarise(chr = chr[[1]],
             start = min(start),
@@ -168,6 +180,7 @@ outlier_summary_gerp <- data_win_tr |>
 
 outlier_summary_fst <- data_win_tr |>
   filter(complete.cases(fst_ol_id)) |>
+  filter(all_min_2) |>
   group_by(fst_ol_id) |>
   summarise(chr = chr[[1]],
             start = min(start),
