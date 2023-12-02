@@ -28,4 +28,4 @@ data_all |>
   left_join(data_ota |> select(-c(chr, start, end))) |>
   left_join(data_pho |> select(-c(chr, start, end))) |>
   mutate(all_min_2 = cov_ota > 2 & cov_pho > 2) |>
-  write_tsv(here(glue("results/neutral_tree/cov/by_win/combined/combined_{mscaf}.tsv.gz")))
+  write_tsv(here(glue("results/neutral_tree/cov/by_win/combined/combined-{mscaf}.tsv.gz")))

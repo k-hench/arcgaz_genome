@@ -26,7 +26,7 @@ rule cov_by_fam:
       collapsed_cov = expand( "results/neutral_tree/cov/fam/{fam}-{mscaf}.collapsed.bed.gz", fam = ["pho", "ota"], mscaf = SCFS ),
       cov_by = expand( "results/neutral_tree/cov/by_{by}/{mscaf}.tsv.gz", mscaf = SCFS, by = [ "win", "busco" ] ),
       cov_by_fam = expand( "results/neutral_tree/cov/by_{by}/fam/{fam}-{mscaf}.tsv.gz", fam = ["pho", "ota"], mscaf = SCFS, by = [ "win", "busco" ] ),
-      cov_combined_win = expand( "results/neutral_tree/cov/by_win/combined_{mscaf}.tsv.gz", mscaf = SCFS )
+      cov_combined_win = expand( "results/neutral_tree/cov/by_win/combined/combined-{mscaf}.tsv.gz", mscaf = SCFS )
 
 wildcard_constraints:
     fam = "[^_]*",
@@ -140,7 +140,7 @@ rule comine_win_coverage:
       ota = "results/neutral_tree/cov/by_win/fam/ota-{mscaf}.tsv.gz",
       pho = "results/neutral_tree/cov/by_win/fam/pho-{mscaf}.tsv.gz"
     output:
-      tsv = "results/neutral_tree/cov/by_win/combined/combined_{mscaf}.tsv.gz"
+      tsv = "results/neutral_tree/cov/by_win/combined/combined-{mscaf}.tsv.gz"
     log: "logs/comine_win_coverage_{mscaf}.log"
     container: c_conda
     conda: "r_tidy"
