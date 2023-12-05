@@ -254,10 +254,14 @@ pbd_t <- go_and_busco |>
            show.legend = FALSE) +
   geom_hdr_lines(linewidth = .3,
                  probs = c(0.99, 0.9, 0.66),
-                 color = clrs[[1]],
+                 aes(color = go_term == "GO:0051965"),
+                 # color = clrs[[1]],
                  xlim = c(0, .1), ylim = c(0, 1)) +
   facet_grid(. ~ glue::glue("{str_pad(gerp_top_rank, width = 2, pad = 0)}: {go_term}")  ) +
   labs(subtitle = "High GERP Score GO Terms") +
+  scale_color_manual(values = c(`TRUE` = "black",
+                                `FALSE` = clrs[[1]]),
+                     guide = "none") +
   theme_ms()  +
   theme(axis.title.x = element_blank())
 
@@ -275,9 +279,13 @@ pbd_f <- go_and_busco |>
            show.legend = FALSE) +
   geom_hdr_lines(linewidth = .3,
                  probs = c(0.99, 0.9, 0.66),
-                 color = clr_darken(clrs[[2]],.2),
+                 aes(color = go_term == "GO:0051965"),
+                 # color = clr_darken(clrs[[2]],.2),
                  xlim = c(0, .1), ylim = c(0, 1)) +
   facet_grid(. ~ glue::glue("{str_pad(fst_rank, width = 2, pad = 0)}: {go_term}")) +
+  scale_color_manual(values = c(`TRUE` = "black",
+                                `FALSE` = clr_darken(clrs[[2]],.2)),
+                     guide = "none") +
   labs(subtitle = "High *F<sub>ST</sub>* GO Terms") +
   theme_ms()
 

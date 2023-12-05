@@ -27,11 +27,11 @@ coverage_win <- scfs |> map_dfr(read_coverages, type = "win")
 coverage_busco_summary <- coverage_busco |> summarize_cov()
 coverage_win_summary <- coverage_win |> summarize_cov()
 
-data_busco_summary |> pivot_wider(values_from = n, names_from = value)
-data_win_summary |> pivot_wider(values_from = n, names_from = value)
+coverage_busco_summary |> pivot_wider(values_from = n, names_from = value)
+coverage_win_summary |> pivot_wider(values_from = n, names_from = value)
 
-p1 <- data_busco_summary |> ggplot() + labs(subtitle = "BUSCOS")
-p2 <- data_win_summary |> ggplot() + labs(subtitle = "win")
+p1 <- coverage_busco_summary |> ggplot() + labs(subtitle = "BUSCOS")
+p2 <- coverage_win_summary |> ggplot() + labs(subtitle = "win")
 
 p1 / p2 +
   plot_layout(guide = "collect") &

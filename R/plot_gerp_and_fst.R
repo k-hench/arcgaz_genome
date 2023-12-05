@@ -84,8 +84,8 @@ p2 <- ggplot() +
             dpi = 300, dev = "ragg") +
   geom_text(data = data_outlier |>
               filter(outlier_type == "fst") |>
-              filter(row_number() %in% c(1,2,3,6,7,9,10,12,13,14,15,16,20,22)),
-            aes(x = gmid -3e7*c(1,-1,1,-1,1,-1,1,-1,1,-1,-1,1,-1,1),
+              filter(row_number() != 6),
+            aes(x = gmid -3e7  * rep(c(1,-1), c(5,1)),
                 y = 1,
                 label = outlier_label),
             color = "black",
@@ -192,7 +192,7 @@ p3 <- data_win |>
        y = "Average *F<sub>ST</sub>* per 50kb Window") +
   guides(fill = guide_colorbar(title.position = "left",
                                barwidth = unit(2.5, "pt"),
-                               barheight = unit(5, "pt"))) +
+                               barheight = unit(50, "pt"))) +
   coord_cartesian(expand = 0,
                   xlim = c(1.1, 1.1) * range(data_win$gerp_rs_mean),
                   ylim = c(-.025,1.025)) +

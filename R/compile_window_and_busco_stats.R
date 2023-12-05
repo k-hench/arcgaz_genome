@@ -69,17 +69,20 @@ read_coverages <- \(scf, type){
   read_tsv(here(glue("results/neutral_tree/cov/by_{type}/combined/combined-{scf}.tsv.gz")))
 }
 
-coverage_win <- scfs |> map_dfr(read_coverages, type = "win")
+coverage_win <- scfs |> map_dfr(read_coverages, type = "win") |>
+  mutate(all_min_2_75 = cov_ota > 2 & cov_pho > 2 & cov_min_2_ota > 0.75 & cov_min_2_pho > 0.75 )
 
 data_win <- data_win_gerp |>
   select(chr, start, end, eo, gstart,gend, gmid, gerp_rs_mean, gerp_rs_med) |>
   left_join(data_win_fst_vt |>
-              select(chr = CHROM, end = BIN_END, fst_w_0, fst_m_0) |>
+              select(chr = CHROM, end = BIN_END, n_snps = N_VARIANTS, fst_w_0, fst_m_0) |>
               left_join(data_win_fst |>
                           select(chr, end, fst_mean, fst_med),
                         by = c("chr", "end"))) |>
   left_join(coverage_win |> select(chr, start, all_min_2),
-            by = c("chr", "start"))
+            by = c("chr", "start")) |>
+  filter(n_snps >= 500,
+         all_min_2)
 
 data_win |> write_tsv(here("results/pinniped/win_gerp_fst.tsv"))
 
@@ -103,7 +106,9 @@ data_busco <- data_buso_gerp |>
                      n_snps_fst = n_snps,
                      fst_mean,
                      fst_med)) |>
-  left_join(coverage_busco |> select(busco_id, all_min_2))
+  left_join(coverage_busco |> select(busco_id, all_min_2)) |>
+  filter(n_snps_fst >= (bend-bstart)*0.01,
+         all_min_2)
 
 # focal_gerp <- "gerp_rs_mean"
 # gerp_lab <- "average RS score (GERP)"
@@ -114,8 +119,8 @@ data_busco <- data_buso_gerp |>
 
 # within BUSCO comparison
 querry_thresholds <- \(stat, type, by = "BUSCO"){
-  dat <- list(BUSCO  = data_busco |> filter(all_min_2),
-              win = data_win |> filter(all_min_2))
+  dat <- list(BUSCO  = data_busco,
+              win = data_win)
   prbs <- list(gerp = 1 - c(.99, .95, .975, .995, .5, .025, .01,.0001),
                fst = c(.5, .95, .975, .99, .995, .999, .9995, .9999, .99995))
   trs <- quantile(dat[[by]][[stat]],

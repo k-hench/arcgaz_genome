@@ -6,21 +6,22 @@ library(tidyverse)
 library(ggtree)
 library(prismatic)
 library(here)
+library(ggtext)
 source("R/plot_defaults.R")
 
 tree <- read.tree(file = here("results/neutral_tree/rerooted.tree"))
 
-spec_long <- c(odoros = "Odobenus rosmarus",
-          calurs = "Callorhinus ursinus",
-          arcgaz = "Arctocephalus gazella",
-          eumjub = "Eumetopias jubatus",
-          zalcal = "Zalophus californianus",
-          lepwed = "Leptonychotes weddellii",
-          mirleo = "Mirounga leonina",
-          mirang = "Mirounga angustirostris",
-          neosch = "Neomonachus schauinslandi",
-          phovit = "Phoca vitulina",
-          halgry = "Halichoerus grypus")
+spec_long <- c(odoros = "*Odobenus rosmarus*",
+               calurs = "*Callorhinus ursinus*",
+               arcgaz = "__*Arctocephalus gazella*__",
+               eumjub = "*Eumetopias jubatus*",
+               zalcal = "*Zalophus californianus*",
+               lepwed = "*Leptonychotes weddellii*",
+               mirleo = "*Mirounga leonina*",
+               mirang = "*Mirounga angustirostris*",
+               neosch = "*Neomonachus schauinslandi*",
+               phovit = "*Phoca vitulina*",
+               halgry = "*Halichoerus grypus*")
 
 gens <- c("otariidae", "phocidae")
 
@@ -42,7 +43,7 @@ pho <- hypoimg::hypo_read_svg(here("results/img/illustrations/halgry.c.svg")) |>
 odo <- hypoimg::hypo_read_svg(here("results/img/illustrations/odoros.c.svg")) |>
   hypoimg::hypo_recolor_svg(color = clr_alpha("black"))
 
-ggtree(tree, color = NA) +
+p <- ggtree(tree, color = NA) +
   geom_rect(inherit.aes = FALSE,
             data = tibble(x1 = c(.00725, .0232),
                           x2 = c(.03, .0465),
@@ -73,9 +74,14 @@ ggtree(tree, color = NA) +
             aes(label = label),
             angle = -90, size = 5, fontface = "bold", color = "white") +
   geom_tree(size = .4) +
-  geom_tiplab(aes(x = x + .0003,
-                  label = specs_short[label]),
-              fontface = "italic") +
+  # geom_tiplab(aes(x = x + .0003,
+  #                 label = specs_short[label]),
+  #             fontface = "italic") +
+  geom_richtext(aes(x = x + .0003,
+                    label = specs_short[label]),
+                hjust = 0,
+                fill = NA, label.color = NA, # remove background and outline
+                label.padding = grid::unit(rep(0, 4), "pt")) +
   geom_treescale(offset = -.4,
                  width = 0.005,
                  x = 0,
@@ -92,6 +98,7 @@ ggtree(tree, color = NA) +
                   expand = 0)
 
 ggsave(here("results/img/neutral_tree.pdf"),
+       plot = p,
        width = 8, height = 6,
        device = cairo_pdf)
 

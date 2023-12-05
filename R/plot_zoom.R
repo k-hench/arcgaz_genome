@@ -15,7 +15,7 @@ library(here)
 library(arcgazgen)
 source("R/plot_defaults.R")
 
-fs <- 12#fnt_sz
+fs <- fnt_sz
 clr_l_gray <- rgb(.85,.85,.85)
 
 scfs <- str_c("mscaf_a1_",
@@ -29,15 +29,12 @@ read_10k <- \(scf, type = "gerp", win = "GERP"){
 
 data_gerp_10k <- map_dfr(scfs, read_10k)
 data_fst_10k <- map_dfr(scfs, read_10k, type = "fst", win = "*F<sub>ST</sub>*")
-data_fst_bp <- read_tsv(here("results/fst_bp.tsv.gz")) |>
-  filter(!is.na(WEIR_AND_COCKERHAM_FST))
-
 data_cov <- scfs |>
   map(\(scf){read_tsv(here(glue("results/neutral_tree/cov/{scf}.collapsed.bed.gz")),
                                 col_names = c('chr', "start", "end", "cov"))}) |>
   set_names(nm = scfs)
 
-data_win  <- read_tsv(here("results/pinniped/win_gerp_fst.tsv"))
+data_win  <- read_tsv(here("results/pinniped/win_gerp_fst.tsv")) |>  mutate(mid = (start + end)/2)
 data_outlier <- read_tsv(here("results/pinniped/win_outlier_summary.tsv"))
 data_busco_go_summary <- read_tsv(here("results/pinniped/go_terms/go_term_busco_stats.tsv")) |>
   group_by(busco_id) |>
@@ -55,19 +52,22 @@ data_busco <- read_tsv(here("results/pinniped/busco_gerp_fst.tsv")) |>
   mutate(busco_type = replace_na(busco_type, 4),
          busco_color = c(clrs, "black", "lightgray")[busco_type])
 
-zoom_buffer <- 6e4
+zoom_buffer <- 1e5
 
 plot_zoom <- \(chr, start, end,
                z_buff = zoom_buffer,
                n_tracks = 5,
                n_tracks_b = 5,
                focal_genes = c(),
-               # b_track_height = .5,
                outlier_label = "",
                ...){
   z_start <- start - z_buff
   z_end <- end + z_buff
   chr_in <- chr
+
+  data_win_z <- data_win |>
+    filter(chr == chr_in,
+           start < z_end & end > z_start)
 
   data_gerp <- data_gerp_10k |>
     filter(chr == chr_in,
@@ -77,38 +77,16 @@ plot_zoom <- \(chr, start, end,
     filter(chr == chr_in,
            start < z_end & end > z_start)
 
-  data_fst_bp_z <- data_fst_bp |>
-    filter(CHROM == chr_in,
-           POS < z_end & POS > z_start) |>
-    mutate(window = "*F<sub>ST</sub> (bp)*")
-
-
   data_cov_z <- data_cov[[chr_in]]|>
     filter(end > z_start & start < z_end) |>
     pivot_longer(start:end, values_to = "pos") |>
     mutate(window = "coverage")
-    #   mutate(y_track = (dplyr::row_number() - 1) %% n_tracks_b) |>
-    #   rowwise()
-  # data_busco_z <- data_busco |>
-  #   filter(chr == chr_in) |>
-  #   filter(bend > z_start & bstart < z_end) |>
-  #   mutate(y_track = (dplyr::row_number() - 1) %% n_tracks_b) |>
-  #   rowwise() |>
-  #   dplyr::mutate(bstart = max(bstart, z_start),
-  #                 bend = min(bend, z_end)) |>
-  #   ungroup() |>
-  #   mutate(mid = (start  + end )/2,
-  #          window = "BUSCO") |>
-  #   select(busco_id, chr, bstart, bend, y_track, busco_type, busco_color, window) |>
-  #   arrange(bstart)
 
   gerp_range <- range(data_gerp_10k$gerp_rs_mean)
-  # fst_range <- range(data_fst$fst_mean)
-  # fst_range <- range(data_fst_bp_z$WEIR_AND_COCKERHAM_FST)
   fst_range <- 0:1
 
   win_types <- c("genes",# "BUSCO",
-                 "GERP", "*F<sub>ST</sub>*", "*F<sub>ST</sub> (bp)*", "coverage")
+                 "GERP", "*F<sub>ST</sub>*", "coverage")
   p1 <- ggplot() +
     geom_blank(data = tibble(window = rep(win_types[1], each = 2),
                              y = c(c(-0.5, n_tracks - 0.5)#,
@@ -119,14 +97,6 @@ plot_zoom <- \(chr, start, end,
                            aes(xmin = x1, xmax = x2, ymin = -Inf, ymax = Inf),
                            color = "transparent",
                            fill = clr_alpha("black", .1)) +
-                 # geom_rect(data = data_busco_z,
-                 #           aes(xmin = bstart,
-                 #               xmax = bend,
-                 #               ymin = y_track - b_track_height/2,
-                 #               ymax = y_track + b_track_height/2,
-                 #               color = busco_color,
-                 #               fill =  busco_color,
-                 #               group = busco_id)) +
                  scale_fill_identity() +
                  scale_color_identity() +
                  ggnewscale::new_scale_fill() +
@@ -134,13 +104,17 @@ plot_zoom <- \(chr, start, end,
                  ag_plot_zoom(z_chr = chr,
                               z_start = z_start, z_end = z_end,
                               n_tracks = n_tracks,
+                              arrow_size = unit(1, "pt"),
                               style = "simple",
                               focal_genes = focal_genes,
-                              label_offset = -0.7,
-                              label_size = .5*fs/ggplot2::.pt,
+                              label_offset = -0.5,
+                              label_size = .45 * fs/ggplot2::.pt,
                               label_fun = \(lb){ if_else(str_length(lb) > 10,
                                                          str_c(str_sub(lb, 1, 8), ".."),
-                                                         lb) }) +
+                                                         lb) |>
+                                  str_replace("HOXA", "Hoxa") |>
+                                  str_replace("GSTT","Gstt")},
+                              arrow_lwd = .5*plt_lwd) +
                  facet_grid(factor(window, levels = win_types) ~ .,
                             scales = "free", switch = "y") +
                  coord_cartesian(xlim = c(z_start, z_end),
@@ -155,9 +129,8 @@ plot_zoom <- \(chr, start, end,
                        axis.title = element_blank())
 
                p2 <- ggplot() +
-                 geom_blank(data = tibble(window = rep(win_types[2:5], each = 2),
+                 geom_blank(data = tibble(window = rep(win_types[2:4], each = 2),
                                           y = c(gerp_range + c(-.1,.1) * diff(gerp_range),
-                                                fst_range + c(-.1,.1),
                                                 fst_range + c(-.1,.1),
                                                 c(-.5,11.5))),
                             aes(x = -Inf, y = y)) +
@@ -165,18 +138,22 @@ plot_zoom <- \(chr, start, end,
                            aes(xmin = x1, xmax = x2, ymin = -Inf, ymax = Inf),
                            color = "transparent",
                            fill = clr_alpha("black", .1)) +
+                 geom_line(data = data_win_z |> mutate(window = "GERP"),
+                           aes(x = mid, y = gerp_rs_mean),
+                           linewidth = .3, color = clr_alpha(clrs[[1]])) +
                  geom_line(data = data_gerp,
                            aes(x = mid, y = gerp_rs_mean),
                            linewidth = .3, color = clrs[[1]]) +
-                 geom_point(data = data_fst_bp_z,
-                           aes(x = POS, y = WEIR_AND_COCKERHAM_FST),
-                           size = .3, color = clr_alpha(clrs[[2]],.15)) +
+                 geom_line(data = data_win_z |> mutate(window = "*F<sub>ST</sub>*"),
+                           aes(x = mid, y = fst_mean),
+                           linewidth = .3, color = clr_alpha(clrs[[2]])) +
                  geom_line(data = data_fst,
                            aes(x = mid, y = fst_mean),
                            linewidth = .3, color = clrs[[2]]) +
                  geom_step(data = data_cov_z,
                            aes(x = pos, y = cov),
-                           linewidth = .3) +
+                           color = rgb(0,0,0,.75),
+                           linewidth = .5 * plt_lwd) +
                  scale_x_continuous(labels = \(x){sprintf("%.1f", x *1e-6)}) +
                  facet_grid(factor(window, levels = win_types) ~ .,
                             scales = "free", switch = "y") +
@@ -193,57 +170,95 @@ plot_zoom <- \(chr, start, end,
                        plot.subtitle = element_text(hjust = .5))
 
                list(p = p,
-                    # z_busco = data_busco_z,
                     data_genes = ag_gene_data(z_chr = chr, z_start = z_start, z_end = z_end, n_tracks = n_tracks))
 }
 
-p_list <- data_outlier[c(4,8,9,10,11,15,16,17,19,20,
-                         21,22,23,24,25,26,27,28,29,
-                         30,31,32,33,34,35),] |>
-  pmap(plot_zoom, focal_genes = c("HOXA5"))
-
 p_list <- data_outlier |>
-  pmap(plot_zoom, focal_genes = c("HOXA5"))
+  pmap(plot_zoom)
 
 # p_list[c(4,8,9,10,11,15,16,17,19,20,
 #          21,22,23,24,25,26,27,28,29,
 #          30,31,32,33,34,35)] |>
-p_list |>
+
+tag_fun <- \(n_letters){
+  letters[1:n_letters] |> map(\(l){ c(l,"")}) |> unlist()
+}
+
+pp1 <- p_list |>
   map(\(x){x$p}) |>
-  wrap_plots(nrow = 4, guides = "collect")
+  wrap_plots(nrow = 3, guides = "collect") +
+  plot_annotation(tag_levels = list(tag_fun(length(p_list)))) &
+  scale_color_brewer(palette = "Set1", guide = "none") &
+  theme(strip.text.y.left = element_markdown())
 
-p_list[[20]]$p
+# p_list[c(4,6,10,13)] |>
+#   map(\(x){x$p}) |>
+#   wrap_plots(nrow = 2, guides = "collect") &
+#   theme(strip.text.y.left = element_markdown(),
+#         legend.position = "none")
 
+ggsave(plot = pp1,
+       filename = here("results/img/zoom_win_outlier_.pdf"),
+       width = 7, height = 7,
+       device = cairo_pdf)
+
+# p_list[[16]]$p
+set.seed(42)
 random_buscos <- data_busco |>
   select(chr, start = bstart, end = bend, outlier_label = busco_id) |>
-  slice_sample(n = 16) |>
+  slice_sample(n = 12) |>
   pmap(plot_zoom)
 
-random_buscos |>
+pp2 <- random_buscos |>
   map(\(x){x$p}) |>
-  wrap_plots(nrow = 4, guides = "collect")
+  wrap_plots(nrow = 4, guides = "collect") +
+  plot_annotation(tag_levels = list(tag_fun(length(random_buscos)))) &
+  scale_color_brewer(palette = "Set1", guide = "none") &
+  theme(strip.text.y.left = element_markdown(),
+        plot.tag = element_text(family = fnt_sel))
+
+ggsave(plot = pp2,
+       filename = here("results/img/zoom_busco_random.pdf"),
+       width = 7, height = 7,
+       device = cairo_pdf)
 
 top_gerp_buscos <- data_busco |>
   arrange(-gerp_rs_mean) |>
   select(chr, start = bstart, end = bend, outlier_label = busco_id, gerp_rs_mean) |>
-  slice_head(n = 16) |>
+  slice_head(n = 12) |>
   pmap(plot_zoom)
 
-top_gerp_buscos |>
+pp3 <- top_gerp_buscos |>
   map(\(x){x$p}) |>
-  wrap_plots(nrow = 4, guides = "collect")
+  wrap_plots(nrow = 4, guides = "collect") +
+  plot_annotation(tag_levels = list(tag_fun(length(top_gerp_buscos)))) &
+  scale_color_brewer(palette = "Set1", guide = "none") &
+  theme(strip.text.y.left = element_markdown(),
+        plot.tag = element_text(family = fnt_sel))
+
+ggsave(plot = pp3,
+       filename = here("results/img/zoom_busco_top_gerp.pdf"),
+       width = 9, height = 8, device = cairo_pdf)
 
 top_fst_buscos <- data_busco |>
   arrange(-fst_mean) |>
   select(chr, start = bstart, end = bend, outlier_label = busco_id, fst_mean) |>
-  slice_head(n = 16) |>
+  slice_head(n = 12) |>
   pmap(plot_zoom)
 
-top_fst_buscos |>
+pp4 <- top_fst_buscos |>
   map(\(x){x$p}) |>
-  wrap_plots(nrow = 4, guides = "collect")
+  wrap_plots(nrow = 4, guides = "collect") +
+  plot_annotation(tag_levels = list(tag_fun(length(top_fst_buscos)))) &
+  scale_color_brewer(palette = "Set1", guide = "none") &
+  theme(strip.text.y.left = element_markdown(),
+        plot.tag = element_text(family = fnt_sel))
 
+ggsave(plot = pp4,
+       filename = here("results/img/zoom_busco_top_fst.pdf"),
+       width = 9, height = 8, device = cairo_pdf)
 
+# =================================
 data_busco |>
   mutate(length = bend - bstart) |>
   select(length, fst_mean, gerp_rs_mean) |>
