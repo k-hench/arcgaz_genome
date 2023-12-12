@@ -33,11 +33,11 @@ wildcard_constraints:
     mscaf = "[^-]*"
     
 
-fams = { "pho": ["halgry", "lepwed", "mirang", "mirleo", "neosch", "odoros", "phovit"],
+fams = { "pho": ["halgry", "lepwed", "mirang", "mirleo", "neosch", "phovit"],
          "ota": ["calurs", "eumjub", "arcgaz", "zalcal"]}
 
 
-fams_c = { "pho": "halgry,lepwed,mirang,mirleo,neosch,odoros,phovit",
+fams_c = { "pho": "halgry,lepwed,mirang,mirleo,neosch,phovit",
            "ota": "calurs,eumjub,arcgaz,zalcal"}
 
 

@@ -136,6 +136,9 @@ plt_gprh <- \(grph, resultKS, ttl = NULL){
 l_gerp_top <- plt_gprh(grph_gerp_top, result_gerp_top, "Sub-Ontology (GERP)")
 l_fst <- plt_gprh(grph_fst, result_fst, "Sub-Ontology (*F<sub>ST<sub>*)")
 
+# saveRDS(object = l_gerp_top, file = "~/Downloads/l_gerp.RDS")
+# saveRDS(object = l_fst, file = "~/Downloads/l_fst.RDS")
+
 p0 <- l_gerp_top$p +
   l_fst$p +
   plot_layout(guides = "collect") +
@@ -196,7 +199,8 @@ write_lines(x = glue("# Download report for GO term descriptions\n# Accessed at 
 go_details_filled |>
   unnest(definition) |>
   select(go_term:text,aspect, usage) |>
-  write_tsv(here("results/pinniped/go_terms/go_term_info.tsv"),col_names = TRUE,
+  write_tsv(here("results/pinniped/go_terms/go_term_info.tsv"),
+            col_names = TRUE,
             append = TRUE)
 
 go_and_busco <- go_details_filled |>
@@ -291,7 +295,7 @@ pbd_f <- go_and_busco |>
 
 pp_2d_dens <- pbd_0 + (pbd_t + pbd_f + plot_layout(heights = c(.95, 1))) +
   plot_layout(guides = "collect",
-              widths = c(.4, 1)) +
+              widths = c(.3, 1)) +
   plot_annotation(tag_levels = "a") &
   # scale_color_manual(values = c("gray", rev(clrs))) &
   scale_fill_manual(values = RColorBrewer::brewer.pal(5,"Greys")[2:4]) &
@@ -313,7 +317,7 @@ pp_2d_dens <- pbd_0 + (pbd_t + pbd_f + plot_layout(heights = c(.95, 1))) +
 
 ggsave(plot = pp_2d_dens,
        filename = here("results/img/busco_go_term_2d_dens.pdf"),
-       width = 9, height = 3.5, device = cairo_pdf)
+       width = 9, height = 3, device = cairo_pdf)
 
 go_details_filled |>
   unnest(definition) |>
