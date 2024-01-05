@@ -11,6 +11,9 @@ source("R/plot_defaults.R")
 
 tree <- read.tree(file = here("results/neutral_tree/rerooted.tree"))
 
+# cumulative branch length (as reference for GERP RS scores)
+sum(tree$edge.length)
+
 spec_long <- c(odoros = "*Odobenus rosmarus*",
                calurs = "*Callorhinus ursinus*",
                arcgaz = "__*Arctocephalus gazella*__",

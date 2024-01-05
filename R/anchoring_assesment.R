@@ -1,8 +1,8 @@
-# library(tidyverse)
-# library(prismatic)
-# library(patchwork)
-# library(glue)
-# library(here)
+library(tidyverse)
+library(prismatic)
+library(patchwork)
+library(glue)
+library(here)
 
 source(here("R/plot_defaults.R"))
 
@@ -126,7 +126,7 @@ compile_bed <- \(ht = 1){
                        sec.axis = sec_axis(breaks = c(data_bed$gmid[1:18],
                                                       (data_bed$gstart[19] + max(data_bed$gend)) / 2 )* 1e-9,
                                            labels = c(str_c(
-                                             data_bed$name_new[1:18] |> str_remove("mscaf_"),
+                                             data_bed$name_new[1:18] |> str_remove("mscaf_a[12]_"),
                                                             "\n", str_remove(data$org_scaffold_v3[1:18], "CAAAJK-01000") |> str_remove("^0*") %>% str_c("v3_",.)),
                                                       " unplaced"),
                                            trans = identity)) +
@@ -151,3 +151,12 @@ both_beds <- 1:2 |>
 #   wrap_plots(ncol = 1) &
 #   theme(legend.position = "none")
 
+p <- both_beds$plot |>
+  wrap_plots(ncol = 1) &
+  theme(legend.position = "none")
+
+ggsave(plot = p,
+       filename = here("results/img/fig_s_anchoring.pdf"),
+       width = fwidth,
+       height = fwidth / 2,
+       device = cairo_pdf)

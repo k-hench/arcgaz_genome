@@ -79,7 +79,7 @@ data_win <- data_win_gerp |>
               left_join(data_win_fst |>
                           select(chr, end, fst_mean, fst_med),
                         by = c("chr", "end"))) |>
-  left_join(coverage_win |> select(chr, start, all_min_2),
+  left_join(coverage_win |> select(chr, start, cov_all, all_min_2),
             by = c("chr", "start")) |>
   filter(n_snps >= 500,
          all_min_2)
@@ -121,8 +121,8 @@ data_busco <- data_buso_gerp |>
 querry_thresholds <- \(stat, type, by = "BUSCO"){
   dat <- list(BUSCO  = data_busco,
               win = data_win)
-  prbs <- list(gerp = 1 - c(.99, .95, .975, .995, .5, .025, .01,.0001),
-               fst = c(.5, .95, .975, .99, .995, .999, .9995, .9999, .99995))
+  prbs <- list(gerp = 1 - c(.99, .95, .975, .995, .5, .025, .01,.0001, 0.16, 0.84),
+               fst = c(.5, .95, .975, .99, .995, .999, .9995, .9999, .99995, 0.16, 0.84))
   trs <- quantile(dat[[by]][[stat]],
                   probs = prbs[[type]],
                   na.rm = TRUE)

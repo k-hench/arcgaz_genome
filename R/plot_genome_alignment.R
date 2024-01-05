@@ -118,10 +118,10 @@ il_height <- .5
 
 p1 <- psl_diag |>
   ggplot() +
-  annotation_custom(grob = il_arcgaz, xmin = -2.5e8, xmax = 3e7,
-                    ymax = -.15, ymin = -.15 -il_height) +
-  annotation_custom(grob = il_zalcal, xmin = -2.5e8, xmax = 3e7,
-                    ymax = 1.1 + il_height, ymin = 1.1 ) +
+  annotation_custom(grob = il_arcgaz, xmin = -2.5e8, xmax = 0,
+                    ymin = -.25, ymax = -.25 + il_height) +
+  annotation_custom(grob = il_zalcal, xmin = -2.5e8, xmax = 0,
+                    ymax = .85 + il_height, ymin = .85 ) +
   geom_diagonal_wide(aes(x = y, y = x, group = group,
                          color = factor(dir),
                          fill = after_scale(clr_lighten(color))),
@@ -135,20 +135,24 @@ p1 <- psl_diag |>
   geom_text(data = sizes,
             aes(x = mid,
                 # y = y_base + (label_sign *  (skip + genome_width * .5)),
-                y = y_base + (label_sign *  (2.2 * skip + genome_width)),
-                label = chr,
-                hjust = c(1, 0)[as.numeric(factor(label_sign))]),
+                y = c(arcgaz_anc_h1 = -.17, zalcal_v1 = 1.1)[genome],
+                # y = y_base + (label_sign *  (2.2 * skip + genome_width)),
+                label = str_remove(chr, "mscaf_a1_"),
+                hjust = c(arcgaz_anc_h1 = .5, zalcal_v1 = 0)[genome],
+                vjust = c(arcgaz_anc_h1 = 0, zalcal_v1 = .5)[genome],
+                angle = c(arcgaz_anc_h1 = 0, zalcal_v1 = 90)[genome]),
             color = "grey30",#"black", # clr_genome,
             family = fnt_sel,
-            size = .3 * fnt_sz,
-            angle = 90)  +
-  geom_text(data = tibble(x = -2.5e7,
-                          y = 1*c(-genome_width,genome_width) +  c(0,1),
+            size = .3 * fnt_sz#,
+            #angle = 90
+            )  +
+  geom_text(data = tibble(x = -1.25e8,#-3.5e7,
+                          y = 1 * c(-genome_width, genome_width) +  c(0,1) - .15,
                           label = c("A. gazella", "Z. californianus")),
             aes(x = x,
                 y = y,
                 label = label),
-                hjust = 1,
+                hjust = .5,
             vjust = .5,
             color = "grey30",
             family = fnt_sel,
@@ -160,8 +164,7 @@ p1 <- psl_diag |>
                   clip = "off") +
   scale_color_manual(values = clrs |> clr_alpha(.3)) +
   theme_void(base_family = fnt_sel) +
-  theme(legend.position = "none"
-        )
+  theme(legend.position = "none")
 
 p2 <- psl |>
   ggplot(aes(x = log10(tSize))) +
@@ -195,10 +198,10 @@ p3 <- psl_filtered |>
         panel.grid = element_blank(),
         axis.title.x = element_markdown(lineheight = 1.5))
 
-p <- p1 + theme(plot.margin = margin(t = unit(12,"pt"))) +
+p <- free( p1 + theme(plot.margin = margin(t = unit(12,"pt")))) +
   ( p2/ p3 + plot_layout(heights = c(1,1))) +
   plot_annotation(tag_levels = 'a') +
-  plot_layout(widths = c(1, .2)) &
+  plot_layout(widths = c(1, .2),) &
   theme(text = element_text(family = fnt_sel,
                             size = fnt_sz),
         plot.tag = element_text(family = fnt_sel,

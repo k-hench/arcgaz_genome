@@ -82,8 +82,16 @@ plot_zoom <- \(chr, start, end,
     pivot_longer(start:end, values_to = "pos") |>
     mutate(window = "coverage")
 
-  gerp_range <- range(data_gerp_10k$gerp_rs_mean)
-  fst_range <- 0:1
+  gerp_range <- c(.04, .075) # range(data_gerp_10k$gerp_rs_mean)
+  fst_range <- c(.3, .7)#0:1
+
+  # gerp_labs <- c(min(min(gerp_range), min(data_gerp$gerp_rs_mean)),
+  #                max(max(gerp_range), max(data_gerp$gerp_rs_mean))) |>
+  #   round(digits = 2)
+  #
+  # fst_labs <- c(min(min(fst_range), min(data_fst$fst_mean)),
+  #                max(max(fst_range), max(data_fst$fst_mean))) |>
+  #   round(digits = 1)
 
   win_types <- c("genes",# "BUSCO",
                  "GERP", "*F<sub>ST</sub>*", "coverage")
@@ -108,7 +116,7 @@ plot_zoom <- \(chr, start, end,
                               style = "simple",
                               focal_genes = focal_genes,
                               label_offset = -0.5,
-                              label_size = .45 * fs/ggplot2::.pt,
+                              label_size = .65 * fs/ggplot2::.pt,
                               label_fun = \(lb){ if_else(str_length(lb) > 10,
                                                          str_c(str_sub(lb, 1, 8), ".."),
                                                          lb) |>
@@ -155,6 +163,7 @@ plot_zoom <- \(chr, start, end,
                            color = rgb(0,0,0,.75),
                            linewidth = .5 * plt_lwd) +
                  scale_x_continuous(labels = \(x){sprintf("%.1f", x *1e-6)}) +
+                 scale_y_continuous(n.breaks = 3) +
                  facet_grid(factor(window, levels = win_types) ~ .,
                             scales = "free", switch = "y") +
                  coord_cartesian(xlim = c(z_start, z_end),
@@ -198,8 +207,32 @@ pp1 <- p_list |>
 #         legend.position = "none")
 
 ggsave(plot = pp1,
-       filename = here("results/img/zoom_win_outlier_.pdf"),
+       filename = here("results/img/zoom_win_outlier.pdf"),
        width = 7, height = 7,
+       device = cairo_pdf)
+
+pp1a <- p_list[1:8] |>
+  map(\(x){x$p}) |>
+  wrap_plots(nrow = 3, guides = "collect") +
+  plot_annotation(tag_levels = list(tag_fun(length(p_list)))) &
+  scale_color_brewer(palette = "Set1", guide = "none") &
+  theme(strip.text.y.left = element_markdown())
+
+ggsave(plot = pp1a,
+       filename = here("results/img/zoom_win_outlier_gerp.pdf"),
+       width = 6, height = 5,
+       device = cairo_pdf)
+
+pp1b <- p_list[9:16] |>
+  map(\(x){x$p}) |>
+  wrap_plots(nrow = 3, guides = "collect") +
+  plot_annotation(tag_levels = list(tag_fun(length(p_list)))) &
+  scale_color_brewer(palette = "Set1", guide = "none") &
+  theme(strip.text.y.left = element_markdown())
+
+ggsave(plot = pp1b,
+       filename = here("results/img/zoom_win_outlier_fst.pdf"),
+       width = 6, height = 6,
        device = cairo_pdf)
 
 # p_list[[16]]$p

@@ -22,8 +22,9 @@ data_ota <- scfs |> map_dfr(read_cov_fam, fam = "ota")
 data_pho <- scfs |> map_dfr(read_cov_fam, fam = "pho")
 
 cov_summary <- \(dat, grp){
+  grp_offset <- c(all = 1, Otariidae = 1, Phocidae = 0)
   dat |>
-    group_by(coverage = cov + 1) |>
+    group_by(coverage = cov + grp_offset[grp]) |>
     summarise(bp = sum(end - start)) |>
     ungroup() |>
     mutate(z_bp = cumsum(bp),
@@ -38,7 +39,8 @@ data_pho_summary <- data_pho |> cov_summary(grp = "Phocidae")
 
 data_summary <- data_all_summary |>
   bind_rows(data_ota_summary) |>
-  bind_rows(data_pho_summary)
+  bind_rows(data_pho_summary) |>
+  filter(coverage > 0)
 
 clr_grp <- c(all = "black", Otariidae = clrs[[1]], Phocidae = clrs[[2]])
 
@@ -86,4 +88,9 @@ ggsave(filename = here("results/img/hal_coverage.pdf"),
 
 data_summary |>
   select(coverage, percent, group) |>
-  pivot_wider(names_from = group, values_from = percent)
+  pivot_wider(names_from = group, values_from = percent) |>
+  mutate(across(all:Phocidae, \(x){rev(cumsum(rev(replace_na(as.numeric(x),0))))},
+                .names = "{.col}_cum")) |>
+  select(coverage, starts_with("a"),
+         starts_with("O"),
+         starts_with("P"))

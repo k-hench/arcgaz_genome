@@ -229,23 +229,26 @@ pbd_0 <- go_and_busco |>
   geom_hdr(data = busco_data,
            aes(fill = after_stat(probs)),
            probs = c(0.99, 0.9, 0.66),
-           alpha= 1,
+           alpha = 1,
            show.legend = FALSE) +
-  geom_richtext(data = tibble(gerp_rs_mean = rep((gerp_median + c(0, .1))/2, each = 2),
+  geom_richtext(data = tibble(gerp_rs_mean = rep((gerp_median + c(0, .105))/2, each = 2),
                           fst_mean = rep((fst_median + c(0, 1))/2,2),
-                          label = c(clr_lab("unconserved","undiverged"),
-                                    clr_lab("unconserved","diverged"),
-                                            clr_lab("conserved","undiverged"),
-                                                    clr_lab("conserved","diverged"))),
+                          label = c(clr_lab("unconserved","undifferentiated"),
+                                    clr_lab("unconserved","differentiated"),
+                                            clr_lab("conserved","undifferentiated"),
+                                                    clr_lab("conserved","differentiated"))),
             aes(label = label),
             fill = NA, label.color = NA,
             label.padding = grid::unit(rep(0, 4), "pt"),
             family = fnt_sel,
-            size = 1.2 * fnt_sz / ggplot2::.pt)+
+            size = fnt_sz / ggplot2::.pt)+
   theme_ms()
 
 pbd_t <- go_and_busco |>
   filter(gerp_top_rank <= top_n) |>
+  mutate(go_term = fct_reorder(go_term,
+                               as.numeric(factor(str_c(str_pad(gerp_top_rank, width = 2, pad = 0),
+                                                       "_", go_term))))) |>
   ggplot(aes(x = gerp_rs_mean, y = fst_mean)) +
   geom_vline(xintercept = gerp_median,
              color = "gray", linetype = 3, linewidth = .2) +
@@ -261,7 +264,7 @@ pbd_t <- go_and_busco |>
                  aes(color = go_term == "GO:0051965"),
                  # color = clrs[[1]],
                  xlim = c(0, .1), ylim = c(0, 1)) +
-  facet_grid(. ~ glue::glue("{str_pad(gerp_top_rank, width = 2, pad = 0)}: {go_term}")  ) +
+  facet_grid(. ~ glue::glue("G{str_pad(as.numeric(go_term), width = 2, pad = 0)}: {go_term}")  ) +
   labs(subtitle = "High GERP Score GO Terms") +
   scale_color_manual(values = c(`TRUE` = "black",
                                 `FALSE` = clrs[[1]]),
@@ -271,6 +274,9 @@ pbd_t <- go_and_busco |>
 
 pbd_f <- go_and_busco |>
   filter(fst_rank <= top_n) |>
+  mutate(go_term = fct_reorder(go_term,
+                               as.numeric(factor(str_c(str_pad(fst_rank, width = 2, pad = 0),
+                                                       "_", go_term))))) |>
   ggplot(aes(x = gerp_rs_mean, y = fst_mean)) +
   geom_vline(xintercept = gerp_median,
              color = "gray", linetype = 3, linewidth = .2) +
@@ -286,16 +292,15 @@ pbd_f <- go_and_busco |>
                  aes(color = go_term == "GO:0051965"),
                  # color = clr_darken(clrs[[2]],.2),
                  xlim = c(0, .1), ylim = c(0, 1)) +
-  facet_grid(. ~ glue::glue("{str_pad(fst_rank, width = 2, pad = 0)}: {go_term}")) +
+  facet_grid(. ~ glue::glue("F{str_pad(as.numeric(go_term), width = 2, pad = 0)}: {go_term}")) +
   scale_color_manual(values = c(`TRUE` = "black",
                                 `FALSE` = clr_darken(clrs[[2]],.2)),
                      guide = "none") +
   labs(subtitle = "High *F<sub>ST</sub>* GO Terms") +
   theme_ms()
 
-pp_2d_dens <- pbd_0 + (pbd_t + pbd_f + plot_layout(heights = c(.95, 1))) +
-  plot_layout(guides = "collect",
-              widths = c(.3, 1)) +
+pp_2d_dens <- pbd_t + pbd_f +
+  plot_layout(heights = c(.95, 1),guides = "collect") +
   plot_annotation(tag_levels = "a") &
   # scale_color_manual(values = c("gray", rev(clrs))) &
   scale_fill_manual(values = RColorBrewer::brewer.pal(5,"Greys")[2:4]) &
@@ -317,7 +322,68 @@ pp_2d_dens <- pbd_0 + (pbd_t + pbd_f + plot_layout(heights = c(.95, 1))) +
 
 ggsave(plot = pp_2d_dens,
        filename = here("results/img/busco_go_term_2d_dens.pdf"),
-       width = 9, height = 3, device = cairo_pdf)
+       width = 9, height = 4, device = cairo_pdf)
+
+
+go_subset <- c("GO:0051965", "GO:0021794", "GO:0007193", "GO:0003071", "GO:0007585", "GO:0070098")
+
+
+p1 <- go_and_busco |>
+  filter(go_term %in% go_subset) |>
+  mutate(go_term = case_when(
+    go_term == "GO:0051965" ~ "G01/F02: GO:0051965",
+    fst_rank <= top_n ~ str_c("F", str_pad(fst_rank, width = 2, pad = 0), ": ", go_term),
+    gerp_top_rank <= top_n ~ str_c("G", str_pad(gerp_top_rank, width = 2, pad = 0), ": ", go_term)),
+    go_term = factor(go_term, levels = c("G01/F02: GO:0051965", "G03: GO:0007193", "G07: GO:0007585",
+                                         "F01: GO:0070098", "F05: GO:0021794", "F09: GO:0003071")),
+    type = if_else(go_term == "G01/F02: GO:0051965", "both", str_sub(go_term, 1, 1))) |>
+  ggplot(aes(x = gerp_rs_mean, y = fst_mean)) +
+  geom_vline(xintercept = gerp_median,
+             color = "gray", linetype = 3, linewidth = .2) +
+  geom_hline(yintercept = fst_median,
+             color = "gray", linetype = 3, linewidth = .2) +
+  geom_hdr(data = busco_data,
+           aes(fill = after_stat(probs)),
+           probs = c(0.99, 0.9, 0.66),
+           alpha= 1,
+           show.legend = FALSE) +
+  geom_hdr_lines(linewidth = .3,
+                 probs = c(0.99, 0.9, 0.66),
+                 aes(color = type),
+                 xlim = c(0, .1), ylim = c(0, 1)) +
+  facet_wrap(. ~ go_term) +
+  scale_color_manual(values = c(both = "black",
+                                `G` = clr_darken(clrs[[1]],.2),
+                                `F` = clr_darken(clrs[[2]],.2)),
+                     guide = "none" ) +
+  theme_ms()
+
+
+pp_2d_sub <- pbd_0 + p1 +
+  plot_layout(guides = "collect",
+              widths = c(.66, 1)) +
+  plot_annotation(tag_levels = "a") &
+  # scale_color_manual(values = c("gray", rev(clrs))) &
+  scale_fill_manual(values = RColorBrewer::brewer.pal(5,"Greys")[2:4]) &
+  scale_x_continuous(breaks = c(0, .04, .08)) &
+  scale_y_continuous(breaks = c(0, .5, 1)) &
+  labs(x = "Average GERP RS Score per BUSCO",
+       y = "Average *F<sub>ST</sub>* per BUSCO") &
+  guides(alpha = guide_legend(title = "Density Mass",
+                              override.aes = list(color = rgb(.1,.1,.1),
+                                                  linewidth = .75))) &
+  coord_cartesian(xlim = c(0, .1),
+                  ylim = c(0, 1)) &
+  theme(legend.position = "bottom",
+        panel.background = element_rect(fill = "transparent", color = "lightgray", linewidth = .2),
+        axis.title.y = element_markdown(),
+        plot.subtitle = element_markdown(),
+        plot.tag = element_text(family = fnt_sel),
+        legend.margin = margin())
+
+ggsave(plot = pp_2d_sub,
+       filename = here("results/img/busco_go_term_2d_sub.pdf"),
+       width = 4.5, height = 2.5, device = cairo_pdf)
 
 go_details_filled |>
   unnest(definition) |>
@@ -332,3 +398,4 @@ go_details_filled |>
   knitr::kable(format = "latex") |>
   str_remove_all("\\\\hline\n") |>
   write_lines(here("results/tab/top_go_terms.tex"))
+
