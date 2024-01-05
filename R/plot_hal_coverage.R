@@ -22,7 +22,7 @@ data_ota <- scfs |> map_dfr(read_cov_fam, fam = "ota")
 data_pho <- scfs |> map_dfr(read_cov_fam, fam = "pho")
 
 cov_summary <- \(dat, grp){
-  grp_offset <- c(all = 1, Otariidae = 1, Phocidae = 0)
+  grp_offset <- c(`combined (incl. walrus)` = 1, Otariidae = 1, Phocidae = 0)
   dat |>
     group_by(coverage = cov + grp_offset[grp]) |>
     summarise(bp = sum(end - start)) |>
@@ -33,7 +33,7 @@ cov_summary <- \(dat, grp){
            group = grp)
 }
 
-data_all_summary <- data |> cov_summary(grp = "all")
+data_all_summary <- data |> cov_summary(grp = "combined (incl. walrus)")
 data_ota_summary <- data_ota |> cov_summary(grp = "Otariidae")
 data_pho_summary <- data_pho |> cov_summary(grp = "Phocidae")
 
@@ -42,7 +42,7 @@ data_summary <- data_all_summary |>
   bind_rows(data_pho_summary) |>
   filter(coverage > 0)
 
-clr_grp <- c(all = "black", Otariidae = clrs[[1]], Phocidae = clrs[[2]])
+clr_grp <- c(`combined (incl. walrus)` = "black", Otariidae = clrs[[1]], Phocidae = clrs[[2]])
 
 clr_label <- \(grp){glue("<span style='color:{clr_grp[grp]}'>{grp}</span>")}
 
@@ -79,7 +79,7 @@ p <- data_summary |>
                   xlim = c(0, 1.04 * max(data_summary$z_bp)),
                   expand = 0) +
   theme_ms() +
-  theme(strip.text.y.right = element_markdown(size = fnt_sz),
+  theme(strip.text.y.right = element_markdown(size = fnt_sz, family = fnt_sel),
         panel.spacing.y = unit(5, "pt"))
 
 ggsave(filename = here("results/img/hal_coverage.pdf"),

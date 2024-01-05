@@ -2,7 +2,7 @@ mm_to_inch <- 25.4
 fwidth <- 178 / mm_to_inch
 fhalfwidth <- 87 / mm_to_inch
 
-fnt_sel <- "CMU Sans Serif"
+fnt_sel <- "Arial"
 fnt_sz <- 17 / ggplot2::.pt
 
 clrs <- c("#1f4971", "#8cce28")

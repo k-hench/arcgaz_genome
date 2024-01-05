@@ -327,7 +327,6 @@ ggsave(plot = pp_2d_dens,
 
 go_subset <- c("GO:0051965", "GO:0021794", "GO:0007193", "GO:0003071", "GO:0007585", "GO:0070098")
 
-
 p1 <- go_and_busco |>
   filter(go_term %in% go_subset) |>
   mutate(go_term = case_when(
@@ -383,7 +382,7 @@ pp_2d_sub <- pbd_0 + p1 +
 
 ggsave(plot = pp_2d_sub,
        filename = here("results/img/busco_go_term_2d_sub.pdf"),
-       width = 4.5, height = 2.5, device = cairo_pdf)
+       width = 4.75, height = 2.5, device = cairo_pdf)
 
 go_details_filled |>
   unnest(definition) |>

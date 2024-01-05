@@ -44,15 +44,15 @@ ott <- hypoimg::hypo_read_svg(here("results/img/illustrations/arcgaz.c.svg")) |>
 pho <- hypoimg::hypo_read_svg(here("results/img/illustrations/halgry.c.svg")) |>
   hypoimg::hypo_recolor_svg(color = "white")
 odo <- hypoimg::hypo_read_svg(here("results/img/illustrations/odoros.c.svg")) |>
-  hypoimg::hypo_recolor_svg(color = clr_alpha("black"))
+  hypoimg::hypo_recolor_svg(color = "white")
 
 p <- ggtree(tree, color = NA) +
   geom_rect(inherit.aes = FALSE,
-            data = tibble(x1 = c(.00725, .0232),
-                          x2 = c(.03, .0465),
-                          y1 = c(1.5, 5.5) + y_offfset/2,
-                          y2 = c(5.5, 11.5) - y_offfset/2,
-                          group = gens),
+            data = tibble(x1 = c(.00725, .0232, .00725),
+                          x2 = c(.03, .0465, .024),
+                          y1 = c(1.5, 5.5, .5) + y_offfset/2,
+                          y2 = c(5.5, 11.5, 1.5) - y_offfset/2,
+                          group = c(gens, "odo")),
             aes(xmin = x1, xmax = x2,
                 ymin = y1, ymax = y2,
                 fill = group)) +
@@ -75,14 +75,14 @@ p <- ggtree(tree, color = NA) +
                           y = c(3.5, 8.5),
                           label = gens),
             aes(label = label),
-            angle = -90, size = 5, fontface = "bold", color = "white") +
+            angle = -90, size = 5, fontface = "bold", family = fnt_sel, color = "white") +
   geom_tree(size = .4) +
   # geom_tiplab(aes(x = x + .0003,
   #                 label = specs_short[label]),
   #             fontface = "italic") +
   geom_richtext(aes(x = x + .0003,
                     label = specs_short[label]),
-                hjust = 0,
+                hjust = 0, family = fnt_sel,
                 fill = NA, label.color = NA, # remove background and outline
                 label.padding = grid::unit(rep(0, 4), "pt")) +
   geom_treescale(offset = -.4,
@@ -90,14 +90,15 @@ p <- ggtree(tree, color = NA) +
                  x = 0,
                  y = 8.5,
                  linesize = .4,
-                 label = "subs. / site",
+                 label = "subs. / site",family = fnt_sel,
                  offset.label = .45)  +
-  scale_fill_manual(values = clrs |>
+  scale_fill_manual(values = c(clrs, "gray20") |>
                       clr_lighten(.2) |>
-                      clr_alpha(.7),
+                      clr_alpha(.7) |>
+                      set_names(nm = c(gens, "odo")),
                     guide = "none") +
   coord_cartesian(xlim = c(0, .0465),
-                  ylim = c(0.75, 11.5),
+                  ylim = c(0.45, 11.5),
                   expand = 0)
 
 ggsave(here("results/img/neutral_tree.pdf"),
