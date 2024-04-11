@@ -13,12 +13,12 @@ This repository contains the code for the study *Refinement of the Antarctic fur
 > However, for the final submission it was necessary to rename the assembly files and to slightly adjust the scaffold names (removing the problematic characters `;` and `=`, which are prohibited by NCBI).
 > The preliminary and final versions (submitted to NCBI) of the genomes are equivalent, in every aspect except for the update of the scaffold names (to adhere to NCBI regulations).
 >
-> | | preliminary version | final version |
-> |--:|:-----|:---|
-> | file | `arcgaz_anc_h1.fa` | `arcGaz4_h1.fa` |
-> | example seq | `>ScDpJTZ_100;HRSCAF=126` | `>ScDpJTZ_100_HRSCAF_126` |
-> | file | `arcgaz_anc_h2.fa` | `arcGaz4_h2.fa` |
-> | example seq | `>Sc3htSU_100;HRSCAF=118` | `>Sc3htSU_100_HRSCAF_118` |
+> | | preliminary version | final version | NCBI accession |
+> |--:|:-----|:---|---|
+> | file | `arcgaz_anc_h1.fa` | `arcGaz4_h1.fa` | PRJNA1099198 |
+> | example seq | `>ScDpJTZ_100;HRSCAF=126` | `>ScDpJTZ_100_HRSCAF_126` ||
+> | file | `arcgaz_anc_h2.fa` | `arcGaz4_h2.fa` | PRJNA1099197 |
+> | example seq | `>Sc3htSU_100;HRSCAF=118` | `>Sc3htSU_100_HRSCAF_118` ||
 > 
 > Also, the multi-species alignment of submitted to dryad contains the *preliminary version* of the haplotype 1 genome assembly.
 
