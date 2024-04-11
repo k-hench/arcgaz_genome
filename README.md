@@ -35,7 +35,7 @@ The analysis was managed using the workflow manager `snakemake`.
 High level commands to run specific parts of the analysis are given below.
 They correspond to different modules of the analysis distributed across various `.smk` files located under `workflow/rules`.
 
-Below are examples of dry-runs of the selected pipeline part.
+Below are examples of dry-runs of the respective pipeline part.
 For an actual re-run, the `-n` flag needs to be replaced depending on your computation setup (s. [snakemake documentation]
 (https://snakemake.readthedocs.io/en/stable/executing/cli.html#useful-command-line-arguments)).
 
@@ -140,8 +140,8 @@ data/
 
 The included external genomes are:
 
-- *Arctocephalus gazella* ([Antarctic fur seal v1](https://www.ncbi.nlm.nih.gov/assembly/GCA_900642305.1), **GenBank** GCA_900642305.1)
--  *Zalophus californianus* ([California sea lion v1](https://www.ncbi.nlm.nih.gov/assembly/GCF_009762305.2/), **RefSeq** GCF_009762305.2)
+- *Arctocephalus gazella* ([Antarctic fur seal (arcGaz3)](https://www.ncbi.nlm.nih.gov/assembly/GCA_900642305.1), **GenBank** GCA_900642305.1)
+-  *Zalophus californianus* ([California sea lion](https://www.ncbi.nlm.nih.gov/assembly/GCF_009762305.2/), **RefSeq** GCF_009762305.2)
 
 ### Code
 
