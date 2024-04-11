@@ -33,8 +33,12 @@ This includes the `cactus` alignment, the calling of evolutionary conservation s
 
 The analysis was managed using the workflow manager `snakemake`.
 High level commands to run specific parts of the analysis are given below.
+They correspond to different modules of the analysis distributed across various `.smk` files located under `workflow/rules`.
 
-> The following examples are triggering a dry-run of the selected pipline part. For an actual re-run the `-n` flag needs to be replaced, depending on the setup (s. [snakemake documentation](https://snakemake.readthedocs.io/en/stable/executing/cli.html#useful-command-line-arguments)).
+
+Below are examples of dry-runs of the selected pipeline part.
+For an actual re-run the `-n` flag needs to be replaced, depending on the setup (s. [snakemake documentation]
+(https://snakemake.readthedocs.io/en/stable/executing/cli.html#useful-command-line-arguments)).
 
 <br>
 <p align="center">
