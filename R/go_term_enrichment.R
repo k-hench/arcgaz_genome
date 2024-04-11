@@ -7,6 +7,7 @@
 # - "results/pinniped/go_terms/go_term_busco_stats.tsv"
 # - "results/img/go_sub_graph.pdf"
 # - "results/img/busco_go_term_2d_dens.pdf"
+# - "results/img/busco_go_term_2d_sub.pdf"
 library(tidyverse)
 library(prismatic)
 library(patchwork)
@@ -383,18 +384,3 @@ pp_2d_sub <- pbd_0 + p1 +
 ggsave(plot = pp_2d_sub,
        filename = here("results/img/busco_go_term_2d_sub.pdf"),
        width = 4.75, height = 2.5, device = cairo_pdf)
-
-go_details_filled |>
-  unnest(definition) |>
-  select(go_term,
-         gerp_rank = gerp_top_rank,
-         gerp_p = gerp_top_p_val,
-         fst_rank,
-         fst_p = fst_p_val,
-         term = name,
-         description = text) |>
-  mutate(across(ends_with("p"), \(x){sprintf("%.4f",x)})) |>
-  knitr::kable(format = "latex") |>
-  str_remove_all("\\\\hline\n") |>
-  write_lines(here("results/tab/top_go_terms.tex"))
-

@@ -5,7 +5,7 @@
 # - "results/pinniped/win_gerp_fst.tsv"
 # - "results/pinniped/win_outlier_summary.tsv"
 # output:
-# -
+# - "results/img/win_gerp_fst.pdf"
 library(tidyverse)
 library(glue)
 library(prismatic)

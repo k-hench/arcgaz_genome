@@ -5,7 +5,8 @@
 # - "results/pinniped/win_gerp_fst.tsv"
 # - "results/pinniped/win_outlier_summary.tsv"
 # output:
-# -
+# - "results/img/zoom_win_outlier_gerp.pdf",
+# - "results/img/zoom_win_outlier_fst.pdf"
 library(tidyverse)
 library(glue)
 library(prismatic)
@@ -82,18 +83,10 @@ plot_zoom <- \(chr, start, end,
     pivot_longer(start:end, values_to = "pos") |>
     mutate(window = "coverage")
 
-  gerp_range <- c(.04, .075) # range(data_gerp_10k$gerp_rs_mean)
-  fst_range <- c(.3, .7)#0:1
+  gerp_range <- c(.04, .075)
+  fst_range <- c(.3, .7)
 
-  # gerp_labs <- c(min(min(gerp_range), min(data_gerp$gerp_rs_mean)),
-  #                max(max(gerp_range), max(data_gerp$gerp_rs_mean))) |>
-  #   round(digits = 2)
-  #
-  # fst_labs <- c(min(min(fst_range), min(data_fst$fst_mean)),
-  #                max(max(fst_range), max(data_fst$fst_mean))) |>
-  #   round(digits = 1)
-
-  win_types <- c("genes",# "BUSCO",
+  win_types <- c("genes",
                  "GERP", "*F<sub>ST</sub>*", "coverage")
   p1 <- ggplot() +
     geom_blank(data = tibble(window = rep(win_types[1], each = 2),
@@ -185,10 +178,6 @@ plot_zoom <- \(chr, start, end,
 p_list <- data_outlier |>
   pmap(plot_zoom)
 
-# p_list[c(4,8,9,10,11,15,16,17,19,20,
-#          21,22,23,24,25,26,27,28,29,
-#          30,31,32,33,34,35)] |>
-
 tag_fun <- \(n_letters){
   letters[1:n_letters] |> map(\(l){ c(l,"")}) |> unlist()
 }
@@ -199,12 +188,6 @@ pp1 <- p_list |>
   plot_annotation(tag_levels = list(tag_fun(length(p_list)))) &
   scale_color_brewer(palette = "Set1", guide = "none") &
   theme(strip.text.y.left = element_markdown())
-
-# p_list[c(4,6,10,13)] |>
-#   map(\(x){x$p}) |>
-#   wrap_plots(nrow = 2, guides = "collect") &
-#   theme(strip.text.y.left = element_markdown(),
-#         legend.position = "none")
 
 ggsave(plot = pp1,
        filename = here("results/img/zoom_win_outlier.pdf"),
@@ -234,74 +217,3 @@ ggsave(plot = pp1b,
        filename = here("results/img/zoom_win_outlier_fst.pdf"),
        width = 6, height = 6,
        device = cairo_pdf)
-
-# p_list[[16]]$p
-set.seed(42)
-random_buscos <- data_busco |>
-  select(chr, start = bstart, end = bend, outlier_label = busco_id) |>
-  slice_sample(n = 12) |>
-  pmap(plot_zoom)
-
-pp2 <- random_buscos |>
-  map(\(x){x$p}) |>
-  wrap_plots(nrow = 4, guides = "collect") +
-  plot_annotation(tag_levels = list(tag_fun(length(random_buscos)))) &
-  scale_color_brewer(palette = "Set1", guide = "none") &
-  theme(strip.text.y.left = element_markdown(),
-        plot.tag = element_text(family = fnt_sel))
-
-ggsave(plot = pp2,
-       filename = here("results/img/zoom_busco_random.pdf"),
-       width = 7, height = 7,
-       device = cairo_pdf)
-
-top_gerp_buscos <- data_busco |>
-  arrange(-gerp_rs_mean) |>
-  select(chr, start = bstart, end = bend, outlier_label = busco_id, gerp_rs_mean) |>
-  slice_head(n = 12) |>
-  pmap(plot_zoom)
-
-pp3 <- top_gerp_buscos |>
-  map(\(x){x$p}) |>
-  wrap_plots(nrow = 4, guides = "collect") +
-  plot_annotation(tag_levels = list(tag_fun(length(top_gerp_buscos)))) &
-  scale_color_brewer(palette = "Set1", guide = "none") &
-  theme(strip.text.y.left = element_markdown(),
-        plot.tag = element_text(family = fnt_sel))
-
-ggsave(plot = pp3,
-       filename = here("results/img/zoom_busco_top_gerp.pdf"),
-       width = 9, height = 8, device = cairo_pdf)
-
-top_fst_buscos <- data_busco |>
-  arrange(-fst_mean) |>
-  select(chr, start = bstart, end = bend, outlier_label = busco_id, fst_mean) |>
-  slice_head(n = 12) |>
-  pmap(plot_zoom)
-
-pp4 <- top_fst_buscos |>
-  map(\(x){x$p}) |>
-  wrap_plots(nrow = 4, guides = "collect") +
-  plot_annotation(tag_levels = list(tag_fun(length(top_fst_buscos)))) &
-  scale_color_brewer(palette = "Set1", guide = "none") &
-  theme(strip.text.y.left = element_markdown(),
-        plot.tag = element_text(family = fnt_sel))
-
-ggsave(plot = pp4,
-       filename = here("results/img/zoom_busco_top_fst.pdf"),
-       width = 9, height = 8, device = cairo_pdf)
-
-# =================================
-data_busco |>
-  mutate(length = bend - bstart) |>
-  select(length, fst_mean, gerp_rs_mean) |>
-  pivot_longer(-length) |>
-  filter(!is.na(value)) |>
-  group_by(name) |>
-  # mutate(value = rethinking::standardize(value)) |>
-  ungroup() |>
-  ggplot(aes(x = log10(length),#*1e-3,
-             y = value)) +
-  ggdensity::geom_hdr() +
-  facet_wrap(name ~ ., scales = "free") +
-  theme_ms(fontsize = 13)

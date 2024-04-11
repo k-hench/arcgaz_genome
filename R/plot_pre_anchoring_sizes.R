@@ -45,7 +45,7 @@ n_largest <- 37
             linewidth = plt_lwd) +
   geom_richtext(data = genome_summary,
                 aes(y = y_base + .5 * g_height,
-                    label = glue("{str_replace(str_remove(genome, '_hardmasked'),'arcgaz_dt_h', 'HiRise h')}<br>n: {n}"),
+                    label = glue("{str_replace(str_replace(str_remove(genome, '_hardmasked'),'arcgaz_dt_h', 'HiRise h'),'gaz_v3','Gaz3')}<br>n: {n}"),
                     x = -.1e9),
                 hjust = 1, size = fnt_sz/2,
                 fill = NA, label.color = NA, family = fnt_sel,
@@ -68,7 +68,6 @@ n_largest <- 37
         axis.ticks.length = unit(-2, "pt"),
         plot.title = element_text(hjust = .5),
         plot.subtitle = element_text(hjust = .5)) )
-
 
 ggsave(plot = p_sizes,
        filename = here("results/img/fig_s_hirise_sizes.pdf"),

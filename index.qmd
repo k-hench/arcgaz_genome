@@ -1,3 +1,0 @@
-<img src="img/arcgaz_gen_hex.svg" align="right" alt="" width="160" />
-
-# Index {.unnumbered}

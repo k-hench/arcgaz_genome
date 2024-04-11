@@ -1,19 +1,3 @@
-'''
-snakemake \
-  -p -j 5 \
-  --configfile workflow/config.yml \
-  -R complete
-
-snakemake \
-  -p -j 5 \
-  --configfile workflow/config.yml \
-  -R numbering
-
-snakemake \
-  -p -j 5 \
-  --configfile workflow/config.yml \
-  -R lettering
-'''
 import os
 from copy import deepcopy
 import numpy as np
@@ -21,19 +5,16 @@ import pandas as pd
 import re
 import datetime
 
-# configfile: "workflow/config.yml"
-
 rule all:
     params:
       wd = os.getcwd()
     message:
      '''
-     This pipeline is meant to be run in increments.
-     Users can run the sub-workflow `numbering` (`numbers.smk`),
-     the sub-workflow `lettering` (`letters.smk`),
-     or the complete pipeline (`rule: complete`).
+     This pipeline is meant to be run in increments, using differnt config files and target rules at different steps.
+     Please refer to the readme file (`README.md`) for more details.
      '''
 
+# Part 1: genome assembly block
 MASK_SUFFIX = config[ 'mask_suffix' ]
 U_REF = config[ 'ref' ]
 U_QUERY = config[ 'queries' ]
@@ -46,18 +27,13 @@ G_ALL.insert( 0, G_REF )
 
 HAPLOTYPES = config['haplotypes']
 
-# rule complete:
-#     input:
-#       expand("results/l_{let_in}.txt", let_in = ALL_LETTERS),
-#       expand("results/n_{num_in}.txt", num_in = ALL_NUMBERS)
-
 include: "./rules/repeat_mask.smk"
 include: "./rules/align.smk"
 include: "./rules/anchor.smk"
 include: "./rules/genome_stats.smk"
 include: "./rules/busco_and_blast.smk"
 
-c_cactus = config[ 'cactus_sif' ]
+# Part 2: post assembly block
 
 P_NAME = config[ 'alignment_name' ]
 SPEC_REF = config[ 'refName' ]
@@ -67,17 +43,26 @@ SPEC_ALL.insert( 0, SPEC_REF )
 CACTUS_CORES=config[ 'cactus_cores' ]
 GENOME_PARTITIONS = [ str(x + 1).zfill(2) for x in np.arange(20)]
 
+REF_SPEC = "arcgaz"
+TIP_SPECS = "calurs,eumjub,halgry,lepwed,mirang,mirleo,neosch,odoros,phovit,zalcal"
+MSCAFS = [ "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "x"]
+s_bind_paths="$CDATA"
+
+c_cactus = config[ 'cactus_sif' ]
 c_conda = "$CDATA/apptainer_local/conda_byoe.sif"
 c_vcfh = "$CDATA/apptainer_local/vcftools_haploid_v0.1.sif"
 
 include: "./rules/initial_dl.smk"
 include: "./rules/cactus_prep.smk"
-include: "./rules/hal_conversions.smk"
-include: "./rules/neutral_branch_lengths.smk"
-include: "./rules/snp_to_vcf.smk"
-include: "./rules/fst_and_gerp.smk"
-include: "./rules/coverage_check.smk"
 
-# conditional kick-off of the actual cactus alignment
+# conditional kick-off of the actual cactus alignment (and following analysis)
 if os.path.exists("results/cactus/job_inventory.tsv"):
   include: "./rules/cactus_stepwise.smk"
+
+if os.path.exists("results/cactus/pinniped_set.hal"):
+  include: "./rules/hal_conversions.smk"
+  include: "./rules/neutral_branch_lengths.smk"
+  include: "./rules/snp_to_vcf.smk"
+  include: "./rules/fst_and_gerp.smk"
+  include: "./rules/coverage_check.smk"
+  include: "./rules/go_and_plots.smk"

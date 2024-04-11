@@ -172,7 +172,8 @@ p2 <- psl |>
                fill = clr_alpha(clrs[2]),
                linewidth = plt_lwd)+
   geom_vline(xintercept = log10(min(psl_filtered$tSize)),
-             color = clrs[2], linetype = 3, linewidth = plt_lwd) +
+             color = clr_darken(clrs[2],.3),
+             linetype = 3, linewidth = plt_lwd * 1.2) +
   scale_x_continuous(glue("Alignment Size log<sub>10</sub>(bp)<br>{round(range(psl$tSize) / c(1, 1e6), digits = 2) %>% str_c(' ',.,c('bp ', 'Mb '), collapse = '–')}, n: {nrow(psl)}")) +
   coord_cartesian(expand = 0, clip = "off") +
   theme_minimal(base_family = fnt_sel) +
@@ -188,7 +189,8 @@ p3 <- psl_filtered |>
                fill = clr_alpha(clrs[2]),
                linewidth = plt_lwd) +
   geom_vline(xintercept = min(psl_filtered$tSize) * 1e-6,
-             color = clrs[2], linetype = 3, linewidth = plt_lwd) +
+             color = clr_darken(clrs[2],.3),
+             linetype = 3, linewidth = plt_lwd * 1.2) +
   scale_x_continuous(glue("Alignment Size (Mb)<br>{sprintf('%.2f',range(psl_filtered$tSize)/1e6) %>% str_c(' ',.,'Mb ', collapse = '–')}, n: {nrow(psl_filtered)}")) +
   coord_cartesian(expand = 0) +
   theme_minimal(base_family = fnt_sel) +
