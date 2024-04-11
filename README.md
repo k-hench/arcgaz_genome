@@ -41,7 +41,7 @@ High level commands to run specific parts of the analysis are given below.
 <img src="img/dna.svg" alt="" width="80">
 </p>
 
-## Assembly Related Code
+## Block 1: Assembly Related Code
 
 ### Alignment Guided Anchoring
 
@@ -71,7 +71,7 @@ snakemake -n --rerun-triggers mtime --configfile workflow/config_all_genomes.yml
 snakemake -n --configfile workflow/config.yml --rerun-triggers mtime -R all_blast
 ```
 
-## Post-assembly Analysis
+## Block 2: Post-assembly Analysis
 
 ### Multi species Alignment 
 
