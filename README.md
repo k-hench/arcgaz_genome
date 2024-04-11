@@ -36,7 +36,7 @@ High level commands to run specific parts of the analysis are given below.
 
 > The following examples are triggering a dry-run of the selected pipline part. For an actual re-run the `-n` flag needs to be replaced, depending on the setup (s. [snakemake documentation](https://snakemake.readthedocs.io/en/stable/executing/cli.html#useful-command-line-arguments)).
 
-<img src="img/dna.svg" alt="" width="80" style="display: block;margin-left:auto; margin-right:auto; margin-top:15pt;"/>
+<img src="img/dna.svg" align="center" alt="" width="80" style="display: block;margin-left:auto; margin-right:auto; margin-top:15pt;"/>
 
 ## Assembly Related Code
 
@@ -166,4 +166,4 @@ The used containers are:
 | `c_conda` | `conda_byoe.sif` | not online | contains `conda` environments specified in `workflow/envs` |
 
 ---
-<img src="img/dna.svg" alt="" width="100" style="display: block;margin-left:auto; margin-right:auto; margin-top:15pt;"/>
+<img src="img/dna.svg" align="center" alt="" width="100" style="display: block;margin-left:auto; margin-right:auto; margin-top:15pt;"/>
