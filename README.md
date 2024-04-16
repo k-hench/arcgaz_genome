@@ -1,5 +1,7 @@
 # Antarctic Fur Seal Dovetail Genome <img src="img/arcgaz_gen_hex.svg" align="right" alt="" width="120" />
 
+[![DOI](https://zenodo.org/badge/566430221.svg)](https://zenodo.org/doi/10.5281/zenodo.10979149)
+
 **Authors:** Kosmas Hench and David Vendrami
 
 This repository contains the code for the study *Refinement of the Antarctic fur seal (Arctocephalus gazella) reference genome increases continuity and completeness* by Hench et al.
