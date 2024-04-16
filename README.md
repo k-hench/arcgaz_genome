@@ -138,10 +138,13 @@ data/
     └── zalcal_v1.fa.gz    # the california sea lion reference genome
 ```
 
-The included external genomes are:
+The accession numbers for external genomes are:
 
-- *Arctocephalus gazella* ([Antarctic fur seal (arcGaz3)](https://www.ncbi.nlm.nih.gov/assembly/GCA_900642305.1), **GenBank** GCA_900642305.1)
--  *Zalophus californianus* ([California sea lion](https://www.ncbi.nlm.nih.gov/assembly/GCF_009762305.2/), **RefSeq** GCF_009762305.2)
+- *Arctocephalus gazella* (Antarctic fur seal):
+   - `arcgaz_v1.fa.gz` = [arcGaz3](https://www.ncbi.nlm.nih.gov/assembly/GCA_900642305.1), **GenBank** GCA_900642305.1
+   - `arcgaz_dt_h1.fa.gz` & `arcgaz_dt_h2.fa.gz` initial *de novo* assemblies by Dovetail Genomics, provided in accompanying dryad repository 
+-  *Zalophus californianus* (California sea lion)
+   - `zalcal_v1.fa.gz ` = [mZalCal1.pri.v2](https://www.ncbi.nlm.nih.gov/assembly/GCF_009762305.2/), **RefSeq** GCF_009762305.2
 
 ### Code
 
