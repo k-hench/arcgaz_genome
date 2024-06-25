@@ -88,21 +88,28 @@ psl <- get_psl(glue("slim_{genomes[[2]]}_on_{genomes[[1]]}.psl.gz"))
 
 align_min_length <- 0.2e6
 
+flip_scaf <- c("NC_045602.1", "NC_045609.1", "NC_045607.1",
+               "NC_045608.1", "NC_045596.1", "NC_045601.1",
+               "NC_045604.1", "NC_045610.1", "NC_045599.1")
+
 psl_filtered <- psl |>
   filter(tName %in% sizes$chr,
          qName %in% sizes$chr) |>
   arrange(-tSize) |>
   filter(tSize > align_min_length) |>
-  left_join(sizes |> select(tName = chr, tg_start = start, t_eo = eo)) |>
-  left_join(sizes |> select(qName = chr, qg_start = start, q_eo = eo)) |>
+  left_join(sizes |> select(tName = chr, tg_start = start, tg_end = end, t_eo = eo)) |>
+  left_join(sizes |> select(qName = chr, qg_start = start, qg_end = end, q_eo = eo)) |>
   mutate(ymin_start = tStart + tg_start,
          ymax_start = tEnd + tg_start,
-         ymin_end = qStart + qg_start,
-         ymax_end = qEnd + qg_start,
+         qStart_flip = if_else(qName %in% flip_scaf, qg_end - qg_start - qEnd, qStart),
+         qEnd_flip =  if_else(qName %in% flip_scaf, qg_end - qg_start - qStart, qEnd),
+         ymin_end = qStart_flip + qg_start,
+         ymax_end = qEnd_flip + qg_start,
          group = row_number())
 
 psl_diag <- psl_filtered |>
   select(ymin_start:group, dir = t_eo) |>
+  select(-c(qStart_flip, qEnd_flip)) |>
   pmap_dfr(diag_to_wide)
 
 genome_width <- .05
@@ -129,8 +136,9 @@ p1 <- psl_diag |>
   geom_rect(data = sizes,
             aes(xmin = start, xmax = end,
                 ymin = y_base + (label_sign * skip),
-                ymax = y_base + (label_sign * (skip + genome_width))),
-            color = clr_genome, fill = clr_lighten(clr_genome,.75),
+                ymax = y_base + (label_sign * (skip + genome_width)),
+                fill = chr %in% flip_scaf,
+                color = after_scale(clr_darken(fill,.75))),
             linewidth = .5 * plt_lwd) +
   geom_text(data = sizes,
             aes(x = mid,
@@ -163,6 +171,9 @@ p1 <- psl_diag |>
                   xlim = c(-2e8, max(sizes$end_with_skip)),
                   clip = "off") +
   scale_color_manual(values = clrs |> clr_alpha(.3)) +
+  scale_fill_manual(values = c(`FALSE` = clr_lighten(clr_genome,.75),
+                               `TRUE` = clr_lighten(clr_genome,.25)),
+                    guide = "none") +
   theme_void(base_family = fnt_sel) +
   theme(legend.position = "none")
 

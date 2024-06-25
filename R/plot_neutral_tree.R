@@ -46,7 +46,21 @@ pho <- hypoimg::hypo_read_svg(here("results/img/illustrations/halgry.c.svg")) |>
 odo <- hypoimg::hypo_read_svg(here("results/img/illustrations/odoros.c.svg")) |>
   hypoimg::hypo_recolor_svg(color = "white")
 
+xs <- c(.047, .049, .052)
 p <- ggtree(tree, color = NA) +
+  ggforce::geom_bezier(inherit.aes = FALSE,
+              aes(x = x, y = y),
+              data = tibble(x = c(.031, .0375, .042, .043),
+                            y = c(3, 3, 3.5, 5)),
+              arrow = arrow(ends = "both",
+                            length = unit(4, "pt"),
+                            type = "closed"),
+              color = "gray70") +
+  geom_path(inherit.aes = FALSE,
+            aes(x = x, y = y),
+            data = tibble(x = c(.0475, .0485, .0485,.0475),
+                          y = c(11.45, 11.45, 0.45,0.45)),
+            color = "gray70") +
   geom_rect(inherit.aes = FALSE,
             data = tibble(x1 = c(.00725, .0232, .00725),
                           x2 = c(.03, .0465, .024),
@@ -75,7 +89,9 @@ p <- ggtree(tree, color = NA) +
                           y = c(3.5, 8.5),
                           label = gens),
             aes(label = label),
-            angle = -90, size = 5, fontface = "bold", family = fnt_sel, color = "white") +
+            angle = -90, size = 5,
+            fontface = "bold",
+            family = fnt_sel, color = "white") +
   geom_tree(size = .4) +
   # geom_tiplab(aes(x = x + .0003,
   #                 label = specs_short[label]),
@@ -85,6 +101,18 @@ p <- ggtree(tree, color = NA) +
                 hjust = 0, family = fnt_sel,
                 fill = NA, label.color = NA, # remove background and outline
                 label.padding = grid::unit(rep(0, 4), "pt")) +
+  geom_richtext(data = tibble(x = c(.0375, .0485),
+                              y = c(3.15, 6),
+                              hjust = .5,
+                              lab = c("*F<sub>ST</sub>*",
+                                      "GERP"),
+                              ang = c(0, -90)),
+                aes(x = x, y = y,
+                      label = lab,
+                    angle = ang),
+                  family = fnt_sel,
+                  fill = "white", label.color = NA, # remove background and outline
+                  label.padding = grid::unit(rep(0, 4), "pt")) +
   geom_treescale(offset = -.4,
                  width = 0.005,
                  x = 0,
@@ -97,8 +125,8 @@ p <- ggtree(tree, color = NA) +
                       clr_alpha(.7) |>
                       set_names(nm = c(gens, "odo")),
                     guide = "none") +
-  coord_cartesian(xlim = c(0, .0465),
-                  ylim = c(0.45, 11.5),
+  coord_cartesian(xlim = c(0, .049),
+                  ylim = c(0.4, 11.55),
                   expand = 0)
 
 ggsave(here("results/img/neutral_tree.pdf"),
